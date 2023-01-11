@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lao_tipitaka/page/books.dart';
 import 'package:lao_tipitaka/page/categories.dart';
+import 'package:lao_tipitaka/page/home.dart';
 import 'package:path_provider/path_provider.dart' as path;
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
@@ -11,6 +11,8 @@ void main() async {
   final dir = await path.getApplicationDocumentsDirectory();
   Hive.init(dir.path);
   Hive.initFlutter('hive_db');
+
+  await Hive.openBox("home");
 
   runApp(const MyApp());
 }
@@ -27,34 +29,6 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: const HomePage(title: 'Lao-Tipitaka'),
-    );
-  }
-}
-
-class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        backgroundColor: const Color.fromARGB(255, 175, 93, 78),
-      ),
-      drawer: const NavigationDrawer(),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          // children: <Widget>[],
-        ),
-      ),
     );
   }
 }
