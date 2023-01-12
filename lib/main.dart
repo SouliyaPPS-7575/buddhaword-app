@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:lao_tipitaka/model/sutra.dart';
 import 'package:lao_tipitaka/page/books.dart';
 import 'package:lao_tipitaka/page/categories.dart';
 import 'package:lao_tipitaka/page/home.dart';
+import 'package:lao_tipitaka/page/sutraL_list.dart';
 import 'package:path_provider/path_provider.dart' as path;
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -12,7 +14,10 @@ void main() async {
   Hive.init(dir.path);
   Hive.initFlutter('hive_db');
 
+  Hive.registerAdapter<Sutra>(SutraAdapter());
+
   await Hive.openBox("home");
+  await Hive.openBox<Sutra>("sutra");
 
   runApp(const MyApp());
 }
@@ -24,11 +29,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Lao-Tipitaka',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const HomePage(title: 'Lao-Tipitaka'),
+      home: const SutraList(title: 'Lao-Tipitaka'),
     );
   }
 }
@@ -79,6 +85,17 @@ class NavigationDrawer extends StatelessWidget {
             ),
             const Divider(
               color: Colors.black54,
+            ),
+            ListTile(
+              leading: const Icon(Icons.add),
+              title: const Text('Add Sutra'),
+              onTap: () => Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => const SutraList(
+                    title: 'Sutra List',
+                  ),
+                ),
+              ),
             ),
             ListTile(
               leading: const Icon(Icons.category),
