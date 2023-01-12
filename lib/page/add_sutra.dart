@@ -1,5 +1,5 @@
 // ignore_for_file: avoid_print
-
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:hive/hive.dart';
@@ -68,81 +68,127 @@ class _AddSutraListState extends State<AddSutraList>
         drawer: const NavigationDrawer(),
         body: Column(
           children: [
-            FormBuilder(
-              key: _formkey,
-              onChanged: () => print("Form has been changed"),
-              // ignore: prefer_const_literals_to_create_immutables
-              initialValue: {
-                'number': '',
-              },
-              skipDisabled: true,
-              child: Column(
-                children: [
-                  FormBuilderTextField(
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'id',
-                      helperText: 'Input your id',
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: FormBuilder(
+                key: _formkey,
+                onChanged: () => print("Form has been changed"),
+                // ignore: prefer_const_literals_to_create_immutables
+                initialValue: {
+                  'number': "${Random().nextInt(100)}",
+                },
+                skipDisabled: true,
+                child: Column(
+                  children: <Widget>[
+                    Visibility(
+                      visible: false,
+                      child: FormBuilderTextField(
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: 'id',
+                          helperText: 'Input your id',
+                        ),
+                        onSaved: (value) {
+                          id = int.parse(value.toString());
+                        },
+                        name: 'number',
+                        enabled: false,
+                      ),
                     ),
-                    onSaved: (value) {
-                      id = int.parse(value.toString());
-                    },
-                    name: 'number',
-                    enabled: false,
-                  ),
-                  FormBuilderTextField(
-                    keyboardType: TextInputType.name,
-                    decoration: const InputDecoration(
-                      labelText: 'Title',
-                      helperText: 'Input your title',
+                    FormBuilderTextField(
+                      keyboardType: TextInputType.name,
+                      decoration: const InputDecoration(
+                        labelText: 'Title',
+                        helperText: 'Input your title',
+                      ),
+                      onSaved: (value) {
+                        title = value.toString();
+                      },
+                      name: 'textfield',
+                      enabled: true,
+                      autovalidateMode: AutovalidateMode.always,
+                      validator: (val) {
+                        if (val == null || val == "") {
+                          return 'Please enter a title';
+                        }
+                        return null;
+                      },
                     ),
-                    onSaved: (value) {
-                      title = value.toString();
-                    },
-                    name: 'textfield',
-                    enabled: true,
-                  ),
-                  FormBuilderTextField(
-                    keyboardType: TextInputType.multiline,
-                    decoration: const InputDecoration(
-                      labelText: 'Contents',
-                      helperText: 'Input your contents',
+                    FormBuilderTextField(
+                      keyboardType: TextInputType.multiline,
+                      decoration: const InputDecoration(
+                        labelText: 'Contents',
+                        helperText: 'Input your contents',
+                      ),
+                      onSaved: (value) {
+                        content = value.toString();
+                      },
+                      name: 'textfield',
+                      enabled: true,
+                      autovalidateMode: AutovalidateMode.always,
+                      validator: (val) {
+                        if (val == null || val == "") {
+                          return 'Please enter a contents';
+                        }
+                        return null;
+                      },
                     ),
-                    onSaved: (value) {
-                      content = value.toString();
-                    },
-                    name: 'textfield',
-                    enabled: true,
-                  ),
-                  FormBuilderTextField(
-                    keyboardType: TextInputType.name,
-                    decoration: const InputDecoration(
-                      labelText: 'Category',
-                      helperText: 'Input your category',
+                    FormBuilderTextField(
+                      keyboardType: TextInputType.name,
+                      decoration: const InputDecoration(
+                        labelText: 'Category',
+                        helperText: 'Input your category',
+                      ),
+                      onSaved: (value) {
+                        category = value.toString();
+                      },
+                      name: 'textfield',
+                      enabled: true,
+                      autovalidateMode: AutovalidateMode.always,
+                      validator: (val) {
+                        if (val == null || val == "") {
+                          return 'Please enter a category';
+                        }
+                        return null;
+                      },
                     ),
-                    onSaved: (value) {
-                      category = value.toString();
-                    },
-                    name: 'textfield',
-                    enabled: true,
-                  ),
-                ],
+                  ],
+                ),
               ),
             )
           ],
         ),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
-            saveSutra();
-            showDialog(
-              context: context,
-              builder: (_) => const AlertDialog(
-                content: Text("Success"),
-              ),
-            );
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return const SutraList(title: "Sutra List");
-            }));
+            final valid = (_formkey.currentState?.validate() ?? false);
+            if (!valid) {
+              showDialog(
+                  context: context,
+                  builder: (context) => const SimpleDialog(
+                        contentPadding: EdgeInsets.all(20),
+                        title: Text('Please check the form'),
+                        children: [
+                          Text(
+                              'Some details are missing or incorrect. Please check the details and try again.')
+                        ],
+                      ));
+            } else {
+              saveSutra();
+              showDialog(
+                context: context,
+                builder: (_) => const AlertDialog(
+                  content: Text("Success"),
+                ),
+              );
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return const SutraList(title: "Sutra List");
+                  },
+                ),
+              );
+            }
           },
           label: const Text('Save'),
           icon: const Icon(Icons.save),
