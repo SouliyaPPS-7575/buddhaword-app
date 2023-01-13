@@ -42,11 +42,9 @@ class _DetailSutraState extends State<DetailSutra> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                // SideBox
                 const SizedBox(
-                  height: 5,
+                  height: 10,
                 ),
-                // Divider light
                 const Divider(
                   color: Colors.black,
                   thickness: 1,
@@ -56,14 +54,26 @@ class _DetailSutraState extends State<DetailSutra> {
                   height: 10,
                 ),
                 Text(
+                  textAlign: TextAlign.start,
                   widget.content,
                   style: const TextStyle(
                     fontSize: 25,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-
+                const SizedBox(
+                  height: 10,
+                ),
+                const Divider(
+                  color: Colors.black,
+                  thickness: 1,
+                  height: 1,
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
                 Text(
+                  textAlign: TextAlign.right,
                   widget.category,
                   style: const TextStyle(
                     fontSize: 20,
@@ -75,47 +85,6 @@ class _DetailSutraState extends State<DetailSutra> {
           ),
         ),
       ),
-
-      // body: SingleChildScrollView(
-      //   child: InteractiveViewer(
-      //     maxScale: 4.0,
-      //     minScale: 0.5,
-      //     child: Container(
-      //       color: Colors.orangeAccent[100],
-      //       child: Column(
-      //         children: <Widget>[
-      //           Expanded(
-      //             child: ListView(
-      //               children: <Widget>[
-      //                 Text(
-      //                   widget.title,
-      //                   style: const TextStyle(
-      //                     fontSize: 30,
-      //                     fontWeight: FontWeight.bold,
-      //                   ),
-      //                 ),
-      //                 Text(
-      //                   widget.content,
-      //                   style: const TextStyle(
-      //                     fontSize: 25,
-      //                     fontWeight: FontWeight.bold,
-      //                   ),
-      //                 ),
-      //                 Text(
-      //                   widget.category,
-      //                   style: const TextStyle(
-      //                     fontSize: 20,
-      //                     fontWeight: FontWeight.bold,
-      //                   ),
-      //                 ),
-      //               ],
-      //             ),
-      //           ),
-      //         ],
-      //       ),
-      //     ),
-      //   ),
-      // ),
     );
   }
 }

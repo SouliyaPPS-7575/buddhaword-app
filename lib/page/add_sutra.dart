@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, unnecessary_string_interpolations
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -6,6 +6,7 @@ import 'package:hive/hive.dart';
 import 'package:lao_tipitaka/main.dart';
 import 'package:lao_tipitaka/model/sutra.dart';
 import 'package:lao_tipitaka/page/sutraL_list.dart';
+import 'package:html_editor_enhanced/html_editor.dart';
 
 class AddSutraList extends StatefulWidget {
   const AddSutraList({Key? key, required this.title}) : super(key: key);
@@ -49,6 +50,8 @@ class _AddSutraListState extends State<AddSutraList>
     }
   }
 
+  final HtmlEditorController controller = HtmlEditorController();
+
   @override
   Widget build(BuildContext context) {
     return ScaleTransition(
@@ -67,132 +70,188 @@ class _AddSutraListState extends State<AddSutraList>
           backgroundColor: const Color.fromARGB(255, 175, 93, 78),
         ),
         drawer: const NavigationDrawer(),
-        body: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: FormBuilder(
-                key: _formkey,
-                onChanged: () => print("Form has been changed"),
-                // ignore: prefer_const_literals_to_create_immutables
-                initialValue: {
-                  'number': "${Random().nextInt(100)}",
-                },
-                skipDisabled: true,
-                child: Column(
-                  children: <Widget>[
-                    Visibility(
-                      visible: false,
-                      child: FormBuilderTextField(
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'ລະຫັດ',
-                          helperText: 'ໃສ່ລະຫັດ',
+        body: SingleChildScrollView(
+          child: InteractiveViewer(
+            maxScale: 4.0,
+            minScale: 0.5,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: FormBuilder(
+                    key: _formkey,
+                    onChanged: () => print("Form has been changed"),
+                    // ignore: prefer_const_literals_to_create_immutables
+                    initialValue: {
+                      'number': "${Random().nextInt(100)}",
+                    },
+                    skipDisabled: true,
+                    child: Column(
+                      children: <Widget>[
+                        Visibility(
+                          visible: false,
+                          child: FormBuilderTextField(
+                            keyboardType: TextInputType.number,
+                            decoration: const InputDecoration(
+                              labelText: 'ລະຫັດ',
+                              helperText: 'ໃສ່ລະຫັດ',
+                            ),
+                            onSaved: (value) {
+                              id = int.parse(value.toString());
+                            },
+                            name: 'number',
+                            enabled: false,
+                          ),
                         ),
-                        onSaved: (value) {
-                          id = int.parse(value.toString());
-                        },
-                        name: 'number',
-                        enabled: false,
-                      ),
+                        FormBuilderTextField(
+                          keyboardType: TextInputType.name,
+                          decoration: const InputDecoration(
+                            labelText: 'ຊື່ພຣະສູດ',
+                            helperText: 'ໃສ່ຊື່ພຣະສູດ',
+                          ),
+                          onSaved: (value) {
+                            title = value.toString();
+                          },
+                          name: 'textfield',
+                          enabled: true,
+                          autovalidateMode: AutovalidateMode.always,
+                          validator: (val) {
+                            if (val == null || val == "") {
+                              return 'ກະລຸນາໃສ່ຊື່ພຣະສູດ';
+                            }
+                            return null;
+                          },
+                        ),
+                        FormBuilderDropdown(
+                          decoration: const InputDecoration(
+                            labelText: 'ໝວດທັມ',
+                            helperText: 'ໃສ່ໝວດທັມ',
+                          ),
+                          name: "dropdown",
+                          onSaved: (value) {
+                            category = value.toString();
+                          },
+                          autovalidateMode: AutovalidateMode.always,
+                          enabled: true,
+                          validator: (val) {
+                            if (val == null || val == "") {
+                              return 'ກະລຸນາໃສ່ໝວດທັມ';
+                            }
+                            return null;
+                          },
+                          items:
+                              ['ທັມໃນເບື້ອງຕົ້ນ', 'ທັມໃນທ່າມກາງ', 'ທັມໃນທີສຸດ']
+                                  .map((category) => DropdownMenuItem(
+                                        value: category,
+                                        child: Text('$category'),
+                                      ))
+                                  .toList(),
+                        ),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        SingleChildScrollView(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              SizedBox(
+                                child: FormBuilderTextField(
+                                  style: const TextStyle(
+                                      fontSize: 20.0,
+                                      height: 2.0,
+                                      color: Colors.black),
+                                  keyboardType: TextInputType.multiline,
+                                  decoration: const InputDecoration(
+                                    labelText: 'ພຣະສູດ',
+                                    helperText: 'ໃສ່ພຣະສູດ',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  maxLines: 5, // <-- SEE HERE
+                                  minLines: 1, // <-- SEE HERE
+                                  onSaved: (value) {
+                                    content = value.toString();
+                                  },
+                                  name: 'textfield',
+                                  enabled: true,
+                                  autovalidateMode: AutovalidateMode.always,
+                                  validator: (val) {
+                                    if (val == null || val == "") {
+                                      return 'ກະລຸນາໃສ່ພຣະສູດ';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // SingleChildScrollView(
+                        //   child: Column(
+                        //     mainAxisAlignment: MainAxisAlignment.center,
+                        //     children: <Widget>[
+                        //       HtmlEditor(
+                        //         controller: controller,
+                        //         htmlEditorOptions: const HtmlEditorOptions(
+                        //           hint: 'ໃສ່ພຣະສູດ...',
+                        //           shouldEnsureVisible: true,
+                        //         ),
+                        //         otherOptions: const OtherOptions(
+                        //           height: 400,
+                        //         ),
+                        //         htmlToolbarOptions: const HtmlToolbarOptions(
+                        //           toolbarPosition:
+                        //               ToolbarPosition.aboveEditor, //by default
+                        //           toolbarType:
+                        //               ToolbarType.nativeScrollable, //by default
+                        //         ),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
+                      ],
                     ),
-                    FormBuilderTextField(
-                      keyboardType: TextInputType.name,
-                      decoration: const InputDecoration(
-                        labelText: 'ຊື່ພຣະສູດ',
-                        helperText: 'ໃສ່ຊື່ພຣະສູດ',
-                      ),
-                      onSaved: (value) {
-                        title = value.toString();
-                      },
-                      name: 'textfield',
-                      enabled: true,
-                      autovalidateMode: AutovalidateMode.always,
-                      validator: (val) {
-                        if (val == null || val == "") {
-                          return 'ກະລຸນາໃສ່ຊື່ພຣະສູດ';
-                        }
-                        return null;
-                      },
-                    ),
-                    FormBuilderTextField(
-                      keyboardType: TextInputType.multiline,
-                      decoration: const InputDecoration(
-                        labelText: 'ພຣະສູດ',
-                        helperText: 'ໃສ່ພຣະສູດ',
-                      ),
-                      onSaved: (value) {
-                        content = value.toString();
-                      },
-                      name: 'textfield',
-                      enabled: true,
-                      autovalidateMode: AutovalidateMode.always,
-                      validator: (val) {
-                        if (val == null || val == "") {
-                          return 'ກະລຸນາໃສ່ພຣະສູດ';
-                        }
-                        return null;
-                      },
-                    ),
-                    FormBuilderTextField(
-                      keyboardType: TextInputType.name,
-                      decoration: const InputDecoration(
-                        labelText: 'ໝວດທັມ',
-                        helperText: 'ໃສ່ໝວດທັມ',
-                      ),
-                      onSaved: (value) {
-                        category = value.toString();
-                      },
-                      name: 'textfield',
-                      enabled: true,
-                      autovalidateMode: AutovalidateMode.always,
-                      validator: (val) {
-                        if (val == null || val == "") {
-                          return 'ກະລຸນາໃສ່ໝວດທັມ';
-                        }
-                        return null;
-                      },
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            )
-          ],
-        ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            final valid = (_formkey.currentState?.validate() ?? false);
-            if (!valid) {
-              showDialog(
-                  context: context,
-                  builder: (context) => const SimpleDialog(
-                        contentPadding: EdgeInsets.all(20),
-                        title: Text('ກະລຸນາກວດສອບຂໍ້ມູນ'),
-                        children: [
-                          Text('ກະລຸນາກວດສອບຂໍ້ມູນທີ່ທ່ານປ້ອນຄືນກ່ອນການບັນທຶກ')
-                        ],
-                      ));
-            } else {
-              saveSutra();
-              showDialog(
-                context: context,
-                builder: (_) => const AlertDialog(
-                  content: Text("ສຳເລັດ"),
-                ),
-              );
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return const SutraList(title: "ລາຍການພຣະສູດ");
+                FloatingActionButton.extended(
+                  onPressed: () {
+                    final valid = (_formkey.currentState?.validate() ?? false);
+                    if (!valid) {
+                      showDialog(
+                          context: context,
+                          builder: (context) => const SimpleDialog(
+                                contentPadding: EdgeInsets.all(20),
+                                title: Text('ກະລຸນາກວດສອບຂໍ້ມູນ'),
+                                children: [
+                                  Text(
+                                      'ກະລຸນາກວດສອບຂໍ້ມູນທີ່ທ່ານປ້ອນຄືນກ່ອນການບັນທຶກ')
+                                ],
+                              ));
+                    } else {
+                      saveSutra();
+                      showDialog(
+                        context: context,
+                        builder: (_) => const AlertDialog(
+                          content: Text("ສຳເລັດ"),
+                        ),
+                      );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return const SutraList(title: "ລາຍການພຣະສູດ");
+                          },
+                        ),
+                      );
+                    }
                   },
+                  label: const Text('ບັນທຶກ'),
+                  icon: const Icon(Icons.save),
                 ),
-              );
-            }
-          },
-          label: const Text('ບັນທຶກ'),
-          icon: const Icon(Icons.save),
+              ],
+            ),
+          ),
         ),
+        // floatingActionButton:
       ),
     );
   }
