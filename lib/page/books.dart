@@ -9,7 +9,7 @@ class BookList extends StatelessWidget {
     return Scaffold(
       drawer: const NavigationDrawer(),
       appBar: AppBar(
-        title: const Text("Books"),
+        title: const Text("📚📖 ປື້ມ"),
         backgroundColor: const Color.fromARGB(255, 175, 93, 78),
       ),
       body: const Center(

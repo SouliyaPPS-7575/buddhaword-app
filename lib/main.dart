@@ -16,7 +16,6 @@ void main() async {
 
   Hive.registerAdapter<Sutra>(SutraAdapter());
 
-  await Hive.openBox("home");
   await Hive.openBox<Sutra>("sutra");
 
   runApp(const MyApp());
@@ -34,7 +33,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const SutraList(title: 'Lao-Tipitaka'),
+      home: const HomePage(title: 'Lao-Tipitaka'),
     );
   }
 }
@@ -64,8 +63,8 @@ class NavigationDrawer extends StatelessWidget {
           runSpacing: 0, //verticalSpacing
           children: [
             ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text('Home'),
+              leading: const Icon(Icons.library_books),
+              title: const Text('ພຣະສູດ 📖'),
               onTap: () => Navigator.of(context).pushReplacement(
                 MaterialPageRoute(
                   builder: (context) => const HomePage(
@@ -76,7 +75,7 @@ class NavigationDrawer extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.book),
-              title: const Text('Books'),
+              title: const Text('📚📖 ປື້ມ'),
               onTap: () => Navigator.of(context).pushReplacement(
                 MaterialPageRoute(
                   builder: (context) => const BookList(),
@@ -88,18 +87,18 @@ class NavigationDrawer extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.add),
-              title: const Text('Add Sutra'),
+              title: const Text('ເພີ່ມພຣະສູດ'),
               onTap: () => Navigator.of(context).pushReplacement(
                 MaterialPageRoute(
                   builder: (context) => const SutraList(
-                    title: 'Sutra List',
+                    title: 'ລາຍການພຣະສູດ',
                   ),
                 ),
               ),
             ),
             ListTile(
               leading: const Icon(Icons.category),
-              title: const Text('Categories'),
+              title: const Text('ໝວດທັມ'),
               onTap: () => Navigator.of(context).pushReplacement(
                 MaterialPageRoute(
                   builder: (context) => const Categories(),

@@ -9,7 +9,7 @@ class Categories extends StatelessWidget {
     return Scaffold(
       drawer: const NavigationDrawer(),
       appBar: AppBar(
-        title: const Text("Categories"),
+        title: const Text("ໝວດທັມ"),
         backgroundColor: const Color.fromARGB(255, 175, 93, 78),
       ),
       body: const Center(

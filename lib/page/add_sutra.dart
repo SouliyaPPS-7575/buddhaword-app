@@ -32,6 +32,7 @@ class _AddSutraListState extends State<AddSutraList>
     sutraBox = Hive.box<Sutra>("sutra");
   }
 
+// Create
   void saveSutra() {
     final isValid = _formkey.currentState?.validate();
 
@@ -62,14 +63,14 @@ class _AddSutraListState extends State<AddSutraList>
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.title),
+          title: const Text('ເພີ່ມພຣະສູດ'),
           backgroundColor: const Color.fromARGB(255, 175, 93, 78),
         ),
         drawer: const NavigationDrawer(),
         body: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(15.0),
               child: FormBuilder(
                 key: _formkey,
                 onChanged: () => print("Form has been changed"),
@@ -85,8 +86,8 @@ class _AddSutraListState extends State<AddSutraList>
                       child: FormBuilderTextField(
                         keyboardType: TextInputType.number,
                         decoration: const InputDecoration(
-                          labelText: 'id',
-                          helperText: 'Input your id',
+                          labelText: 'ລະຫັດ',
+                          helperText: 'ໃສ່ລະຫັດ',
                         ),
                         onSaved: (value) {
                           id = int.parse(value.toString());
@@ -98,8 +99,8 @@ class _AddSutraListState extends State<AddSutraList>
                     FormBuilderTextField(
                       keyboardType: TextInputType.name,
                       decoration: const InputDecoration(
-                        labelText: 'Title',
-                        helperText: 'Input your title',
+                        labelText: 'ຊື່ພຣະສູດ',
+                        helperText: 'ໃສ່ຊື່ພຣະສູດ',
                       ),
                       onSaved: (value) {
                         title = value.toString();
@@ -109,7 +110,7 @@ class _AddSutraListState extends State<AddSutraList>
                       autovalidateMode: AutovalidateMode.always,
                       validator: (val) {
                         if (val == null || val == "") {
-                          return 'Please enter a title';
+                          return 'ກະລຸນາໃສ່ຊື່ພຣະສູດ';
                         }
                         return null;
                       },
@@ -117,8 +118,8 @@ class _AddSutraListState extends State<AddSutraList>
                     FormBuilderTextField(
                       keyboardType: TextInputType.multiline,
                       decoration: const InputDecoration(
-                        labelText: 'Contents',
-                        helperText: 'Input your contents',
+                        labelText: 'ພຣະສູດ',
+                        helperText: 'ໃສ່ພຣະສູດ',
                       ),
                       onSaved: (value) {
                         content = value.toString();
@@ -128,7 +129,7 @@ class _AddSutraListState extends State<AddSutraList>
                       autovalidateMode: AutovalidateMode.always,
                       validator: (val) {
                         if (val == null || val == "") {
-                          return 'Please enter a contents';
+                          return 'ກະລຸນາໃສ່ພຣະສູດ';
                         }
                         return null;
                       },
@@ -136,8 +137,8 @@ class _AddSutraListState extends State<AddSutraList>
                     FormBuilderTextField(
                       keyboardType: TextInputType.name,
                       decoration: const InputDecoration(
-                        labelText: 'Category',
-                        helperText: 'Input your category',
+                        labelText: 'ໝວດທັມ',
+                        helperText: 'ໃສ່ໝວດທັມ',
                       ),
                       onSaved: (value) {
                         category = value.toString();
@@ -147,7 +148,7 @@ class _AddSutraListState extends State<AddSutraList>
                       autovalidateMode: AutovalidateMode.always,
                       validator: (val) {
                         if (val == null || val == "") {
-                          return 'Please enter a category';
+                          return 'ກະລຸນາໃສ່ໝວດທັມ';
                         }
                         return null;
                       },
@@ -166,10 +167,9 @@ class _AddSutraListState extends State<AddSutraList>
                   context: context,
                   builder: (context) => const SimpleDialog(
                         contentPadding: EdgeInsets.all(20),
-                        title: Text('Please check the form'),
+                        title: Text('ກະລຸນາກວດສອບຂໍ້ມູນ'),
                         children: [
-                          Text(
-                              'Some details are missing or incorrect. Please check the details and try again.')
+                          Text('ກະລຸນາກວດສອບຂໍ້ມູນທີ່ທ່ານປ້ອນຄືນກ່ອນການບັນທຶກ')
                         ],
                       ));
             } else {
@@ -177,20 +177,20 @@ class _AddSutraListState extends State<AddSutraList>
               showDialog(
                 context: context,
                 builder: (_) => const AlertDialog(
-                  content: Text("Success"),
+                  content: Text("ສຳເລັດ"),
                 ),
               );
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) {
-                    return const SutraList(title: "Sutra List");
+                    return const SutraList(title: "ລາຍການພຣະສູດ");
                   },
                 ),
               );
             }
           },
-          label: const Text('Save'),
+          label: const Text('ບັນທຶກ'),
           icon: const Icon(Icons.save),
         ),
       ),

@@ -4,6 +4,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lao_tipitaka/main.dart';
 import 'package:lao_tipitaka/model/sutra.dart';
 import 'package:lao_tipitaka/page/add_sutra.dart';
+import 'package:lao_tipitaka/page/detail_sutra.dart';
 
 class SutraList extends StatefulWidget {
   const SutraList({Key? key, required this.title}) : super(key: key);
@@ -24,6 +25,24 @@ class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
     sutraBox = Hive.box<Sutra>("sutra");
   }
 
+  // How to create view detail page
+  void viewDetail(BuildContext context, int index) {
+    final sutra = sutraBox.getAt(index);
+    //how to navigate to DetailSutra page
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => DetailSutra(
+          title: sutra!.title.toString(),
+          content: sutra.content.toString(),
+          category: sutra.category.toString(),
+        ),
+      ),
+    );
+  }
+
+  // How to create edit page
+
   @override
   Widget build(BuildContext context) {
     return ScaleTransition(
@@ -38,7 +57,7 @@ class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.title),
+          title: const Text("ລາຍການພຣະສູດ"),
           backgroundColor: const Color.fromARGB(255, 175, 93, 78),
         ),
         drawer: const NavigationDrawer(),
@@ -51,19 +70,23 @@ class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
                   itemCount: sutraBox.length,
                   itemBuilder: ((context, index) {
                     final sutra = sutraBox.getAt(index) as Sutra;
+
                     return Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              sutra.title.toString(),
-                              style: const TextStyle(fontSize: 20),
-                            ),
-                            Text(sutra.content.toString()),
-                            Text(sutra.category.toString()),
-                          ],
+                      // How to add viewDetail function
+                      child: InkWell(
+                        onTap: () => viewDetail(context, index),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                sutra.title.toString(),
+                                style: const TextStyle(fontSize: 20),
+                              ),
+                              Text(sutra.category.toString()),
+                            ],
+                          ),
                         ),
                       ),
                     );
@@ -77,10 +100,10 @@ class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
                 context,
                 MaterialPageRoute(
                     builder: (_) => const AddSutraList(
-                          title: 'Add Sutra',
+                          title: 'ລາຍການທີ່ບັນທຶກ',
                         )));
           },
-          label: const Text('Add'),
+          label: const Text('ເພີ່ມ'),
           icon: const Icon(Icons.add),
         ),
       ),

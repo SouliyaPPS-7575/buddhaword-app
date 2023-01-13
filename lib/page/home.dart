@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lao_tipitaka/main.dart';
+import 'package:lao_tipitaka/model/sutra.dart';
+import 'package:lao_tipitaka/page/detail_sutra.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.title});
+  const HomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
@@ -12,19 +14,29 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
-  late Box homeBox;
+  late Box<Sutra> sutraBox;
+  late final Function updateListViewLength;
 
   @override
   void initState() {
     super.initState();
+    sutraBox = Hive.box<Sutra>("sutra");
+  }
 
-    homeBox = Hive.box("home");
-    homeBox.put("1", 'Lao');
-    homeBox.put("2", 'Thai');
-    homeBox.put("3", 'Eng');
-
-    homeBox.add("ww");
-    homeBox.add("how");
+  // How to create view detail page
+  void viewDetail(BuildContext context, int index) {
+    final sutra = sutraBox.getAt(index);
+    //how to navigate to DetailSutra page
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => DetailSutra(
+          title: sutra!.title.toString(),
+          content: sutra.content.toString(),
+          category: sutra.category.toString(),
+        ),
+      ),
+    );
   }
 
   @override
@@ -46,20 +58,37 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
         drawer: const NavigationDrawer(),
         body: InteractiveViewer(
-          boundaryMargin: const EdgeInsets.all(double.infinity),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const SizedBox(height: 20),
-                Text(homeBox.get('1')),
-                Text(homeBox.get('2')),
-                Text(homeBox.get('3')),
-                Text(homeBox.getAt(0)),
-                Text(homeBox.getAt(1)),
-              ],
-            ),
-          ),
+          boundaryMargin: const EdgeInsets.all(double.maxFinite),
+          child: ValueListenableBuilder(
+              valueListenable: sutraBox.listenable(),
+              builder: (context, box, child) {
+                return ListView.builder(
+                  itemCount: sutraBox.length,
+                  itemBuilder: ((context, index) {
+                    final sutra = sutraBox.getAt(index) as Sutra;
+                    return
+                        // How to view detail page
+                        GestureDetector(
+                      onTap: () => viewDetail(context, index),
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                sutra.title.toString(),
+                                style: const TextStyle(fontSize: 20),
+                              ),
+                              Text(sutra.category.toString()),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                );
+              }),
         ),
       ),
     );
