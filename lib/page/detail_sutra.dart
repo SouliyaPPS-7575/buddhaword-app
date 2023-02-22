@@ -23,7 +23,7 @@ class _DetailSutraState extends State<DetailSutra> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("ພຣະສູດ"),
-        backgroundColor: const Color.fromARGB(255, 175, 93, 78),
+        backgroundColor: const Color.fromARGB(241, 179, 93, 78),
       ),
       drawer: const NavigationDrawer(),
       body: InteractiveViewer(

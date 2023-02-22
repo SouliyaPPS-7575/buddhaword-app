@@ -10,7 +10,7 @@ class Categories extends StatelessWidget {
       drawer: const NavigationDrawer(),
       appBar: AppBar(
         title: const Text("ໝວດທັມ"),
-        backgroundColor: const Color.fromARGB(255, 175, 93, 78),
+        backgroundColor: const Color.fromARGB(241, 179, 93, 78),
       ),
       body: const Center(
         child: Text("This is the Categories page"),

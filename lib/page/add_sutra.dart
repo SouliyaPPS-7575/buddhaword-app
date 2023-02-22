@@ -67,7 +67,7 @@ class _AddSutraListState extends State<AddSutraList>
       child: Scaffold(
         appBar: AppBar(
           title: const Text('ເພີ່ມພຣະສູດ'),
-          backgroundColor: const Color.fromARGB(255, 175, 93, 78),
+          backgroundColor: const Color.fromARGB(241, 179, 93, 78),
         ),
         drawer: const NavigationDrawer(),
         body: SingleChildScrollView(

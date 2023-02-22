@@ -58,7 +58,7 @@ class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
       child: Scaffold(
         appBar: AppBar(
           title: const Text("ລາຍການພຣະສູດ"),
-          backgroundColor: const Color.fromARGB(255, 175, 93, 78),
+          backgroundColor: const Color.fromARGB(241, 179, 93, 78),
         ),
         drawer: const NavigationDrawer(),
         body: InteractiveViewer(
