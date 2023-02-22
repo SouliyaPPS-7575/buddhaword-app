@@ -1,12 +1,13 @@
-// ignore_for_file: unnecessary_const
-
+// ignore_for_file: unnecessary_const, non_constant_identifier_names, avoid_print, deprecated_member_use
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lao_tipitaka/model/sutra.dart';
-import 'package:lao_tipitaka/page/books.dart';
 import 'package:lao_tipitaka/page/home.dart';
 import 'package:lao_tipitaka/page/sutraL_list.dart';
 import 'package:path_provider/path_provider.dart' as path;
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:universal_html/html.dart' as html;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,6 +50,17 @@ class NavigationDrawer extends StatefulWidget {
 class _NavigationDrawerState extends State<NavigationDrawer> {
   late final bool _isChecked = false;
   late final Color _checkColor = const Color.fromARGB(255, 175, 93, 78);
+
+  void openLink() async {
+    String url = 'https://flutter.dev';
+    if (kIsWeb) {
+      html.window.open(url, '_blank');
+    } else {
+      if (await canLaunch(url)) {
+        launch(url);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) => Drawer(
@@ -97,13 +109,17 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                 '📚📖 ປື້ມ',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              onTap: () => {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => const BookList(),
-                  ),
-                ),
-              },
+              onTap: () => {},
+            ),
+            ListTile(
+              leading: _isChecked
+                  ? Icon(Icons.book, color: _checkColor)
+                  : Icon(Icons.book_outlined, color: _checkColor),
+              title: const Text(
+                'ຄຳສອນພຣະພຸດທະເຈົ້າ',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              onTap: () => {},
             ),
             const Divider(
               color: Colors.black54,
