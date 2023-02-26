@@ -61,6 +61,18 @@ class _DetailSutraState extends State<DetailSutra>
     _scaleController.forward();
   }
 
+  void _onZoomInPressed() {
+    setState(() {
+      _scale += 0.1;
+    });
+  }
+
+  void _onZoomOutPressed() {
+    setState(() {
+      _scale -= 0.1;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -127,6 +139,28 @@ class _DetailSutraState extends State<DetailSutra>
                   ),
                 ),
               ),
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          FloatingActionButton(
+            onPressed: _onZoomInPressed,
+            backgroundColor: const Color(0xFFF5F5F5),
+            child: const Icon(
+              Icons.add,
+              color: Color.fromARGB(241, 179, 93, 78),
+            ),
+          ),
+          const SizedBox(width: 10),
+          FloatingActionButton(
+            onPressed: _onZoomOutPressed,
+            backgroundColor: const Color(0xFFF5F5F5),
+            child: const Icon(
+              Icons.remove,
+              color: Color.fromARGB(241, 179, 93, 78),
             ),
           ),
         ],
