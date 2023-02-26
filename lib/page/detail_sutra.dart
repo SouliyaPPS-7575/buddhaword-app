@@ -64,62 +64,72 @@ class _DetailSutraState extends State<DetailSutra>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("ພຣະສູດ"),
-        backgroundColor: const Color.fromARGB(241, 179, 93, 78),
-      ),
       drawer: const NavigationDrawer(),
-      body: GestureDetector(
-        onScaleStart: _onScaleStart,
-        onScaleUpdate: _onScaleUpdate,
-        onScaleEnd: _onScaleEnd,
-        child: SingleChildScrollView(
-          child: Container(
-            color: const Color(0xFFF5F5F5),
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Text(
-                  widget.title,
-                  style: const TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                const Divider(color: Colors.black, thickness: 1, height: 1),
-                const SizedBox(height: 10),
-                SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  child: Container(
-                    constraints: BoxConstraints(
-                      minHeight: MediaQuery.of(context).size.height,
-                    ),
-                    child: Text(
-                      widget.content,
-                      style: TextStyle(
-                        fontSize: 20 * _scale,
-                        height: 1.5,
+      body: CustomScrollView(
+        slivers: <Widget>[
+          const SliverAppBar(
+            title: Text("ພຣະສູດ"),
+            backgroundColor: Color.fromARGB(241, 179, 93, 78),
+            floating: true,
+            snap: true,
+          ),
+          SliverToBoxAdapter(
+            child: GestureDetector(
+              onScaleStart: _onScaleStart,
+              onScaleUpdate: _onScaleUpdate,
+              onScaleEnd: _onScaleEnd,
+              child: SingleChildScrollView(
+                child: Container(
+                  color: const Color(0xFFF5F5F5),
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      Text(
+                        widget.title,
+                        style: const TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 10),
+                      const Divider(
+                          color: Colors.black, thickness: 1, height: 1),
+                      const SizedBox(height: 10),
+                      SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        child: Container(
+                          constraints: BoxConstraints(
+                            minHeight: MediaQuery.of(context).size.height,
+                          ),
+                          child: Text(
+                            widget.content,
+                            style: TextStyle(
+                              fontSize: 20 * _scale,
+                              height: 1.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Divider(
+                          color: Colors.black, thickness: 1, height: 1),
+                      const SizedBox(height: 10),
+                      Text(
+                        widget.category,
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                          fontSize: 20 * _scale,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 10),
-                const Divider(color: Colors.black, thickness: 1, height: 1),
-                const SizedBox(height: 10),
-                Text(
-                  widget.category,
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                    fontSize: 20 * _scale,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
