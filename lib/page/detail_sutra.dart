@@ -26,14 +26,15 @@ class _DetailSutraState extends State<DetailSutra>
   @override
   void initState() {
     super.initState();
-    _scaleController =
-        AnimationController(vsync: this, duration: const Duration(milliseconds: 200));
-    _scaleAnimation = Tween<double>(begin: _scale, end: _scale).animate(_scaleController)
-      ..addListener(() {
-        setState(() {
-          _scale = _scaleAnimation.value;
-        });
-      });
+    _scaleController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 200));
+    _scaleAnimation =
+        Tween<double>(begin: _scale, end: _scale).animate(_scaleController)
+          ..addListener(() {
+            setState(() {
+              _scale = _scaleAnimation.value;
+            });
+          });
   }
 
   @override
@@ -54,7 +55,8 @@ class _DetailSutraState extends State<DetailSutra>
   }
 
   void _onScaleEnd(ScaleEndDetails details) {
-    _scaleAnimation = Tween<double>(begin: _scale, end: 1.0).animate(_scaleController);
+    _scaleAnimation =
+        Tween<double>(begin: _scale, end: 1.0).animate(_scaleController);
     _scaleController.reset();
     _scaleController.forward();
   }
@@ -73,7 +75,7 @@ class _DetailSutraState extends State<DetailSutra>
         onScaleEnd: _onScaleEnd,
         child: SingleChildScrollView(
           child: Container(
-            color: Colors.orangeAccent[100],
+            color: const Color(0xFFF5F5F5),
             padding: const EdgeInsets.all(10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,

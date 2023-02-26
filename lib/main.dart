@@ -6,7 +6,7 @@ import 'package:lao_tipitaka/page/sutraL_list.dart';
 import 'package:path_provider/path_provider.dart' as path;
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+// import 'package:flutter/rendering.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -17,6 +17,9 @@ void main() async {
   Hive.registerAdapter<Sutra>(SutraAdapter());
 
   await Hive.openBox<Sutra>("sutra");
+
+  // debugPaintSizeEnabled = true;
+  // debugPaintBaselinesEnabled = true;
 
   runApp(const MyApp());
 }
