@@ -52,6 +52,7 @@ class _DetailSutraState extends State<DetailSutra>
       _scale = _scaleAnimation.value;
       _scale *= details.scale;
     });
+    _scaleController.duration = const Duration(milliseconds: 500);
   }
 
   void _onScaleEnd(ScaleEndDetails details) {
@@ -91,51 +92,79 @@ class _DetailSutraState extends State<DetailSutra>
               onScaleUpdate: _onScaleUpdate,
               onScaleEnd: _onScaleEnd,
               child: SingleChildScrollView(
-                child: Container(
-                  color: const Color(0xFFF5F5F5),
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      Text(
-                        widget.title,
-                        style: const TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      const Divider(
-                          color: Colors.black, thickness: 1, height: 1),
-                      const SizedBox(height: 10),
-                      SingleChildScrollView(
-                        physics: const BouncingScrollPhysics(),
-                        child: Container(
-                          constraints: BoxConstraints(
-                            minHeight: MediaQuery.of(context).size.height,
+                child: InteractiveViewer(
+                  minScale: 1.0,
+                  maxScale: 5.0,
+                  child: Container(
+                    color: const Color(0xFFF5F5F5),
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        SelectableText(
+                          textAlign: TextAlign.center,
+                          toolbarOptions: const ToolbarOptions(
+                            copy: true,
+                            cut: true,
+                            paste: true,
+                            selectAll: true,
                           ),
-                          child: Text(
-                            widget.content,
-                            style: TextStyle(
-                              fontSize: 20 * _scale,
-                              height: 1.5,
+                          showCursor: true,
+                          widget.title,
+                          style: const TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        const Divider(
+                            color: Colors.black, thickness: 1, height: 1),
+                        const SizedBox(height: 10),
+                        SingleChildScrollView(
+                          physics: const BouncingScrollPhysics(),
+                          child: Container(
+                            constraints: BoxConstraints(
+                              minHeight: MediaQuery.of(context).size.height,
+                            ),
+                            child: SelectableText(
+                              textAlign: TextAlign.start,
+                              toolbarOptions: const ToolbarOptions(
+                                copy: true,
+                                cut: true,
+                                paste: true,
+                                selectAll: true,
+                              ),
+                              showCursor: true,
+                              widget.content,
+                              style: TextStyle(
+                                fontSize: 20 * _scale,
+                                height: 1.5,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      const Divider(
-                          color: Colors.black, thickness: 1, height: 1),
-                      const SizedBox(height: 10),
-                      Text(
-                        widget.category,
-                        textAlign: TextAlign.right,
-                        style: TextStyle(
-                          fontSize: 20 * _scale,
-                          fontWeight: FontWeight.bold,
+                        const SizedBox(height: 10),
+                        const Divider(
+                            color: Colors.black, thickness: 1, height: 1),
+                        const SizedBox(height: 10),
+                        SelectableText(
+                          toolbarOptions: const ToolbarOptions(
+                            copy: true,
+                            cut: true,
+                            paste: true,
+                            selectAll: true,
+                          ),
+                          showCursor: true,
+                          widget.category,
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                            fontSize: 20 * _scale,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 80),
+                      ],
+                    ),
                   ),
                 ),
               ),

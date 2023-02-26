@@ -60,37 +60,52 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         body: InteractiveViewer(
           boundaryMargin: const EdgeInsets.all(double.maxFinite),
           child: ValueListenableBuilder(
-              valueListenable: sutraBox.listenable(),
-              builder: (context, box, child) {
-                return ListView.builder(
-                  itemCount: sutraBox.length,
-                  itemBuilder: ((context, index) {
-                    final sutra = sutraBox.getAt(index) as Sutra;
-                    return
-                        // How to view detail page
-                        GestureDetector(
-                      onTap: () => viewDetail(context, index),
-                      child: Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                sutra.title.toString(),
-                                style: const TextStyle(fontSize: 20),
+            valueListenable: sutraBox.listenable(),
+            builder: (context, box, child) {
+              return ListView.builder(
+                itemCount: sutraBox.length,
+                itemBuilder: ((context, index) {
+                  final sutra = sutraBox.getAt(index) as Sutra;
+                  return GestureDetector(
+                    onTap: () => viewDetail(context, index),
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              sutra.title.toString(),
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
                               ),
-                              // Text(
-                              //   sutra.category.toString(),
-                              // ),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    sutra.category.toString(),
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.grey,
+                                    ),
+                                    textAlign: TextAlign.right,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                    );
-                  }),
-                );
-              }),
+                    ),
+                  );
+                }),
+              );
+            },
+          ),
         ),
       ),
     );
