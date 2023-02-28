@@ -166,8 +166,8 @@ class _AddSutraListState extends State<AddSutraList>
                                     helperText: 'ໃສ່ພຣະສູດ',
                                     border: OutlineInputBorder(),
                                   ),
-                                  maxLines: 5, // <-- SEE HERE
-                                  minLines: 1, // <-- SEE HERE
+                                  maxLines: 9, // <-- SEE HERE
+                                  minLines: 4, // <-- SEE HERE
                                   onSaved: (value) {
                                     content = value.toString();
                                   },
