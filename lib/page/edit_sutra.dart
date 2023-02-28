@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print, unnecessary_string_interpolations
+// ignore_for_file: avoid_print, unnecessary_string_interpolations, unused_local_variable
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -11,11 +11,14 @@ import 'package:html_editor_enhanced/html_editor.dart';
 class EditSutraList extends StatefulWidget {
   const EditSutraList({
     Key? key,
+    required this.index,
+    required this.id,
     required this.title,
     required this.content,
     required this.category,
   }) : super(key: key);
-
+  final int index;
+  final int id;
   final String title;
   final String content;
   final String category;
@@ -36,8 +39,22 @@ class _EditSutraListState extends State<EditSutraList>
 
   @override
   void initState() {
+    _idController.text = widget.id.toString();
+    _titleController.text = widget.title;
+    _contentController.text = widget.content;
+    _categoryController.text = widget.category;
+
     super.initState();
     sutraBox = Hive.box<Sutra>("sutra");
+  }
+
+  @override
+  void dispose() {
+    _idController.dispose();
+    _titleController.dispose();
+    _contentController.dispose();
+    _categoryController.dispose();
+    super.dispose();
   }
 
 // Create
@@ -57,7 +74,25 @@ class _EditSutraListState extends State<EditSutraList>
     }
   }
 
+  void editSutra() {
+    final isValid = _formkey.currentState?.validate();
+
+    final value = Sutra(
+      id: int.parse(_idController.text),
+      title: _titleController.text,
+      content: _contentController.text,
+      category: _categoryController.text,
+    );
+
+    Hive.box<Sutra>('sutra').putAt(widget.index, value);
+  }
+
   final HtmlEditorController controller = HtmlEditorController();
+
+  final TextEditingController _idController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _contentController = TextEditingController();
+  final TextEditingController _categoryController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -98,6 +133,7 @@ class _EditSutraListState extends State<EditSutraList>
                         Visibility(
                           visible: false,
                           child: FormBuilderTextField(
+                            controller: _idController,
                             keyboardType: TextInputType.number,
                             decoration: const InputDecoration(
                               labelText: 'ລະຫັດ',
@@ -111,6 +147,7 @@ class _EditSutraListState extends State<EditSutraList>
                           ),
                         ),
                         FormBuilderTextField(
+                          controller: _titleController,
                           keyboardType: TextInputType.name,
                           decoration: const InputDecoration(
                             labelText: 'ຊື່ພຣະສູດ',
@@ -129,12 +166,40 @@ class _EditSutraListState extends State<EditSutraList>
                             return null;
                           },
                         ),
-                        FormBuilderDropdown(
+                        // FormBuilderDropdown(
+                        //   // controller: _categoryController,
+                        //   decoration: const InputDecoration(
+                        //     labelText: 'ໝວດທັມ',
+                        //     helperText: 'ໃສ່ໝວດທັມ',
+                        //   ),
+                        //   name: "dropdown",
+                        //   onSaved: (value) {
+                        //     category = value.toString();
+                        //   },
+                        //   autovalidateMode: AutovalidateMode.always,
+                        //   enabled: true,
+                        //   validator: (val) {
+                        //     if (val == null || val == "") {
+                        //       return 'ກະລຸນາໃສ່ໝວດທັມ';
+                        //     }
+                        //     return null;
+                        //   },
+                        //   items:
+                        //       ['ທັມໃນເບື້ອງຕົ້ນ', 'ທັມໃນທ່າມກາງ', 'ທັມໃນທີສຸດ']
+                        //           .map((category) => DropdownMenuItem(
+                        //                 value: category,
+                        //                 child: Text('$category'),
+                        //               ))
+                        //           .toList(),
+                        // ),
+                        FormBuilderTextField(
+                          controller: _categoryController,
+                          keyboardType: TextInputType.name,
                           decoration: const InputDecoration(
                             labelText: 'ໝວດທັມ',
                             helperText: 'ໃສ່ໝວດທັມ',
                           ),
-                          name: "dropdown",
+                          name: "textfield",
                           onSaved: (value) {
                             category = value.toString();
                           },
@@ -146,13 +211,6 @@ class _EditSutraListState extends State<EditSutraList>
                             }
                             return null;
                           },
-                          items:
-                              ['ທັມໃນເບື້ອງຕົ້ນ', 'ທັມໃນທ່າມກາງ', 'ທັມໃນທີສຸດ']
-                                  .map((category) => DropdownMenuItem(
-                                        value: category,
-                                        child: Text('$category'),
-                                      ))
-                                  .toList(),
                         ),
                         const SizedBox(
                           height: 15,
@@ -163,6 +221,7 @@ class _EditSutraListState extends State<EditSutraList>
                             children: <Widget>[
                               SizedBox(
                                 child: FormBuilderTextField(
+                                  controller: _contentController,
                                   style: const TextStyle(
                                       fontSize: 20.0,
                                       height: 2.0,
@@ -173,8 +232,8 @@ class _EditSutraListState extends State<EditSutraList>
                                     helperText: 'ໃສ່ພຣະສູດ',
                                     border: OutlineInputBorder(),
                                   ),
-                                  maxLines: 5, // <-- SEE HERE
-                                  minLines: 1, // <-- SEE HERE
+                                  maxLines: 9, // <-- SEE HERE
+                                  minLines: 4, // <-- SEE HERE
                                   onSaved: (value) {
                                     content = value.toString();
                                   },
@@ -234,7 +293,8 @@ class _EditSutraListState extends State<EditSutraList>
                                 ],
                               ));
                     } else {
-                      saveSutra();
+                      editSutra();
+
                       showDialog(
                         context: context,
                         builder: (_) => const AlertDialog(

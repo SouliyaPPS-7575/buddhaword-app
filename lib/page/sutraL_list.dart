@@ -5,6 +5,7 @@ import 'package:lao_tipitaka/main.dart';
 import 'package:lao_tipitaka/model/sutra.dart';
 import 'package:lao_tipitaka/page/add_sutra.dart';
 import 'package:lao_tipitaka/page/edit_detail_sutra.dart';
+import 'package:lao_tipitaka/page/edit_sutra.dart';
 
 class SutraList extends StatefulWidget {
   const SutraList({Key? key, required this.title}) : super(key: key);
@@ -41,8 +42,6 @@ class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
     );
   }
 
-  // How to create edit page
-
   @override
   Widget build(BuildContext context) {
     return ScaleTransition(
@@ -64,62 +63,76 @@ class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
         body: InteractiveViewer(
           boundaryMargin: const EdgeInsets.all(double.maxFinite),
           child: ValueListenableBuilder(
-              valueListenable: sutraBox.listenable(),
-              builder: (context, box, child) {
-                return ListView.builder(
-                  itemCount: sutraBox.length,
-                  itemBuilder: ((context, index) {
-                    final sutra = sutraBox.getAt(index) as Sutra;
+            valueListenable: sutraBox.listenable(),
+            builder: (context, box, child) {
+              return ListView.builder(
+                itemCount: sutraBox.length,
+                itemBuilder: ((context, index) {
+                  final sutra = sutraBox.getAt(index) as Sutra;
 
-                    return Card(
+                  return Card(
+                    child: ListTile(
                       // How to add viewDetail function
-                      child: InkWell(
-                        onTap: () => viewDetail(context, index),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                sutra.title.toString(),
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                      leading: IconButton(
+                        onPressed: () => {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => EditSutraList(
+                                index: index,
+                                id: sutra.id,
+                                title: sutra.title.toString(),
+                                content: sutra.content.toString(),
+                                category: sutra.category.toString(),
                               ),
-                              const SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      sutra.category.toString(),
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.grey,
-                                      ),
-                                      textAlign: TextAlign.right,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                            ),
+                          )
+                        },
+                        icon: const Icon(
+                          Icons.edit,
+                          color: Color.fromARGB(241, 179, 93, 78),
                         ),
                       ),
-                    );
-                  }),
-                );
-              }),
+                      title: Text(
+                        sutra.title.toString(),
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(sutra.category.toString()),
+                        ],
+                      ),
+                      trailing: IconButton(
+                        onPressed: () => {
+                          sutraBox.deleteAt(index),
+                        },
+                        icon: const Icon(
+                          Icons.delete,
+                          color: Color.fromARGB(241, 179, 93, 78),
+                        ),
+                      ),
+
+                      onTap: () => viewDetail(context, index),
+                    ),
+                  );
+                }),
+              );
+            },
+          ),
         ),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
             Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => const AddSutraList(
-                          title: 'ລາຍການທີ່ບັນທຶກ',
-                        )));
+              context,
+              MaterialPageRoute(
+                builder: (_) => const AddSutraList(
+                  title: 'ລາຍການທີ່ບັນທຶກ',
+                ),
+              ),
+            );
           },
           label: const Text('ເພີ່ມ'),
           icon: const Icon(Icons.add),

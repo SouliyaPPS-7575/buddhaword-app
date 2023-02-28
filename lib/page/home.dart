@@ -31,6 +31,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       context,
       MaterialPageRoute(
         builder: (_) => DetailSutra(
+          index: index,
           title: sutra!.title.toString(),
           content: sutra.content.toString(),
           category: sutra.category.toString(),

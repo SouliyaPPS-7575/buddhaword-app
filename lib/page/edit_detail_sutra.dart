@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:lao_tipitaka/page/edit_sutra.dart';
+import 'package:lao_tipitaka/main.dart';
+import 'package:lao_tipitaka/model/sutra.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class EditDetailSutra extends StatefulWidget {
   const EditDetailSutra({
@@ -22,6 +24,7 @@ class _EditDetailSutraState extends State<EditDetailSutra>
   double _scale = 1.0;
   late Animation<double> _scaleAnimation;
   late AnimationController _scaleController;
+  late Box<Sutra> sutraBox;
 
   @override
   void dispose() {
@@ -32,6 +35,7 @@ class _EditDetailSutraState extends State<EditDetailSutra>
   @override
   void initState() {
     super.initState();
+    sutraBox = Hive.box<Sutra>("sutra");
     _scaleController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 200));
     _scaleAnimation =
@@ -74,30 +78,10 @@ class _EditDetailSutraState extends State<EditDetailSutra>
     });
   }
 
-  void _onEditPressed() {
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (BuildContext context) => const EditSutraList(
-              title: '',
-              content: '',
-              category: '',
-            )));
-  }
-
-  void _onDeletePressed() {}
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("ພຣະສູດ"),
-        backgroundColor: const Color.fromARGB(241, 179, 93, 78),
-        actions: [
-          IconButton(icon: const Icon(Icons.edit), onPressed: _onEditPressed),
-          IconButton(
-              icon: const Icon(Icons.delete), onPressed: _onDeletePressed),
-        ],
-      ),
-      // drawer: const NavigationDrawer(),
+      drawer: const NavigationDrawer(),
       body: CustomScrollView(
         slivers: <Widget>[
           SliverToBoxAdapter(

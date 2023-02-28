@@ -4,11 +4,12 @@ import 'package:lao_tipitaka/main.dart';
 class DetailSutra extends StatefulWidget {
   const DetailSutra({
     Key? key,
+    required this.index,
     required this.title,
     required this.content,
     required this.category,
   }) : super(key: key);
-
+  final int index;
   final String category;
   final String content;
   final String title;
