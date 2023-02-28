@@ -8,16 +8,23 @@ import 'package:lao_tipitaka/model/sutra.dart';
 import 'package:lao_tipitaka/page/sutraL_list.dart';
 import 'package:html_editor_enhanced/html_editor.dart';
 
-class AddSutraList extends StatefulWidget {
-  const AddSutraList({Key? key, required this.title}) : super(key: key);
+class EditSutraList extends StatefulWidget {
+  const EditSutraList({
+    Key? key,
+    required this.title,
+    required this.content,
+    required this.category,
+  }) : super(key: key);
 
   final String title;
+  final String content;
+  final String category;
 
   @override
-  State<AddSutraList> createState() => _AddSutraListState();
+  State<EditSutraList> createState() => _EditSutraListState();
 }
 
-class _AddSutraListState extends State<AddSutraList>
+class _EditSutraListState extends State<EditSutraList>
     with TickerProviderStateMixin {
   String? category;
   String? content;
@@ -66,7 +73,7 @@ class _AddSutraListState extends State<AddSutraList>
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('ເພີ່ມພຣະສູດ'),
+          title: const Text('ເເກ້ໄຂພຣະສູດ'),
           backgroundColor: const Color.fromARGB(241, 179, 93, 78),
         ),
         drawer: const NavigationDrawer(),

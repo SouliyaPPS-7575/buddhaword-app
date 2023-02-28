@@ -4,7 +4,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lao_tipitaka/main.dart';
 import 'package:lao_tipitaka/model/sutra.dart';
 import 'package:lao_tipitaka/page/add_sutra.dart';
-import 'package:lao_tipitaka/page/detail_sutra.dart';
+import 'package:lao_tipitaka/page/edit_detail_sutra.dart';
 
 class SutraList extends StatefulWidget {
   const SutraList({Key? key, required this.title}) : super(key: key);
@@ -32,7 +32,7 @@ class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => DetailSutra(
+        builder: (_) => EditDetailSutra(
           title: sutra!.title.toString(),
           content: sutra.content.toString(),
           category: sutra.category.toString(),
@@ -82,11 +82,27 @@ class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
                             children: [
                               Text(
                                 sutra.title.toString(),
-                                style: const TextStyle(fontSize: 20),
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                              // Text(
-                              //   sutra.category.toString(),
-                              // ),
+                              const SizedBox(height: 8),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      sutra.category.toString(),
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.grey,
+                                      ),
+                                      textAlign: TextAlign.right,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
                         ),
@@ -107,6 +123,7 @@ class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
           },
           label: const Text('ເພີ່ມ'),
           icon: const Icon(Icons.add),
+          backgroundColor: const Color.fromARGB(241, 179, 93, 78),
         ),
       ),
     );

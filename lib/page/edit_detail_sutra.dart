@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:lao_tipitaka/main.dart';
+import 'package:lao_tipitaka/page/edit_sutra.dart';
 
-class DetailSutra extends StatefulWidget {
-  const DetailSutra({
+class EditDetailSutra extends StatefulWidget {
+  const EditDetailSutra({
     Key? key,
     required this.title,
     required this.content,
@@ -14,10 +14,10 @@ class DetailSutra extends StatefulWidget {
   final String title;
 
   @override
-  State<DetailSutra> createState() => _DetailSutraState();
+  State<EditDetailSutra> createState() => _EditDetailSutraState();
 }
 
-class _DetailSutraState extends State<DetailSutra>
+class _EditDetailSutraState extends State<EditDetailSutra>
     with SingleTickerProviderStateMixin {
   double _scale = 1.0;
   late Animation<double> _scaleAnimation;
@@ -74,18 +74,32 @@ class _DetailSutraState extends State<DetailSutra>
     });
   }
 
+  void _onEditPressed() {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) => const EditSutraList(
+              title: '',
+              content: '',
+              category: '',
+            )));
+  }
+
+  void _onDeletePressed() {}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const NavigationDrawer(),
+      appBar: AppBar(
+        title: const Text("ພຣະສູດ"),
+        backgroundColor: const Color.fromARGB(241, 179, 93, 78),
+        actions: [
+          IconButton(icon: const Icon(Icons.edit), onPressed: _onEditPressed),
+          IconButton(
+              icon: const Icon(Icons.delete), onPressed: _onDeletePressed),
+        ],
+      ),
+      // drawer: const NavigationDrawer(),
       body: CustomScrollView(
         slivers: <Widget>[
-          const SliverAppBar(
-            title: Text("ພຣະສູດ"),
-            backgroundColor: Color.fromARGB(241, 179, 93, 78),
-            floating: true,
-            snap: true,
-          ),
           SliverToBoxAdapter(
             child: GestureDetector(
               onScaleStart: _onScaleStart,
