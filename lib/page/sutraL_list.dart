@@ -106,8 +106,33 @@ class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
                         ],
                       ),
                       trailing: IconButton(
-                        onPressed: () => {
-                          sutraBox.deleteAt(index),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text("ຢືນຢັນການລົບ"),
+                                // ignore: prefer_const_constructors
+                                content: const Text(
+                                    "ທ່ານຕ້ອງການລົບພຣະສູດນິ້ ຫຼື ບໍ່?"),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text("Cancel"),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                      sutraBox.deleteAt(index);
+                                    },
+                                    child: const Text("Delete"),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
                         },
                         icon: const Icon(
                           Icons.delete,
