@@ -49,6 +49,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 
+  final TextEditingController searchController = TextEditingController();
+
   void performSearch(String query) {
     setState(() {
       searchText = query;
@@ -85,14 +87,25 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: TextField(
+                  controller: searchController,
                   style: const TextStyle(fontSize: 17.0),
                   focusNode: searchFocusNode,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'ຄົ້ນຫາ...',
-                    prefixIcon: Icon(Icons.search),
-                    hoverColor: Color.fromARGB(241, 179, 93, 78),
-                    fillColor: Color.fromARGB(241, 179, 93, 78),
-                    focusColor: Color.fromARGB(241, 179, 93, 78),
+                    prefixIcon: const Icon(Icons.search),
+                    hoverColor: const Color.fromARGB(241, 179, 93, 78),
+                    fillColor: const Color.fromARGB(241, 179, 93, 78),
+                    focusColor: const Color.fromARGB(241, 179, 93, 78),
+                    suffixIcon: searchController.text.isNotEmpty
+                        ? IconButton(
+                            onPressed: () => {
+                              searchController.clear(),
+                              performSearch(''),
+                            },
+                            icon: const Icon(Icons.clear),
+                            splashRadius: 20.0,
+                          )
+                        : null,
                   ),
                   onChanged: (value) => performSearch(value),
                 ),
