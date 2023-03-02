@@ -19,11 +19,22 @@ class SutraList extends StatefulWidget {
 class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
   late Box<Sutra> sutraBox;
   late final Function updateListViewLength;
+  late String searchText;
+  late List<Sutra> searchResults;
+  late FocusNode searchFocusNode;
 
   @override
   void initState() {
     super.initState();
     sutraBox = Hive.box<Sutra>("sutra");
+    searchText = '';
+    searchFocusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    searchFocusNode.dispose();
+    super.dispose();
   }
 
   // How to create view detail page
@@ -42,127 +53,167 @@ class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
     );
   }
 
+  final TextEditingController searchController = TextEditingController();
+
+  void performSearch(String query) {
+    setState(() {
+      searchText = query;
+      if (searchText.isNotEmpty) {
+        searchResults = sutraBox.values
+            .where((sutra) =>
+                sutra.title.toLowerCase().contains(searchText.toLowerCase()) ||
+                sutra.content
+                    .toLowerCase()
+                    .contains(searchText.toLowerCase()) ||
+                sutra.category.toLowerCase().contains(searchText.toLowerCase()))
+            .toList();
+      } else {
+        searchResults = sutraBox.values.toList();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return ScaleTransition(
-      scale: Tween<double>(begin: 0.5, end: 1.0).animate(
-        CurvedAnimation(
-          parent: AnimationController(
-            vsync: this,
-            duration: const Duration(seconds: 1),
-          )..forward(),
-          curve: Curves.fastOutSlowIn,
-        ),
-      ),
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("ລາຍການພຣະສູດ"),
-          backgroundColor: const Color.fromARGB(241, 179, 93, 78),
-        ),
-        drawer: const NavigationDrawer(),
-        body: InteractiveViewer(
-          boundaryMargin: const EdgeInsets.all(double.maxFinite),
-          child: ValueListenableBuilder(
-            valueListenable: sutraBox.listenable(),
-            builder: (context, box, child) {
-              return ListView.builder(
-                itemCount: sutraBox.length,
-                itemBuilder: ((context, index) {
-                  final sutra = sutraBox.getAt(index) as Sutra;
-
-                  return Card(
-                    child: ListTile(
-                      // How to add viewDetail function
-                      leading: IconButton(
-                        onPressed: () => {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => EditSutraList(
-                                index: index,
-                                id: sutra.id,
-                                title: sutra.title.toString(),
-                                content: sutra.content.toString(),
-                                category: sutra.category.toString(),
-                              ),
-                            ),
-                          )
-                        },
-                        icon: const Icon(
-                          Icons.edit,
-                          color: Color.fromARGB(241, 179, 93, 78),
-                        ),
-                      ),
-                      title: Text(
-                        sutra.title.toString(),
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      subtitle: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(sutra.category.toString()),
-                        ],
-                      ),
-                      trailing: IconButton(
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: const Text("ຢືນຢັນການລົບ"),
-                                // ignore: prefer_const_constructors
-                                content: const Text(
-                                    "ທ່ານຕ້ອງການລົບພຣະສູດນິ້ ຫຼື ບໍ່?"),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text("Cancel"),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                      sutraBox.deleteAt(index);
-                                    },
-                                    child: const Text("Delete"),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        },
-                        icon: const Icon(
-                          Icons.delete,
-                          color: Color.fromARGB(241, 179, 93, 78),
-                        ),
-                      ),
-
-                      onTap: () => viewDetail(context, index),
-                    ),
-                  );
-                }),
-              );
-            },
-          ),
-        ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const AddSutraList(
-                  title: 'ລາຍການທີ່ບັນທຶກ',
+    return Scaffold(
+      appBar: searchText.isEmpty
+          ? AppBar(
+              title: const Text("ລາຍການພຣະສູດ"),
+              backgroundColor: const Color.fromARGB(241, 179, 93, 78),
+            )
+          : null,
+      drawer: const NavigationDrawer(),
+      body: InteractiveViewer(
+        boundaryMargin: const EdgeInsets.all(double.maxFinite),
+        child: SafeArea(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: TextField(
+                  style: const TextStyle(fontSize: 17.0),
+                  focusNode: searchFocusNode,
+                  decoration: const InputDecoration(
+                    hintText: 'ຄົ້ນຫາ...',
+                    prefixIcon: Icon(Icons.search),
+                    hoverColor: Color.fromARGB(241, 179, 93, 78),
+                    fillColor: Color.fromARGB(241, 179, 93, 78),
+                    focusColor: Color.fromARGB(241, 179, 93, 78),
+                  ),
+                  onChanged: (value) => performSearch(value),
                 ),
               ),
-            );
-          },
-          label: const Text('ເພີ່ມ'),
-          icon: const Icon(Icons.add),
-          backgroundColor: const Color.fromARGB(241, 179, 93, 78),
+              Expanded(
+                child: ValueListenableBuilder(
+                  valueListenable: sutraBox.listenable(),
+                  builder: (context, box, child) {
+                    final sutras = sutraBox.values
+                        .where((sutra) => sutra.title
+                            .toString()
+                            .toLowerCase()
+                            .contains(searchText.toLowerCase()))
+                        .toList();
+                    return ListView.builder(
+                      itemCount: sutras.length,
+                      itemBuilder: ((context, index) {
+                        final sutra = sutras[index];
+
+                        return Card(
+                          child: ListTile(
+                            // How to add viewDetail function
+                            leading: IconButton(
+                              onPressed: () => {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => EditSutraList(
+                                      index: index,
+                                      id: sutra.id,
+                                      title: sutra.title.toString(),
+                                      content: sutra.content.toString(),
+                                      category: sutra.category.toString(),
+                                    ),
+                                  ),
+                                )
+                              },
+                              icon: const Icon(
+                                Icons.edit,
+                                color: Color.fromARGB(241, 179, 93, 78),
+                              ),
+                            ),
+                            title: Text(
+                              sutra.title.toString(),
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(sutra.category.toString()),
+                              ],
+                            ),
+                            trailing: IconButton(
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: const Text("ຢືນຢັນການລົບ"),
+                                      // ignore: prefer_const_constructors
+                                      content: const Text(
+                                          "ທ່ານຕ້ອງການລົບພຣະສູດນິ້ ຫຼື ບໍ່?"),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: const Text("Cancel"),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                            sutraBox.deleteAt(index);
+                                          },
+                                          child: const Text("Delete"),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                              icon: const Icon(
+                                Icons.delete,
+                                color: Color.fromARGB(241, 179, 93, 78),
+                              ),
+                            ),
+
+                            onTap: () => viewDetail(context, index),
+                          ),
+                        );
+                      }),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const AddSutraList(
+                title: 'ລາຍການທີ່ບັນທຶກ',
+              ),
+            ),
+          );
+        },
+        label: const Text('ເພີ່ມ'),
+        icon: const Icon(Icons.add),
+        backgroundColor: const Color.fromARGB(241, 179, 93, 78),
       ),
     );
   }

@@ -36,19 +36,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   void viewDetail(BuildContext context, int index) {
     final sutra = sutraBox.getAt(index);
-    Navigator.pushReplacement(
+    Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => Scaffold(
-          appBar: AppBar(
-            title: Text(sutra!.title.toString()),
-          ),
-          body: DetailSutra(
-            index: index,
-            title: sutra.title.toString(),
-            content: sutra.content.toString(),
-            category: sutra.category.toString(),
-          ),
+        builder: (_) => DetailSutra(
+          index: index,
+          title: sutra!.title.toString(),
+          content: sutra.content.toString(),
+          category: sutra.category.toString(),
         ),
       ),
     );
@@ -74,143 +69,132 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return ScaleTransition(
-      scale: Tween<double>(begin: 0.5, end: 1.0).animate(
-        CurvedAnimation(
-          parent: AnimationController(
-            vsync: this,
-            duration: const Duration(seconds: 1),
-          )..forward(),
-          curve: Curves.fastOutSlowIn,
-        ),
-      ),
-      child: Scaffold(
-        appBar: searchText.isEmpty
-            ? AppBar(
-                title: Text(widget.title),
-                backgroundColor: const Color.fromARGB(241, 179, 93, 78),
-              )
-            : null,
-        drawer: const NavigationDrawer(),
-        body: InteractiveViewer(
-          boundaryMargin: const EdgeInsets.all(double.maxFinite),
-          child: SafeArea(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: TextField(
-                    focusNode: searchFocusNode,
-                    decoration: const InputDecoration(
-                      hintText: 'Search',
-                      prefixIcon: Icon(Icons.search),
-                    ),
-                    onChanged: (value) => performSearch(value),
+    return Scaffold(
+      appBar: searchText.isEmpty
+          ? AppBar(
+              title: Text(widget.title),
+              backgroundColor: const Color.fromARGB(241, 179, 93, 78),
+            )
+          : null,
+      drawer: const NavigationDrawer(),
+      body: InteractiveViewer(
+        boundaryMargin: const EdgeInsets.all(double.maxFinite),
+        child: SafeArea(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: TextField(
+                  style: const TextStyle(fontSize: 17.0),
+                  focusNode: searchFocusNode,
+                  decoration: const InputDecoration(
+                    hintText: 'ຄົ້ນຫາ...',
+                    prefixIcon: Icon(Icons.search),
+                    hoverColor: Color.fromARGB(241, 179, 93, 78),
+                    fillColor: Color.fromARGB(241, 179, 93, 78),
+                    focusColor: Color.fromARGB(241, 179, 93, 78),
                   ),
+                  onChanged: (value) => performSearch(value),
                 ),
-                Expanded(
-                  child: ValueListenableBuilder(
-                    valueListenable: sutraBox.listenable(),
-                    builder: (context, box, child) {
-                      if (searchText.isNotEmpty) {
-                        return ListView.builder(
-                          itemCount: searchResults.length,
-                          itemBuilder: ((context, index) {
-                            final sutra = searchResults[index];
-                            return GestureDetector(
-                              onTap: () => viewDetail(
-                                context,
-                                sutraBox.values.toList().indexOf(sutra),
-                              ),
-                              child: Card(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        sutra.title.toString(),
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+              ),
+              Expanded(
+                child: ValueListenableBuilder(
+                  valueListenable: sutraBox.listenable(),
+                  builder: (context, box, child) {
+                    if (searchText.isNotEmpty) {
+                      return ListView.builder(
+                        itemCount: searchResults.length,
+                        itemBuilder: ((context, index) {
+                          final sutra = searchResults[index];
+                          return GestureDetector(
+                            onTap: () => viewDetail(
+                              context,
+                              sutraBox.values.toList().indexOf(sutra),
+                            ),
+                            child: Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      sutra.title.toString(),
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
                                       ),
-                                      const SizedBox(height: 8),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              sutra.category.toString(),
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.grey,
-                                              ),
-                                              textAlign: TextAlign.right,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            sutra.category.toString(),
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.grey,
                                             ),
+                                            textAlign: TextAlign.right,
                                           ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               ),
-                            );
-                          }),
-                        );
-                      } else {
-                        return ListView.builder(
-                          itemCount: sutraBox.length,
-                          itemBuilder: ((context, index) {
-                            final sutra = sutraBox.getAt(index) as Sutra;
-                            return GestureDetector(
-                              onTap: () => viewDetail(context, index),
-                              child: Card(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        sutra.title.toString(),
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                            ),
+                          );
+                        }),
+                      );
+                    } else {
+                      return ListView.builder(
+                        itemCount: sutraBox.length,
+                        itemBuilder: ((context, index) {
+                          final sutra = sutraBox.getAt(index) as Sutra;
+                          return GestureDetector(
+                            onTap: () => viewDetail(context, index),
+                            child: Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      sutra.title.toString(),
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
                                       ),
-                                      const SizedBox(height: 8),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              sutra.category.toString(),
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.grey,
-                                              ),
-                                              textAlign: TextAlign.right,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            sutra.category.toString(),
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.grey,
                                             ),
+                                            textAlign: TextAlign.right,
                                           ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               ),
-                            );
-                          }),
-                        );
-                      }
-                    },
-                  ),
+                            ),
+                          );
+                        }),
+                      );
+                    }
+                  },
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

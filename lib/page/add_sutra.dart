@@ -54,205 +54,192 @@ class _AddSutraListState extends State<AddSutraList>
 
   @override
   Widget build(BuildContext context) {
-    return ScaleTransition(
-      scale: Tween<double>(begin: 0.5, end: 1.0).animate(
-        CurvedAnimation(
-          parent: AnimationController(
-            vsync: this,
-            duration: const Duration(seconds: 1),
-          )..forward(),
-          curve: Curves.fastOutSlowIn,
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('ເພີ່ມພຣະສູດ'),
+        backgroundColor: const Color.fromARGB(241, 179, 93, 78),
       ),
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('ເພີ່ມພຣະສູດ'),
-          backgroundColor: const Color.fromARGB(241, 179, 93, 78),
-        ),
-        drawer: const NavigationDrawer(),
-        body: SingleChildScrollView(
-          child: InteractiveViewer(
-            maxScale: 4.0,
-            minScale: 0.5,
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: FormBuilder(
-                    key: _formkey,
-                    onChanged: () => print("Form has been changed"),
-                    // ignore: prefer_const_literals_to_create_immutables
-                    initialValue: {
-                      'number': "${Random().nextInt(100)}",
-                    },
-                    skipDisabled: true,
-                    child: Column(
-                      children: <Widget>[
-                        Visibility(
-                          visible: false,
-                          child: FormBuilderTextField(
-                            keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
-                              labelText: 'ລະຫັດ',
-                              helperText: 'ໃສ່ລະຫັດ',
-                            ),
-                            onSaved: (value) {
-                              id = int.parse(value.toString());
-                            },
-                            name: 'number',
-                            enabled: false,
-                          ),
-                        ),
-                        FormBuilderTextField(
-                          keyboardType: TextInputType.name,
+      drawer: const NavigationDrawer(),
+      body: SingleChildScrollView(
+        child: InteractiveViewer(
+          maxScale: 4.0,
+          minScale: 0.5,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: FormBuilder(
+                  key: _formkey,
+                  onChanged: () => print("Form has been changed"),
+                  // ignore: prefer_const_literals_to_create_immutables
+                  initialValue: {
+                    'number': "${Random().nextInt(100)}",
+                  },
+                  skipDisabled: true,
+                  child: Column(
+                    children: <Widget>[
+                      Visibility(
+                        visible: false,
+                        child: FormBuilderTextField(
+                          keyboardType: TextInputType.number,
                           decoration: const InputDecoration(
-                            labelText: 'ຊື່ພຣະສູດ',
-                            helperText: 'ໃສ່ຊື່ພຣະສູດ',
+                            labelText: 'ລະຫັດ',
+                            helperText: 'ໃສ່ລະຫັດ',
                           ),
                           onSaved: (value) {
-                            title = value.toString();
+                            id = int.parse(value.toString());
                           },
-                          name: 'textfield',
-                          enabled: true,
-                          autovalidateMode: AutovalidateMode.always,
-                          validator: (val) {
-                            if (val == null || val == "") {
-                              return 'ກະລຸນາໃສ່ຊື່ພຣະສູດ';
-                            }
-                            return null;
-                          },
+                          name: 'number',
+                          enabled: false,
                         ),
-                        FormBuilderDropdown(
-                          decoration: const InputDecoration(
-                            labelText: 'ໝວດທັມ',
-                            helperText: 'ໃສ່ໝວດທັມ',
-                          ),
-                          name: "dropdown",
-                          onSaved: (value) {
-                            category = value.toString();
-                          },
-                          autovalidateMode: AutovalidateMode.always,
-                          enabled: true,
-                          validator: (val) {
-                            if (val == null || val == "") {
-                              return 'ກະລຸນາໃສ່ໝວດທັມ';
-                            }
-                            return null;
-                          },
-                          items:
-                              ['ທັມໃນເບື້ອງຕົ້ນ', 'ທັມໃນທ່າມກາງ', 'ທັມໃນທີສຸດ']
-                                  .map((category) => DropdownMenuItem(
-                                        value: category,
-                                        child: Text('$category'),
-                                      ))
-                                  .toList(),
+                      ),
+                      FormBuilderTextField(
+                        keyboardType: TextInputType.name,
+                        decoration: const InputDecoration(
+                          labelText: 'ຊື່ພຣະສູດ',
+                          helperText: 'ໃສ່ຊື່ພຣະສູດ',
                         ),
-                        const SizedBox(
-                          height: 15,
+                        onSaved: (value) {
+                          title = value.toString();
+                        },
+                        name: 'textfield',
+                        enabled: true,
+                        autovalidateMode: AutovalidateMode.always,
+                        validator: (val) {
+                          if (val == null || val == "") {
+                            return 'ກະລຸນາໃສ່ຊື່ພຣະສູດ';
+                          }
+                          return null;
+                        },
+                      ),
+                      FormBuilderDropdown(
+                        decoration: const InputDecoration(
+                          labelText: 'ໝວດທັມ',
+                          helperText: 'ໃສ່ໝວດທັມ',
                         ),
-                        SingleChildScrollView(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              SizedBox(
-                                child: FormBuilderTextField(
-                                  style: const TextStyle(
-                                      fontSize: 20.0,
-                                      height: 2.0,
-                                      color: Colors.black),
-                                  keyboardType: TextInputType.multiline,
-                                  decoration: const InputDecoration(
-                                    labelText: 'ພຣະສູດ',
-                                    helperText: 'ໃສ່ພຣະສູດ',
-                                    border: OutlineInputBorder(),
-                                  ),
-                                  maxLines: 9, // <-- SEE HERE
-                                  minLines: 4, // <-- SEE HERE
-                                  onSaved: (value) {
-                                    content = value.toString();
-                                  },
-                                  name: 'textfield',
-                                  enabled: true,
-                                  autovalidateMode: AutovalidateMode.always,
-                                  validator: (val) {
-                                    if (val == null || val == "") {
-                                      return 'ກະລຸນາໃສ່ພຣະສູດ';
-                                    }
-                                    return null;
-                                  },
+                        name: "dropdown",
+                        onSaved: (value) {
+                          category = value.toString();
+                        },
+                        autovalidateMode: AutovalidateMode.always,
+                        enabled: true,
+                        validator: (val) {
+                          if (val == null || val == "") {
+                            return 'ກະລຸນາໃສ່ໝວດທັມ';
+                          }
+                          return null;
+                        },
+                        items: ['ທັມໃນເບື້ອງຕົ້ນ', 'ທັມໃນທ່າມກາງ', 'ທັມໃນທີສຸດ']
+                            .map((category) => DropdownMenuItem(
+                                  value: category,
+                                  child: Text('$category'),
+                                ))
+                            .toList(),
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      SingleChildScrollView(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            SizedBox(
+                              child: FormBuilderTextField(
+                                style: const TextStyle(
+                                    fontSize: 20.0,
+                                    height: 2.0,
+                                    color: Colors.black),
+                                keyboardType: TextInputType.multiline,
+                                decoration: const InputDecoration(
+                                  labelText: 'ພຣະສູດ',
+                                  helperText: 'ໃສ່ພຣະສູດ',
+                                  border: OutlineInputBorder(),
                                 ),
+                                maxLines: 9, // <-- SEE HERE
+                                minLines: 4, // <-- SEE HERE
+                                onSaved: (value) {
+                                  content = value.toString();
+                                },
+                                name: 'textfield',
+                                enabled: true,
+                                autovalidateMode: AutovalidateMode.always,
+                                validator: (val) {
+                                  if (val == null || val == "") {
+                                    return 'ກະລຸນາໃສ່ພຣະສູດ';
+                                  }
+                                  return null;
+                                },
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                        // SingleChildScrollView(
-                        //   child: Column(
-                        //     mainAxisAlignment: MainAxisAlignment.center,
-                        //     children: <Widget>[
-                        //       HtmlEditor(
-                        //         controller: controller,
-                        //         htmlEditorOptions: const HtmlEditorOptions(
-                        //           hint: 'ໃສ່ພຣະສູດ...',
-                        //           shouldEnsureVisible: true,
-                        //         ),
-                        //         otherOptions: const OtherOptions(
-                        //           height: 400,
-                        //         ),
-                        //         htmlToolbarOptions: const HtmlToolbarOptions(
-                        //           toolbarPosition:
-                        //               ToolbarPosition.aboveEditor, //by default
-                        //           toolbarType:
-                        //               ToolbarType.nativeScrollable, //by default
-                        //         ),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
-                      ],
-                    ),
+                      ),
+                      // SingleChildScrollView(
+                      //   child: Column(
+                      //     mainAxisAlignment: MainAxisAlignment.center,
+                      //     children: <Widget>[
+                      //       HtmlEditor(
+                      //         controller: controller,
+                      //         htmlEditorOptions: const HtmlEditorOptions(
+                      //           hint: 'ໃສ່ພຣະສູດ...',
+                      //           shouldEnsureVisible: true,
+                      //         ),
+                      //         otherOptions: const OtherOptions(
+                      //           height: 400,
+                      //         ),
+                      //         htmlToolbarOptions: const HtmlToolbarOptions(
+                      //           toolbarPosition:
+                      //               ToolbarPosition.aboveEditor, //by default
+                      //           toolbarType:
+                      //               ToolbarType.nativeScrollable, //by default
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
+                    ],
                   ),
                 ),
-                FloatingActionButton.extended(
-                  onPressed: () {
-                    final valid = (_formkey.currentState?.validate() ?? false);
-                    if (!valid) {
-                      showDialog(
-                          context: context,
-                          builder: (context) => const SimpleDialog(
-                                contentPadding: EdgeInsets.all(20),
-                                title: Text('ກະລຸນາກວດສອບຂໍ້ມູນ'),
-                                children: [
-                                  Text(
-                                      'ກະລຸນາກວດສອບຂໍ້ມູນທີ່ທ່ານປ້ອນຄືນກ່ອນການບັນທຶກ')
-                                ],
-                              ));
-                    } else {
-                      saveSutra();
-                      showDialog(
+              ),
+              FloatingActionButton.extended(
+                onPressed: () {
+                  final valid = (_formkey.currentState?.validate() ?? false);
+                  if (!valid) {
+                    showDialog(
                         context: context,
-                        builder: (_) => const AlertDialog(
-                          content: Text("ສຳເລັດ"),
-                        ),
-                      );
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return const SutraList(title: "ລາຍການພຣະສູດ");
-                          },
-                        ),
-                      );
-                    }
-                  },
-                  label: const Text('ບັນທຶກ'),
-                  icon: const Icon(Icons.save),
-                  backgroundColor: const Color.fromARGB(241, 179, 93, 78),
-                ),
-              ],
-            ),
+                        builder: (context) => const SimpleDialog(
+                              contentPadding: EdgeInsets.all(20),
+                              title: Text('ກະລຸນາກວດສອບຂໍ້ມູນ'),
+                              children: [
+                                Text(
+                                    'ກະລຸນາກວດສອບຂໍ້ມູນທີ່ທ່ານປ້ອນຄືນກ່ອນການບັນທຶກ')
+                              ],
+                            ));
+                  } else {
+                    saveSutra();
+                    showDialog(
+                      context: context,
+                      builder: (_) => const AlertDialog(
+                        content: Text("ສຳເລັດ"),
+                      ),
+                    );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return const SutraList(title: "ລາຍການພຣະສູດ");
+                        },
+                      ),
+                    );
+                  }
+                },
+                label: const Text('ບັນທຶກ'),
+                icon: const Icon(Icons.save),
+                backgroundColor: const Color.fromARGB(241, 179, 93, 78),
+              ),
+            ],
           ),
         ),
-        // floatingActionButton:
       ),
     );
   }
