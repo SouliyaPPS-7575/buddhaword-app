@@ -177,6 +177,7 @@ class _DetailSutraState extends State<DetailSutra>
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           FloatingActionButton(
+            heroTag: 'fab1',
             onPressed: _onZoomInPressed,
             backgroundColor: const Color(0xFFF5F5F5),
             child: const Icon(
@@ -186,6 +187,7 @@ class _DetailSutraState extends State<DetailSutra>
           ),
           const SizedBox(width: 10),
           FloatingActionButton(
+            heroTag: 'fab2',
             onPressed: _onZoomOutPressed,
             backgroundColor: const Color(0xFFF5F5F5),
             child: const Icon(

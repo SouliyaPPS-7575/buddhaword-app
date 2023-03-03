@@ -269,6 +269,7 @@ class _EditSutraListState extends State<EditSutraList>
                 ),
               ),
               FloatingActionButton.extended(
+                heroTag: 'fab1',
                 onPressed: () {
                   final valid = (_formkey.currentState?.validate() ?? false);
                   if (!valid) {
@@ -309,7 +310,6 @@ class _EditSutraListState extends State<EditSutraList>
           ),
         ),
       ),
-      // floatingActionButton:
     );
   }
 }

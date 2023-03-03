@@ -1,4 +1,5 @@
 // ignore_for_file: unnecessary_const, non_constant_identifier_names, avoid_print, deprecated_member_use, prefer_const_constructors
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lao_tipitaka/model/sutra.dart';
 import 'package:lao_tipitaka/page/home.dart';
@@ -6,23 +7,66 @@ import 'package:lao_tipitaka/page/sutraL_list.dart';
 import 'package:path_provider/path_provider.dart' as path;
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:lao_tipitaka/connection.dart';
+import 'package:mongo_dart/mongo_dart.dart' as mongo;
 
 // import 'package:flutter/rendering.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  syncHiveWithMongo();
+
+  // Call the createHiveListener function
+  syncHiveWithFirebase();
+
+  // Initialize Hive
   final dir = await path.getApplicationDocumentsDirectory();
   Hive.init(dir.path);
   Hive.initFlutter('hive_db');
-
   Hive.registerAdapter<Sutra>(SutraAdapter());
-
   await Hive.openBox<Sutra>("sutra");
 
   // debugPaintSizeEnabled = true;
   // debugPaintBaselinesEnabled = true;
+  // Set up Firestore database
+  final firestore = FirebaseFirestore.instance;
+
+  final box = await Hive.openBox<Sutra>('sutra');
+
+  box.watch().listen((event) async {
+    final List<Sutra> sutraList = box.values.toList();
+    final List data = sutraList.map((sutra) => sutra.toJson()).toList();
+
+    try {
+      await firestore.collection('sutra').doc('data').set({'data': data});
+    } catch (e) {
+      print('Error syncing data to Firestore: $e');
+    }
+  });
 
   runApp(const MyApp());
+}
+
+Future<void> syncHiveWithMongo() async {
+  const String mongoCollectionName = 'sutra';
+
+  // Connect to MongoDB Cloud cluster
+  final mongoDb = mongo.Db(
+      'mongodb+srv://dmin:Admin123@cluster0.kvjswr6.mongodb.net/sutra?retryWrites=true&w=majority');
+  await mongoDb.open();
+  final mongoCollection = mongoDb.collection(mongoCollectionName);
+
+  // Get the Hive box
+  final box = await Hive.openBox<Sutra>('sutra');
+  // Get data from Hive box
+  final List<Sutra> sutraList = box.values.toList();
+
+  final List<Map<String, dynamic>> data =
+      sutraList.map<Map<String, dynamic>>((sutra) => sutra.toJson()).toList();
+
+  // Sync data with MongoDB
+  await mongoCollection.drop();
+  await mongoCollection.insertAll(data);
 }
 
 class MyApp extends StatelessWidget {

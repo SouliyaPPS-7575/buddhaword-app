@@ -202,6 +202,7 @@ class _AddSutraListState extends State<AddSutraList>
                 ),
               ),
               FloatingActionButton.extended(
+                heroTag: 'fab1',
                 onPressed: () {
                   final valid = (_formkey.currentState?.validate() ?? false);
                   if (!valid) {

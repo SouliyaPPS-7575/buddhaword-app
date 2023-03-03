@@ -17,4 +17,6 @@ class Sutra extends HiveObject {
       required this.title,
       required this.content,
       required this.category});
+
+  toJson() {}
 }

@@ -46,6 +46,12 @@ dependencies:
   html_editor_enhanced: ^2.2.0+1-dev.1
   url_launcher: ^6.1.7
   universal_html: ^2.0.8
+  firebase_database: ^10.0.14
+  connectivity: ^3.0.6
+  firebase_auth: ^4.2.9
+  firebase_core: ^2.7.0
+  cloud_firestore: ^4.4.3
+  mongo_dart: ^0.8.2
 
 dev_dependencies:
   flutter_test:
