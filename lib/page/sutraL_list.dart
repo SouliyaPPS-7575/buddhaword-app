@@ -144,128 +144,130 @@ class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
             )
           : null,
       drawer: const NavigationDrawer(),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: TextField(
-              controller: searchController,
-              style: const TextStyle(fontSize: 17.0),
-              focusNode: searchFocusNode,
-              decoration: InputDecoration(
-                hintText: 'ຄົ້ນຫາ...',
-                prefixIcon: const Icon(Icons.search),
-                hoverColor: const Color.fromARGB(241, 179, 93, 78),
-                fillColor: const Color.fromARGB(241, 179, 93, 78),
-                focusColor: const Color.fromARGB(241, 179, 93, 78),
-                suffixIcon: searchController.text.isNotEmpty
-                    ? IconButton(
-                        onPressed: () => {
-                          searchController.clear(),
-                          performSearch(''),
-                        },
-                        icon: const Icon(Icons.clear),
-                        splashRadius: 20.0,
-                      )
-                    : null,
-              ),
-              onChanged: (value) => performSearch(value),
-            ),
-          ),
-          Expanded(
-            child: ValueListenableBuilder(
-              valueListenable: sutraBox.listenable(),
-              builder: (context, box, child) {
-                final sutras = sutraBox.values
-                    .where((sutra) => sutra.title
-                        .toString()
-                        .toLowerCase()
-                        .contains(searchText.toLowerCase()))
-                    .toList();
-                return ListView.builder(
-                  itemCount: sutras.length,
-                  itemBuilder: ((context, index) {
-                    final sutra = sutras[index];
-
-                    return Card(
-                      child: ListTile(
-                        // How to add viewDetail function
-                        leading: IconButton(
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: TextField(
+                controller: searchController,
+                style: const TextStyle(fontSize: 17.0),
+                focusNode: searchFocusNode,
+                decoration: InputDecoration(
+                  hintText: 'ຄົ້ນຫາ...',
+                  prefixIcon: const Icon(Icons.search),
+                  hoverColor: const Color.fromARGB(241, 179, 93, 78),
+                  fillColor: const Color.fromARGB(241, 179, 93, 78),
+                  focusColor: const Color.fromARGB(241, 179, 93, 78),
+                  suffixIcon: searchController.text.isNotEmpty
+                      ? IconButton(
                           onPressed: () => {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => EditSutraList(
-                                  index: index,
-                                  id: sutra.id.toString(),
-                                  title: sutra.title.toString(),
-                                  content: sutra.content.toString(),
-                                  category: sutra.category.toString(),
-                                ),
-                              ),
-                            )
+                            searchController.clear(),
+                            performSearch(''),
                           },
-                          icon: const Icon(
-                            Icons.edit,
-                            color: Color.fromARGB(241, 179, 93, 78),
-                          ),
-                        ),
-                        title: Text(
-                          sutra.title.toString(),
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        subtitle: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Text(sutra.category.toString()),
-                          ],
-                        ),
-                        trailing: IconButton(
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: const Text("ຢືນຢັນການລົບ"),
-                                  // ignore: prefer_const_constructors
-                                  content: const Text(
-                                      "ທ່ານຕ້ອງການລົບພຣະສູດນິ້ ຫຼື ບໍ່?"),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: const Text("Cancel"),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                        sutraBox.deleteAt(index);
-                                      },
-                                      child: const Text("Delete"),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                          icon: const Icon(
-                            Icons.delete,
-                            color: Color.fromARGB(241, 179, 93, 78),
-                          ),
-                        ),
-
-                        onTap: () => viewDetail(context, index),
-                      ),
-                    );
-                  }),
-                );
-              },
+                          icon: const Icon(Icons.clear),
+                          splashRadius: 20.0,
+                        )
+                      : null,
+                ),
+                onChanged: (value) => performSearch(value),
+              ),
             ),
-          ),
-        ],
+            Expanded(
+              child: ValueListenableBuilder(
+                valueListenable: sutraBox.listenable(),
+                builder: (context, box, child) {
+                  final sutras = sutraBox.values
+                      .where((sutra) => sutra.title
+                          .toString()
+                          .toLowerCase()
+                          .contains(searchText.toLowerCase()))
+                      .toList();
+                  return ListView.builder(
+                    itemCount: sutras.length,
+                    itemBuilder: ((context, index) {
+                      final sutra = sutras[index];
+      
+                      return Card(
+                        child: ListTile(
+                          // How to add viewDetail function
+                          leading: IconButton(
+                            onPressed: () => {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => EditSutraList(
+                                    index: index,
+                                    id: sutra.id.toString(),
+                                    title: sutra.title.toString(),
+                                    content: sutra.content.toString(),
+                                    category: sutra.category.toString(),
+                                  ),
+                                ),
+                              )
+                            },
+                            icon: const Icon(
+                              Icons.edit,
+                              color: Color.fromARGB(241, 179, 93, 78),
+                            ),
+                          ),
+                          title: Text(
+                            sutra.title.toString(),
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          subtitle: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(sutra.category.toString()),
+                            ],
+                          ),
+                          trailing: IconButton(
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text("ຢືນຢັນການລົບ"),
+                                    // ignore: prefer_const_constructors
+                                    content: const Text(
+                                        "ທ່ານຕ້ອງການລົບພຣະສູດນິ້ ຫຼື ບໍ່?"),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text("Cancel"),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                          sutraBox.deleteAt(index);
+                                        },
+                                        child: const Text("Delete"),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                            icon: const Icon(
+                              Icons.delete,
+                              color: Color.fromARGB(241, 179, 93, 78),
+                            ),
+                          ),
+      
+                          onTap: () => viewDetail(context, index),
+                        ),
+                      );
+                    }),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {

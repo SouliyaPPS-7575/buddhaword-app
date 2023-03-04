@@ -1,5 +1,3 @@
-// ignore_for_file: await_only_futures
-
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lao_tipitaka/connectionUser.dart';
@@ -23,6 +21,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late String searchText;
   late List<Sutra> searchResults;
   late FocusNode searchFocusNode;
+  late String _selectedCategory;
+  late List<String> _categories;
 
   @override
   void initState() {
@@ -32,6 +32,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     sutraBox = Hive.box<Sutra>("sutra");
     searchText = '';
     searchFocusNode = FocusNode();
+    _categories =
+        sutraBox.values.map((sutra) => sutra.category).toSet().toList();
+    _categories.sort();
+    _selectedCategory = _categories.isNotEmpty ? _categories.first : '';
   }
 
   @override
@@ -56,6 +60,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   final TextEditingController searchController = TextEditingController();
+  final DropdownMenuItem<String> _defaultCategory = const DropdownMenuItem(
+    value: '',
+    child: Text('ທັງໝົດ'),
+  );
 
   void performSearch(String query) {
     setState(() {
@@ -73,6 +81,31 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         searchResults = sutraBox.values.toList();
       }
     });
+  }
+
+  void onSelectCategory(String selectedCategory) {
+    setState(() {
+      _selectedCategory = selectedCategory;
+      if (_selectedCategory.isNotEmpty) {
+        searchResults = sutraBox.values
+            .where((sutra) => sutra.category == _selectedCategory)
+            .toList();
+      } else {
+        searchResults = sutraBox.values.toList();
+      }
+    });
+  }
+
+  List<DropdownMenuItem<String>> _getDropdownItems() {
+    final dropdownItems = <DropdownMenuItem<String>>[];
+    dropdownItems.add(_defaultCategory);
+    dropdownItems.addAll(_categories.map((value) {
+      return DropdownMenuItem<String>(
+        value: value,
+        child: Text(value),
+      );
+    }));
+    return dropdownItems;
   }
 
   @override
@@ -127,28 +160,52 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: TextField(
-                  controller: searchController,
-                  style: const TextStyle(fontSize: 17.0),
-                  focusNode: searchFocusNode,
-                  decoration: InputDecoration(
-                    hintText: 'ຄົ້ນຫາ...',
-                    prefixIcon: const Icon(Icons.search),
-                    hoverColor: const Color.fromARGB(241, 179, 93, 78),
-                    fillColor: const Color.fromARGB(241, 179, 93, 78),
-                    focusColor: const Color.fromARGB(241, 179, 93, 78),
-                    suffixIcon: searchController.text.isNotEmpty
-                        ? IconButton(
-                            onPressed: () => {
-                              searchController.clear(),
-                              performSearch(''),
-                            },
-                            icon: const Icon(Icons.clear),
-                            splashRadius: 20.0,
-                          )
-                        : null,
-                  ),
-                  onChanged: (value) => performSearch(value),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: searchController,
+                        style: const TextStyle(fontSize: 17.0),
+                        focusNode: searchFocusNode,
+                        decoration: InputDecoration(
+                          hintText: 'ຄົ້ນຫາ...',
+                          prefixIcon: const Icon(Icons.search),
+                          hoverColor: const Color.fromARGB(241, 179, 93, 78),
+                          fillColor: const Color.fromARGB(241, 179, 93, 78),
+                          focusColor: const Color.fromARGB(241, 179, 93, 78),
+                          suffixIcon: searchController.text.isNotEmpty
+                              ? IconButton(
+                                  onPressed: () => {
+                                    searchController.clear(),
+                                    performSearch(''),
+                                  },
+                                  icon: const Icon(Icons.clear),
+                                  splashRadius: 20.0,
+                                )
+                              : null,
+                        ),
+                        onChanged: (value) => performSearch(value),
+                      ),
+                    ),
+                    const SizedBox(width: 16.0),
+                    Visibility(
+                      visible: searchController.text.isNotEmpty,
+                      child: DropdownButton<String>(
+                        value: _selectedCategory,
+                        icon: const Icon(Icons.arrow_downward),
+                        iconSize: 20,
+                        elevation: 10,
+                        underline: Container(
+                          height: 2,
+                          color: const Color.fromARGB(241, 179, 93, 78),
+                        ),
+                        items: _getDropdownItems(),
+                        onChanged: (String? value) {
+                          onSelectCategory(value!);
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Expanded(
