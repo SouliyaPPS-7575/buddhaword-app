@@ -3,7 +3,6 @@ import 'package:lao_tipitaka/connectionUser.dart';
 import 'package:flutter/material.dart';
 import 'package:lao_tipitaka/model/sutra.dart';
 import 'package:lao_tipitaka/page/home.dart';
-import 'package:lao_tipitaka/page/sutraL_list.dart';
 import 'package:path_provider/path_provider.dart' as path;
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -910,25 +909,25 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                 ),
               ],
             ),
-            const Divider(
-              color: Colors.black54,
-            ),
-            ListTile(
-              leading: _isChecked
-                  ? Icon(Icons.add, color: _checkColor)
-                  : Icon(Icons.add_outlined, color: _checkColor),
-              title: const Text(
-                'ເພີ່ມພຣະສູດ',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              onTap: () => Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (context) => const SutraList(
-                    title: 'ລາຍການພຣະສູດ',
-                  ),
-                ),
-              ),
-            ),
+            // const Divider(
+            //   color: Colors.black54,
+            // ),
+            // ListTile(
+            //   leading: _isChecked
+            //       ? Icon(Icons.add, color: _checkColor)
+            //       : Icon(Icons.add_outlined, color: _checkColor),
+            //   title: const Text(
+            //     'ເພີ່ມພຣະສູດ',
+            //     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            //   ),
+            //   onTap: () => Navigator.of(context).pushReplacement(
+            //     MaterialPageRoute(
+            //       builder: (context) => const SutraList(
+            //         title: 'ລາຍການພຣະສູດ',
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       );
