@@ -94,7 +94,6 @@ class _EditDetailSutraState extends State<EditDetailSutra>
                   minScale: 1.0,
                   maxScale: 5.0,
                   child: Container(
-                    color: const Color(0xFFF5F5F5),
                     padding: const EdgeInsets.all(10),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,

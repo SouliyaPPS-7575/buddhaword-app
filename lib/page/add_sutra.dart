@@ -2,7 +2,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lao_tipitaka/main.dart';
 import 'package:lao_tipitaka/model/sutra.dart';
 import 'package:lao_tipitaka/page/sutraL_list.dart';
@@ -31,6 +31,7 @@ class _AddSutraListState extends State<AddSutraList>
   void initState() {
     super.initState();
     sutraBox = Hive.box<Sutra>("sutra");
+    Hive.openBox('settings');
   }
 
 // Create
@@ -58,6 +59,24 @@ class _AddSutraListState extends State<AddSutraList>
       appBar: AppBar(
         title: const Text('ເພີ່ມພຣະສູດ'),
         backgroundColor: const Color.fromARGB(241, 179, 93, 78),
+        actions: [
+          ValueListenableBuilder(
+            valueListenable: Hive.box('settings').listenable(),
+            builder: (context, box, child) {
+              final isDark = box.get('isDark', defaultValue: false);
+              return Switch(
+                value: isDark,
+                activeColor: Colors.black87,
+                activeTrackColor: Colors.black87,
+                inactiveThumbColor: Colors.white,
+                inactiveTrackColor: Colors.white,
+                onChanged: (val) {
+                  box.put('isDark', val);
+                },
+              );
+            },
+          ),
+        ],
       ),
       drawer: const NavigationDrawer(),
       body: SingleChildScrollView(
@@ -146,9 +165,9 @@ class _AddSutraListState extends State<AddSutraList>
                             SizedBox(
                               child: FormBuilderTextField(
                                 style: const TextStyle(
-                                    fontSize: 20.0,
-                                    height: 2.0,
-                                    color: Colors.black),
+                                  fontSize: 20.0,
+                                  height: 2.0,
+                                ),
                                 keyboardType: TextInputType.multiline,
                                 decoration: const InputDecoration(
                                   labelText: 'ພຣະສູດ',

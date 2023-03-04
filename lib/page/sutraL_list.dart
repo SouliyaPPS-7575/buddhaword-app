@@ -27,6 +27,8 @@ class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     sutraBox = Hive.box<Sutra>("sutra");
+    Hive.openBox('settings');
+
     searchText = '';
     searchFocusNode = FocusNode();
   }
@@ -80,6 +82,24 @@ class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
           ? AppBar(
               title: const Text("ລາຍການພຣະສູດ"),
               backgroundColor: const Color.fromARGB(241, 179, 93, 78),
+              actions: [
+                ValueListenableBuilder(
+                  valueListenable: Hive.box('settings').listenable(),
+                  builder: (context, box, child) {
+                    final isDark = box.get('isDark', defaultValue: false);
+                    return Switch(
+                      activeColor: Colors.black87,
+                      activeTrackColor: Colors.black87,
+                      inactiveThumbColor: Colors.white,
+                      inactiveTrackColor: Colors.white,
+                      value: isDark,
+                      onChanged: (val) {
+                        box.put('isDark', val);
+                      },
+                    );
+                  },
+                ),
+              ],
             )
           : null,
       drawer: const NavigationDrawer(),

@@ -23,6 +23,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    Hive.openBox('settings');
+
     sutraBox = Hive.box<Sutra>("sutra");
     searchText = '';
     searchFocusNode = FocusNode();
@@ -76,6 +78,24 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ? AppBar(
               title: Text(widget.title),
               backgroundColor: const Color.fromARGB(241, 179, 93, 78),
+              actions: [
+                ValueListenableBuilder(
+                  valueListenable: Hive.box('settings').listenable(),
+                  builder: (context, box, child) {
+                    final isDark = box.get('isDark', defaultValue: false);
+                    return Switch(
+                      activeColor: Colors.black87,
+                      activeTrackColor: Colors.black87,
+                      inactiveThumbColor: Colors.white,
+                      inactiveTrackColor: Colors.white,
+                      value: isDark,
+                      onChanged: (val) {
+                        box.put('isDark', val);
+                      },
+                    );
+                  },
+                ),
+              ],
             )
           : null,
       drawer: const NavigationDrawer(),

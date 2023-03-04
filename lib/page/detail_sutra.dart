@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lao_tipitaka/main.dart';
 
 class DetailSutra extends StatefulWidget {
@@ -33,6 +34,8 @@ class _DetailSutraState extends State<DetailSutra>
   @override
   void initState() {
     super.initState();
+    Hive.openBox('settings');
+
     _scaleController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 200));
     _scaleAnimation =
@@ -81,11 +84,29 @@ class _DetailSutraState extends State<DetailSutra>
       drawer: const NavigationDrawer(),
       body: CustomScrollView(
         slivers: <Widget>[
-          const SliverAppBar(
-            title: Text("ພຣະສູດ"),
-            backgroundColor: Color.fromARGB(241, 179, 93, 78),
+          SliverAppBar(
+            title: const Text("ພຣະສູດ"),
+            backgroundColor: const Color.fromARGB(241, 179, 93, 78),
             floating: true,
             snap: true,
+            actions: [
+              ValueListenableBuilder(
+                valueListenable: Hive.box('settings').listenable(),
+                builder: (context, box, child) {
+                  final isDark = box.get('isDark', defaultValue: false);
+                  return Switch(
+                    activeColor: Colors.black87,
+                    activeTrackColor: Colors.black87,
+                    inactiveThumbColor: Colors.white,
+                    inactiveTrackColor: Colors.white,
+                    value: isDark,
+                    onChanged: (val) {
+                      box.put('isDark', val);
+                    },
+                  );
+                },
+              ),
+            ],
           ),
           SliverToBoxAdapter(
             child: GestureDetector(
@@ -97,7 +118,6 @@ class _DetailSutraState extends State<DetailSutra>
                   minScale: 1.0,
                   maxScale: 5.0,
                   child: Container(
-                    color: const Color(0xFFF5F5F5),
                     padding: const EdgeInsets.all(10),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
