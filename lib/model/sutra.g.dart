@@ -17,7 +17,7 @@ class SutraAdapter extends TypeAdapter<Sutra> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Sutra(
-      id: fields[0] == null ? 0 : fields[0] as int,
+      id: fields[0] as String,
       title: fields[1] as String,
       content: fields[2] as String,
       category: fields[3] as String,

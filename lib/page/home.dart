@@ -1,8 +1,12 @@
+// ignore_for_file: await_only_futures
+
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:lao_tipitaka/connectionUser.dart';
 import 'package:lao_tipitaka/main.dart';
 import 'package:lao_tipitaka/model/sutra.dart';
 import 'package:lao_tipitaka/page/detail_sutra.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key, required this.title}) : super(key: key);
@@ -83,15 +87,32 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   valueListenable: Hive.box('settings').listenable(),
                   builder: (context, box, child) {
                     final isDark = box.get('isDark', defaultValue: false);
-                    return Switch(
-                      activeColor: Colors.black87,
-                      activeTrackColor: Colors.black87,
-                      inactiveThumbColor: Colors.white,
-                      inactiveTrackColor: Colors.white,
-                      value: isDark,
-                      onChanged: (val) {
-                        box.put('isDark', val);
-                      },
+                    return Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.sync),
+                          onPressed: () async {
+                            await syncHiveWithFirebase();
+                            Fluttertoast.showToast(
+                              msg: 'Synced data to Firestore successfully!',
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              backgroundColor: Colors.green,
+                              textColor: Colors.white,
+                            );
+                          },
+                        ),
+                        Switch(
+                          activeColor: Colors.black87,
+                          activeTrackColor: Colors.black87,
+                          inactiveThumbColor: Colors.white,
+                          inactiveTrackColor: Colors.white,
+                          value: isDark,
+                          onChanged: (val) {
+                            box.put('isDark', val);
+                          },
+                        ),
+                      ],
                     );
                   },
                 ),

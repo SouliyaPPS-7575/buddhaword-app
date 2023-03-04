@@ -1,6 +1,5 @@
 // ignore_for_file: unnecessary_const, non_constant_identifier_names, avoid_print, deprecated_member_use, prefer_const_constructors
-// import 'package:lao_tipitaka/mongodb.dart';
-import 'package:lao_tipitaka/connection.dart';
+import 'package:lao_tipitaka/connectionUser.dart';
 import 'package:flutter/material.dart';
 import 'package:lao_tipitaka/model/sutra.dart';
 import 'package:lao_tipitaka/page/home.dart';
@@ -12,8 +11,6 @@ import 'package:url_launcher/url_launcher.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // await MongoDatabase.connect();
-
   // Initialize Hive
   final dir = await path.getApplicationDocumentsDirectory();
   Hive.init(dir.path);
@@ -22,19 +19,20 @@ void main() async {
   await Hive.openBox<Sutra>("sutra");
   await Hive.openBox('settings');
 
-  // debugPaintSizeEnabled = true;
-  // debugPaintBaselinesEnabled = true;
-  // Set up Firestore database
-
   // Call the createHiveListener function
   syncHiveWithFirebase();
 
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {

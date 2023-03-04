@@ -1,8 +1,9 @@
-// ignore_for_file: avoid_print, unnecessary_string_interpolations
-import 'dart:math';
+// ignore_for_file: avoid_print, unnecessary_string_interpolations, await_only_futures, depend_on_referenced_packages
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:lao_tipitaka/connectionUser.dart';
 import 'package:lao_tipitaka/main.dart';
 import 'package:lao_tipitaka/model/sutra.dart';
 import 'package:lao_tipitaka/page/sutraL_list.dart';
@@ -21,11 +22,12 @@ class _AddSutraListState extends State<AddSutraList>
     with TickerProviderStateMixin {
   String? category;
   String? content;
-  int id = 0;
   late Box<Sutra> sutraBox;
   String? title;
-
   final _formkey = GlobalKey<FormBuilderState>();
+  final formKey = GlobalKey<FormBuilderState>();
+  late String id =
+      FirebaseFirestore.instance.collection(kSutraCollection).doc().id;
 
   @override
   void initState() {
@@ -42,7 +44,7 @@ class _AddSutraListState extends State<AddSutraList>
       _formkey.currentState?.save();
       sutraBox.add(
         Sutra(
-          id: id,
+          id: id.toString(),
           title: title.toString(),
           content: content.toString(),
           category: category.toString(),
@@ -90,10 +92,6 @@ class _AddSutraListState extends State<AddSutraList>
                 child: FormBuilder(
                   key: _formkey,
                   onChanged: () => print("Form has been changed"),
-                  // ignore: prefer_const_literals_to_create_immutables
-                  initialValue: {
-                    'number': "${Random().nextInt(100)}",
-                  },
                   skipDisabled: true,
                   child: Column(
                     children: <Widget>[
@@ -106,7 +104,7 @@ class _AddSutraListState extends State<AddSutraList>
                             helperText: 'ໃສ່ລະຫັດ',
                           ),
                           onSaved: (value) {
-                            id = int.parse(value.toString());
+                            id = value.toString();
                           },
                           name: 'number',
                           enabled: false,

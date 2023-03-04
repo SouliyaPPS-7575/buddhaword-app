@@ -1,8 +1,9 @@
 // ignore_for_file: avoid_print, unnecessary_string_interpolations, unused_local_variable
-import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:lao_tipitaka/connectionUser.dart';
 import 'package:lao_tipitaka/main.dart';
 import 'package:lao_tipitaka/model/sutra.dart';
 import 'package:lao_tipitaka/page/sutraL_list.dart';
@@ -18,7 +19,7 @@ class EditSutraList extends StatefulWidget {
     required this.category,
   }) : super(key: key);
   final int index;
-  final int id;
+  final String id;
   final String title;
   final String content;
   final String category;
@@ -31,7 +32,8 @@ class _EditSutraListState extends State<EditSutraList>
     with TickerProviderStateMixin {
   String? category;
   String? content;
-  int id = 0;
+  late String id =
+      FirebaseFirestore.instance.collection(kSutraCollection).doc().id;
   late Box<Sutra> sutraBox;
   String? title;
 
@@ -39,7 +41,7 @@ class _EditSutraListState extends State<EditSutraList>
 
   @override
   void initState() {
-    _idController.text = widget.id.toString();
+    _idController.text = widget.id;
     _titleController.text = widget.title;
     _contentController.text = widget.content;
     _categoryController.text = widget.category;
@@ -66,7 +68,7 @@ class _EditSutraListState extends State<EditSutraList>
       _formkey.currentState?.save();
       sutraBox.add(
         Sutra(
-          id: id,
+          id: id.toString(),
           title: title.toString(),
           content: content.toString(),
           category: category.toString(),
@@ -79,7 +81,7 @@ class _EditSutraListState extends State<EditSutraList>
     final isValid = _formkey.currentState?.validate();
 
     final value = Sutra(
-      id: int.parse(_idController.text),
+      id: _idController.text,
       title: _titleController.text,
       content: _contentController.text,
       category: _categoryController.text,
@@ -132,10 +134,6 @@ class _EditSutraListState extends State<EditSutraList>
                 child: FormBuilder(
                   key: _formkey,
                   onChanged: () => print("Form has been changed"),
-                  // ignore: prefer_const_literals_to_create_immutables
-                  initialValue: {
-                    'number': "${Random().nextInt(100)}",
-                  },
                   skipDisabled: true,
                   child: Column(
                     children: <Widget>[
@@ -149,7 +147,7 @@ class _EditSutraListState extends State<EditSutraList>
                             helperText: 'ໃສ່ລະຫັດ',
                           ),
                           onSaved: (value) {
-                            id = int.parse(value.toString());
+                            id = value.toString();
                           },
                           name: 'number',
                           enabled: false,

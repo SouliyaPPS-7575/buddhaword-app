@@ -1,6 +1,8 @@
 // ignore_for_file: file_names
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:lao_tipitaka/connectionAdmin.dart';
 import 'package:lao_tipitaka/main.dart';
 import 'package:lao_tipitaka/model/sutra.dart';
 import 'package:lao_tipitaka/page/add_sutra.dart';
@@ -87,15 +89,54 @@ class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
                   valueListenable: Hive.box('settings').listenable(),
                   builder: (context, box, child) {
                     final isDark = box.get('isDark', defaultValue: false);
-                    return Switch(
-                      activeColor: Colors.black87,
-                      activeTrackColor: Colors.black87,
-                      inactiveThumbColor: Colors.white,
-                      inactiveTrackColor: Colors.white,
-                      value: isDark,
-                      onChanged: (val) {
-                        box.put('isDark', val);
-                      },
+                    return Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.sync),
+                          onPressed: () async {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('ເກັບຂໍ້ມູນໄວ້ໃນ Cloud'),
+                                content: const Text(
+                                    'ທ່ານຕ້ອງການເເກ້ໄຂຂໍ້ມູນ ຫຼື ບໍ?'),
+                                actions: [
+                                  TextButton(
+                                    child: const Text('Cancel'),
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
+                                  ),
+                                  TextButton(
+                                    child: const Text('Sync'),
+                                    onPressed: () async {
+                                      Navigator.of(context).pop();
+                                      await syncHiveWithFirebase();
+                                      Fluttertoast.showToast(
+                                        msg:
+                                            'Synced data to Firestore successfully!',
+                                        toastLength: Toast.LENGTH_SHORT,
+                                        gravity: ToastGravity.BOTTOM,
+                                        backgroundColor: Colors.green,
+                                        textColor: Colors.white,
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                        Switch(
+                          activeColor: Colors.black87,
+                          activeTrackColor: Colors.black87,
+                          inactiveThumbColor: Colors.white,
+                          inactiveTrackColor: Colors.white,
+                          value: isDark,
+                          onChanged: (val) {
+                            box.put('isDark', val);
+                          },
+                        ),
+                      ],
                     );
                   },
                 ),
@@ -103,133 +144,128 @@ class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
             )
           : null,
       drawer: const NavigationDrawer(),
-      body: InteractiveViewer(
-        boundaryMargin: const EdgeInsets.all(double.maxFinite),
-        child: SafeArea(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: TextField(
-                  controller: searchController,
-                  style: const TextStyle(fontSize: 17.0),
-                  focusNode: searchFocusNode,
-                  decoration: InputDecoration(
-                    hintText: 'ຄົ້ນຫາ...',
-                    prefixIcon: const Icon(Icons.search),
-                    hoverColor: const Color.fromARGB(241, 179, 93, 78),
-                    fillColor: const Color.fromARGB(241, 179, 93, 78),
-                    focusColor: const Color.fromARGB(241, 179, 93, 78),
-                    suffixIcon: searchController.text.isNotEmpty
-                        ? IconButton(
-                            onPressed: () => {
-                              searchController.clear(),
-                              performSearch(''),
-                            },
-                            icon: const Icon(Icons.clear),
-                            splashRadius: 20.0,
-                          )
-                        : null,
-                  ),
-                  onChanged: (value) => performSearch(value),
-                ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: TextField(
+              controller: searchController,
+              style: const TextStyle(fontSize: 17.0),
+              focusNode: searchFocusNode,
+              decoration: InputDecoration(
+                hintText: 'ຄົ້ນຫາ...',
+                prefixIcon: const Icon(Icons.search),
+                hoverColor: const Color.fromARGB(241, 179, 93, 78),
+                fillColor: const Color.fromARGB(241, 179, 93, 78),
+                focusColor: const Color.fromARGB(241, 179, 93, 78),
+                suffixIcon: searchController.text.isNotEmpty
+                    ? IconButton(
+                        onPressed: () => {
+                          searchController.clear(),
+                          performSearch(''),
+                        },
+                        icon: const Icon(Icons.clear),
+                        splashRadius: 20.0,
+                      )
+                    : null,
               ),
-              Expanded(
-                child: ValueListenableBuilder(
-                  valueListenable: sutraBox.listenable(),
-                  builder: (context, box, child) {
-                    final sutras = sutraBox.values
-                        .where((sutra) => sutra.title
-                            .toString()
-                            .toLowerCase()
-                            .contains(searchText.toLowerCase()))
-                        .toList();
-                    return ListView.builder(
-                      itemCount: sutras.length,
-                      itemBuilder: ((context, index) {
-                        final sutra = sutras[index];
+              onChanged: (value) => performSearch(value),
+            ),
+          ),
+          Expanded(
+            child: ValueListenableBuilder(
+              valueListenable: sutraBox.listenable(),
+              builder: (context, box, child) {
+                final sutras = sutraBox.values
+                    .where((sutra) => sutra.title
+                        .toString()
+                        .toLowerCase()
+                        .contains(searchText.toLowerCase()))
+                    .toList();
+                return ListView.builder(
+                  itemCount: sutras.length,
+                  itemBuilder: ((context, index) {
+                    final sutra = sutras[index];
 
-                        return Card(
-                          child: ListTile(
-                            // How to add viewDetail function
-                            leading: IconButton(
-                              onPressed: () => {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => EditSutraList(
-                                      index: index,
-                                      id: sutra.id,
-                                      title: sutra.title.toString(),
-                                      content: sutra.content.toString(),
-                                      category: sutra.category.toString(),
+                    return Card(
+                      child: ListTile(
+                        // How to add viewDetail function
+                        leading: IconButton(
+                          onPressed: () => {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => EditSutraList(
+                                  index: index,
+                                  id: sutra.id.toString(),
+                                  title: sutra.title.toString(),
+                                  content: sutra.content.toString(),
+                                  category: sutra.category.toString(),
+                                ),
+                              ),
+                            )
+                          },
+                          icon: const Icon(
+                            Icons.edit,
+                            color: Color.fromARGB(241, 179, 93, 78),
+                          ),
+                        ),
+                        title: Text(
+                          sutra.title.toString(),
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        subtitle: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(sutra.category.toString()),
+                          ],
+                        ),
+                        trailing: IconButton(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text("ຢືນຢັນການລົບ"),
+                                  // ignore: prefer_const_constructors
+                                  content: const Text(
+                                      "ທ່ານຕ້ອງການລົບພຣະສູດນິ້ ຫຼື ບໍ່?"),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text("Cancel"),
                                     ),
-                                  ),
-                                )
-                              },
-                              icon: const Icon(
-                                Icons.edit,
-                                color: Color.fromARGB(241, 179, 93, 78),
-                              ),
-                            ),
-                            title: Text(
-                              sutra.title.toString(),
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            subtitle: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Text(sutra.category.toString()),
-                              ],
-                            ),
-                            trailing: IconButton(
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: const Text("ຢືນຢັນການລົບ"),
-                                      // ignore: prefer_const_constructors
-                                      content: const Text(
-                                          "ທ່ານຕ້ອງການລົບພຣະສູດນິ້ ຫຼື ບໍ່?"),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: const Text("Cancel"),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                            sutraBox.deleteAt(index);
-                                          },
-                                          child: const Text("Delete"),
-                                        ),
-                                      ],
-                                    );
-                                  },
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                        sutraBox.deleteAt(index);
+                                      },
+                                      child: const Text("Delete"),
+                                    ),
+                                  ],
                                 );
                               },
-                              icon: const Icon(
-                                Icons.delete,
-                                color: Color.fromARGB(241, 179, 93, 78),
-                              ),
-                            ),
-
-                            onTap: () => viewDetail(context, index),
+                            );
+                          },
+                          icon: const Icon(
+                            Icons.delete,
+                            color: Color.fromARGB(241, 179, 93, 78),
                           ),
-                        );
-                      }),
+                        ),
+
+                        onTap: () => viewDetail(context, index),
+                      ),
                     );
-                  },
-                ),
-              ),
-            ],
+                  }),
+                );
+              },
+            ),
           ),
-        ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {

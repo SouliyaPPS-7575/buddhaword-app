@@ -4,8 +4,8 @@ part 'sutra.g.dart';
 
 @HiveType(typeId: 0)
 class Sutra extends HiveObject {
-  @HiveField(0, defaultValue: 0)
-  final int id;
+  @HiveField(0)
+  final String id;
   @HiveField(1)
   final String title;
   @HiveField(2)
