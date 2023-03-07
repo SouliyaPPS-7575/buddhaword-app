@@ -41,12 +41,12 @@ class _MyAppState extends State<MyApp> {
         final isDark = box.get('isDark', defaultValue: false);
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'Lao-Tipitaka',
+          title: 'ຄຳສອນພຣະພຸດທະເຈົ້າ',
           theme: ThemeData(
             brightness: isDark ? Brightness.dark : Brightness.light,
             visualDensity: VisualDensity.adaptivePlatformDensity,
           ),
-          home: const HomePage(title: 'Lao-Tipitaka'),
+          home: const HomePage(title: 'ຄຳສອນພຣະພຸດທະເຈົ້າ'),
         );
       },
     );
@@ -449,14 +449,14 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                   ? Icon(Icons.library_books, color: _checkColor)
                   : Icon(Icons.library_books_outlined, color: _checkColor),
               title: const Text(
-                'ພຣະສູດ 📖',
+                'ພຣະສູດ',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               onTap: () => {
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
                     builder: (context) => const HomePage(
-                      title: 'Lao-Tipitaka',
+                      title: 'ຄຳສອນພຣະພຸດທະເຈົ້າ',
                     ),
                   ),
                 ),
@@ -467,7 +467,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                   ? Icon(Icons.book, color: _checkColor)
                   : Icon(Icons.book_outlined, color: _checkColor),
               title: const Text(
-                'ປື້ມ & ເເຜນຜັງ 📚',
+                'ປື້ມ & ເເຜນຜັງ',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               onTap: () => _openLinkBooks(),
@@ -477,7 +477,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                   ? Icon(Icons.open_in_browser_rounded, color: _checkColor)
                   : Icon(Icons.open_in_browser_outlined, color: _checkColor),
               title: const Text(
-                'ພຣະສູດ Web🌐',
+                'ພຣະສູດ Web',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               onTap: () => _openLinkWebapp(),
@@ -487,7 +487,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                   ? Icon(Icons.filter_vintage, color: _checkColor)
                   : Icon(Icons.sunny, color: _checkColor),
               title: const Text(
-                '🌸ພຣະທັມ🌸',
+                'ພຣະທັມ',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               onTap: () => _openLinkDhamma(),
@@ -507,7 +507,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                   ? Icon(Icons.calendar_month, color: _checkColor)
                   : Icon(Icons.calendar_month_outlined, color: _checkColor),
               title: const Text(
-                'ປະຕິທິນທັມ 🗓️',
+                'ປະຕິທິນທັມ',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               onTap: () => _openLinkCalendar(),
@@ -517,7 +517,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                   ? Icon(Icons.video_library, color: _checkColor)
                   : Icon(Icons.video_collection_outlined, color: _checkColor),
               title: const Text(
-                'ອະນັດຕາ 📺',
+                'ອະນັດຕາ',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               onTap: () => _openLinkArnuta(),
