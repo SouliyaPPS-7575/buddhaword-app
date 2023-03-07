@@ -78,6 +78,28 @@ class _DetailSutraState extends State<DetailSutra>
     });
   }
 
+  List<TextSpan> parseContent(String content) {
+    final List<TextSpan> children = [];
+
+    // Split the content into chunks between <b> and </b> tags
+    final List<String> chunks = content.split(RegExp(r'<\/?b>'));
+
+    // Add each chunk as a TextSpan, with a bold TextStyle for <b> tags
+    for (int i = 0; i < chunks.length; i++) {
+      final String chunk = chunks[i];
+      if (i % 2 == 0) {
+        children.add(TextSpan(text: chunk));
+      } else {
+        children.add(TextSpan(
+          text: chunk,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ));
+      }
+    }
+
+    return children;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -147,8 +169,11 @@ class _DetailSutraState extends State<DetailSutra>
                             constraints: BoxConstraints(
                               minHeight: MediaQuery.of(context).size.height,
                             ),
-                            child: SelectableText(
-                              textAlign: TextAlign.start,
+                            child: SelectableText.rich(
+                              TextSpan(
+                                children:
+                                    parseContent(widget.content), // content
+                              ),
                               toolbarOptions: const ToolbarOptions(
                                 copy: true,
                                 cut: true,
@@ -156,10 +181,10 @@ class _DetailSutraState extends State<DetailSutra>
                                 selectAll: true,
                               ),
                               showCursor: true,
-                              widget.content, // content
+                              textAlign: TextAlign.start,
                               style: TextStyle(
                                 fontSize: 20 * _scale,
-                                height: 1.5,
+                                height: 1.8,
                               ),
                             ),
                           ),
