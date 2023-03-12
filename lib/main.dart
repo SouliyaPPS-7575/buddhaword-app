@@ -41,12 +41,12 @@ class _MyAppState extends State<MyApp> {
         final isDark = box.get('isDark', defaultValue: false);
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'ຄຳສອນພຣະພຸດທະເຈົ້າ',
+          title: 'Buddha-Nature',
           theme: ThemeData(
             brightness: isDark ? Brightness.dark : Brightness.light,
             visualDensity: VisualDensity.adaptivePlatformDensity,
           ),
-          home: const HomePage(title: 'ຄຳສອນພຣະພຸດທະເຈົ້າ'),
+          home: const HomePage(title: 'Buddha-Nature'),
         );
       },
     );
@@ -456,7 +456,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
                     builder: (context) => const HomePage(
-                      title: 'ຄຳສອນພຣະພຸດທະເຈົ້າ',
+                      title: 'Buddha-Nature',
                     ),
                   ),
                 ),

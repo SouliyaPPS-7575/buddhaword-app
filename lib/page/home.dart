@@ -27,6 +27,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+
     Hive.openBox('settings');
 
     sutraBox = Hive.box<Sutra>("sutra");
@@ -60,10 +61,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   final TextEditingController searchController = TextEditingController();
-  final DropdownMenuItem<String> _defaultCategory = const DropdownMenuItem(
-    value: '',
-    child: Text('ທັງໝົດ'),
-  );
 
   void performSearch(String query) {
     setState(() {
@@ -96,6 +93,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     });
   }
 
+  final DropdownMenuItem<String> _defaultCategory = const DropdownMenuItem(
+    value: '',
+    child: Text('ທັງໝົດ'),
+  );
+
   List<DropdownMenuItem<String>> _getDropdownItems() {
     final dropdownItems = <DropdownMenuItem<String>>[];
     dropdownItems.add(_defaultCategory);
@@ -106,6 +108,26 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       );
     }));
     return dropdownItems;
+  }
+
+  void _onCategorySelected(String value) {
+    setState(() {
+      if (value == '') {
+        _selectedCategory = '';
+      } else {
+        _selectedCategory = value;
+      }
+    });
+  }
+
+  List<Sutra> _getFilteredSutras() {
+    if (_selectedCategory.isEmpty) {
+      return sutraBox.values.toList();
+    } else {
+      return sutraBox.values
+          .where((sutra) => sutra.category == _selectedCategory)
+          .toList();
+    }
   }
 
   @override
@@ -153,160 +175,239 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             )
           : null,
       drawer: const NavigationDrawer(),
-      body: InteractiveViewer(
-        boundaryMargin: const EdgeInsets.all(double.maxFinite),
-        child: SafeArea(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: searchController,
-                        style: const TextStyle(fontSize: 17.0),
-                        focusNode: searchFocusNode,
-                        decoration: InputDecoration(
-                          hintText: 'ຄົ້ນຫາ...',
-                          prefixIcon: const Icon(Icons.search),
-                          hoverColor: const Color.fromARGB(241, 179, 93, 78),
-                          fillColor: const Color.fromARGB(241, 179, 93, 78),
-                          focusColor: const Color.fromARGB(241, 179, 93, 78),
-                          suffixIcon: searchController.text.isNotEmpty
-                              ? IconButton(
-                                  onPressed: () => {
-                                    searchController.clear(),
-                                    performSearch(''),
-                                  },
-                                  icon: const Icon(Icons.clear),
-                                  splashRadius: 20.0,
-                                )
-                              : null,
-                        ),
-                        onChanged: (value) => performSearch(value),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: searchController,
+                      style: const TextStyle(fontSize: 17.0),
+                      focusNode: searchFocusNode,
+                      decoration: InputDecoration(
+                        hintText: 'ຄົ້ນຫາ...',
+                        prefixIcon: const Icon(Icons.search),
+                        hoverColor: const Color.fromARGB(241, 179, 93, 78),
+                        fillColor: const Color.fromARGB(241, 179, 93, 78),
+                        focusColor: const Color.fromARGB(241, 179, 93, 78),
+                        suffixIcon: searchController.text.isNotEmpty
+                            ? IconButton(
+                                onPressed: () => {
+                                  searchController.clear(),
+                                  performSearch(''),
+                                },
+                                icon: const Icon(Icons.clear),
+                                splashRadius: 20.0,
+                              )
+                            : null,
                       ),
+                      onChanged: (value) => performSearch(value),
                     ),
-                    const SizedBox(width: 16.0),
-                    Visibility(
-                      visible: searchController.text.isNotEmpty,
-                      child: DropdownButton<String>(
-                        value: _selectedCategory,
-                        icon: const Icon(Icons.arrow_downward),
-                        iconSize: 20,
-                        elevation: 10,
-                        underline: Container(
-                          height: 2,
-                          color: const Color.fromARGB(241, 179, 93, 78),
-                        ),
-                        items: _getDropdownItems(),
-                        onChanged: (String? value) {
-                          onSelectCategory(value!);
-                        },
+                  ),
+                  const SizedBox(width: 16.0),
+                  Visibility(
+                    visible: searchController.text.isNotEmpty,
+                    child: DropdownButton<String>(
+                      value: _selectedCategory,
+                      icon: const Icon(Icons.arrow_downward),
+                      iconSize: 20,
+                      elevation: 10,
+                      underline: Container(
+                        height: 2,
+                        color: const Color.fromARGB(241, 179, 93, 78),
                       ),
+                      items: _getDropdownItems(),
+                      onChanged: (String? value) {
+                        onSelectCategory(value!);
+                      },
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              Expanded(
-                child: ValueListenableBuilder(
-                  valueListenable: sutraBox.listenable(),
-                  builder: (context, box, child) {
-                    if (searchText.isNotEmpty) {
-                      return ListView.builder(
-                        itemCount: searchResults.length,
-                        itemBuilder: ((context, index) {
-                          final sutra = searchResults[index];
-                          return GestureDetector(
-                            onTap: () => viewDetail(
-                              context,
-                              sutraBox.values.toList().indexOf(sutra),
-                            ),
-                            child: Card(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      sutra.title.toString(),
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+            ),
+            Expanded(
+              child: ValueListenableBuilder(
+                valueListenable: sutraBox.listenable(),
+                builder: (context, box, child) {
+                  if (searchText.isNotEmpty) {
+                    return ListView.builder(
+                      itemCount: searchResults.length,
+                      itemBuilder: ((context, index) {
+                        final sutra = searchResults[index];
+                        return GestureDetector(
+                          onTap: () => viewDetail(
+                            context,
+                            sutraBox.values.toList().indexOf(sutra),
+                          ),
+                          child: Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    sutra.title.toString(),
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                    const SizedBox(height: 8),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            sutra.category.toString(),
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.grey,
-                                            ),
-                                            textAlign: TextAlign.right,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          sutra.category.toString(),
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.grey,
                                           ),
+                                          textAlign: TextAlign.right,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                    );
+                  } else {
+                    return Column(
+                      children: [
+                        DropdownButton<String>(
+                          value: _selectedCategory.isEmpty
+                              ? ''
+                              : _selectedCategory,
+                          isExpanded: true,
+                          onChanged: (value) => _onCategorySelected(value!),
+                          icon: const Icon(Icons.arrow_downward),
+                          iconSize: 20,
+                          elevation: 10,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyText1!
+                              .copyWith(
+                                fontSize: 16,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                          selectedItemBuilder: (BuildContext context) {
+                            return _getDropdownItems().map<Widget>((item) {
+                              return Center(
+                                child: Text(
+                                  item.value == ''
+                                      ? 'ທັງໝົດ'
+                                      : item.value.toString(),
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              );
+                            }).toList();
+                          },
+                          items: _getDropdownItems(),
+                        ),
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: _getFilteredSutras().length,
+                            itemBuilder: ((context, index) {
+                              final sutra = _getFilteredSutras()[index];
+                              return GestureDetector(
+                                onTap: () => viewDetail(context, index),
+                                child: Card(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          sutra.title.toString(),
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                sutra.category.toString(),
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  color: Colors.grey,
+                                                ),
+                                                textAlign: TextAlign.right,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     ),
-                                  ],
+                                  ),
                                 ),
-                              ),
-                            ),
-                          );
-                        }),
-                      );
-                    } else {
-                      return ListView.builder(
-                        itemCount: sutraBox.length,
-                        itemBuilder: ((context, index) {
-                          final sutra = sutraBox.getAt(index) as Sutra;
-                          return GestureDetector(
-                            onTap: () => viewDetail(context, index),
-                            child: Card(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      sutra.title.toString(),
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            sutra.category.toString(),
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.grey,
-                                            ),
-                                            textAlign: TextAlign.right,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        }),
-                      );
-                    }
-                  },
-                ),
+                              );
+                            }),
+                          ),
+                        ),
+                      ],
+                    );
+                    // return ListView.builder(
+                    //   itemCount: sutraBox.length,
+                    //   itemBuilder: ((context, index) {
+                    //     final sutra = sutraBox.getAt(index) as Sutra;
+                    //     return GestureDetector(
+                    //       onTap: () => viewDetail(context, index),
+                    //       child: Card(
+                    //         child: Padding(
+                    //           padding: const EdgeInsets.all(8.0),
+                    //           child: Column(
+                    //             crossAxisAlignment: CrossAxisAlignment.start,
+                    //             children: [
+                    //               Text(
+                    //                 sutra.title.toString(),
+                    //                 style: const TextStyle(
+                    //                   fontSize: 20,
+                    //                   fontWeight: FontWeight.bold,
+                    //                 ),
+                    //               ),
+                    //               const SizedBox(height: 8),
+                    //               Row(
+                    //                 mainAxisAlignment: MainAxisAlignment.end,
+                    //                 children: [
+                    //                   Expanded(
+                    //                     child: Text(
+                    //                       sutra.category.toString(),
+                    //                       style: const TextStyle(
+                    //                         fontSize: 16,
+                    //                         color: Colors.grey,
+                    //                       ),
+                    //                       textAlign: TextAlign.right,
+                    //                     ),
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //             ],
+                    //           ),
+                    //         ),
+                    //       ),
+                    //     );
+                    //   }),
+                    // );
+                  }
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
