@@ -8,7 +8,7 @@ class EditDetailSutra extends StatefulWidget {
     Key? key,
     required this.title,
     required this.content,
-    required this.category,
+    required this.category, required String id,
   }) : super(key: key);
 
   final String category;

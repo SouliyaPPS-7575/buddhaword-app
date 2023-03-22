@@ -1,10 +1,12 @@
+// ignore_for_file: file_names
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lao_tipitaka/connectionUser.dart';
 import 'package:lao_tipitaka/main.dart';
 import 'package:lao_tipitaka/model/sutra.dart';
 import 'package:lao_tipitaka/page/detail_sutra.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+
+import 'CategoryPage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key, required this.title}) : super(key: key);
@@ -110,24 +112,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return dropdownItems;
   }
 
-  void _onCategorySelected(String value) {
-    setState(() {
-      if (value == '') {
-        _selectedCategory = '';
-      } else {
-        _selectedCategory = value;
+  // create a list of Sutra Category from the list of Sutra
+  List<String> _getSutraCategories(List<Sutra> sutras) {
+    final categories = <String>[];
+    for (final sutra in sutras) {
+      if (!categories.contains(sutra.category)) {
+        categories.add(sutra.category);
       }
-    });
-  }
-
-  List<Sutra> _getFilteredSutras() {
-    if (_selectedCategory.isEmpty) {
-      return sutraBox.values.toList();
-    } else {
-      return sutraBox.values
-          .where((sutra) => sutra.category == _selectedCategory)
-          .toList();
     }
+    return categories;
   }
 
   @override
@@ -147,14 +140,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         IconButton(
                           icon: const Icon(Icons.sync),
                           onPressed: () async {
-                            await syncHiveWithFirebase();
-                            Fluttertoast.showToast(
-                              msg: 'Synced data to Firestore successfully!',
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              backgroundColor: Colors.green,
-                              textColor: Colors.white,
-                            );
+                            await syncHiveWithFirebase(context);
                           },
                         ),
                         Switch(
@@ -279,88 +265,173 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       }),
                     );
                   } else {
-                    return Column(
-                      children: [
-                        DropdownButton<String>(
-                          value: _selectedCategory.isEmpty
-                              ? ''
-                              : _selectedCategory,
-                          isExpanded: true,
-                          onChanged: (value) => _onCategorySelected(value!),
-                          icon: const Icon(Icons.arrow_downward),
-                          iconSize: 20,
-                          elevation: 10,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyText1!
-                              .copyWith(
-                                fontSize: 16,
-                                color: Theme.of(context).colorScheme.onSurface,
+                    return ListView.builder(
+                      itemCount:
+                          _getSutraCategories(sutraBox.values.toList()).length,
+                      itemBuilder: ((context, index) {
+                        final category = _getSutraCategories(
+                            sutraBox.values.toList())[index];
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            GestureDetector(
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CategoryPage(
+                                    category: category,
+                                    sutras: sutraBox.values
+                                        .toList()
+                                        .where((sutra) =>
+                                            sutra.category == category)
+                                        .toList(),
+                                  ),
+                                ),
                               ),
-                          selectedItemBuilder: (BuildContext context) {
-                            return _getDropdownItems().map<Widget>((item) {
-                              return Center(
-                                child: Text(
-                                  item.value == ''
-                                      ? 'ທັງໝົດ'
-                                      : item.value.toString(),
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              );
-                            }).toList();
-                          },
-                          items: _getDropdownItems(),
-                        ),
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: _getFilteredSutras().length,
-                            itemBuilder: ((context, index) {
-                              final sutra = _getFilteredSutras()[index];
-                              return GestureDetector(
-                                onTap: () => viewDetail(context, index),
-                                child: Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          sutra.title.toString(),
-                                          style: const TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                              child: Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        category,
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
                                         ),
-                                        const SizedBox(height: 8),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.end,
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                sutra.category.toString(),
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                  color: Colors.grey,
-                                                ),
-                                                textAlign: TextAlign.right,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              'ລວມ ${sutraBox.values.toList().where((sutra) => sutra.category == category).length} ພຣະສູດ',
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.grey,
                                               ),
+                                              textAlign: TextAlign.right,
                                             ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              );
-                            }),
-                          ),
-                        ),
-                      ],
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
                     );
+
+                    // Expanded List Items Categories
+                    // return ListView.builder(
+                    //   itemCount:
+                    //       _getSutraCategories(sutraBox.values.toList()).length,
+                    //   itemBuilder: ((context, index) {
+                    //     final category = _getSutraCategories(
+                    //         sutraBox.values.toList())[index];
+                    //     return Column(
+                    //       crossAxisAlignment: CrossAxisAlignment.start,
+                    //       children: [
+                    //         GestureDetector(
+                    //           onTap: () => onSelectCategory(category),
+                    //           child: Card(
+                    //             child: Padding(
+                    //               padding: const EdgeInsets.all(8.0),
+                    //               child: Column(
+                    //                 crossAxisAlignment:
+                    //                     CrossAxisAlignment.start,
+                    //                 children: [
+                    //                   Text(
+                    //                     category,
+                    //                     style: const TextStyle(
+                    //                       fontSize: 20,
+                    //                       fontWeight: FontWeight.bold,
+                    //                     ),
+                    //                   ),
+                    //                   const SizedBox(height: 8),
+                    //                   Row(
+                    //                     mainAxisAlignment:
+                    //                         MainAxisAlignment.end,
+                    //                     children: [
+                    //                       Expanded(
+                    //                         child: Text(
+                    //                           'ລວມ ${sutraBox.values.toList().where((sutra) => sutra.category == category).length} ພຣະສູດ',
+                    //                           style: const TextStyle(
+                    //                             fontSize: 16,
+                    //                             color: Colors.grey,
+                    //                           ),
+                    //                           textAlign: TextAlign.right,
+                    //                         ),
+                    //                       ),
+                    //                     ],
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //             ),
+                    //           ),
+                    //         ),
+                    //         if (category == _selectedCategory)
+                    //           ...sutraBox.values
+                    //               .where((sutra) => sutra.category == category)
+                    //               .map((sutra) => GestureDetector(
+                    //                     onTap: () => viewDetail(
+                    //                       context,
+                    //                       sutraBox.values
+                    //                           .toList()
+                    //                           .indexOf(sutra),
+                    //                     ),
+                    //                     child: Card(
+                    //                       child: Padding(
+                    //                         padding: const EdgeInsets.all(8.0),
+                    //                         child: Column(
+                    //                           crossAxisAlignment:
+                    //                               CrossAxisAlignment.start,
+                    //                           children: [
+                    //                             Text(
+                    //                               sutra.title.toString(),
+                    //                               style: const TextStyle(
+                    //                                 fontSize: 20,
+                    //                                 fontWeight: FontWeight.bold,
+                    //                               ),
+                    //                             ),
+                    //                             const SizedBox(height: 8),
+                    //                             Row(
+                    //                               mainAxisAlignment:
+                    //                                   MainAxisAlignment.end,
+                    //                               children: [
+                    //                                 Expanded(
+                    //                                   child: Text(
+                    //                                     sutra.category
+                    //                                         .toString(),
+                    //                                     style: const TextStyle(
+                    //                                       fontSize: 16,
+                    //                                       color: Colors.grey,
+                    //                                     ),
+                    //                                     textAlign:
+                    //                                         TextAlign.right,
+                    //                                   ),
+                    //                                 ),
+                    //                               ],
+                    //                             ),
+                    //                           ],
+                    //                         ),
+                    //                       ),
+                    //                     ),
+                    //                   ))
+                    //               .toList(),
+                    //       ],
+                    //     );
+                    //   }),
+                    // );
+
+                    // All List Items
                     // return ListView.builder(
                     //   itemCount: sutraBox.length,
                     //   itemBuilder: ((context, index) {
@@ -403,6 +474,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     //     );
                     //   }),
                     // );
+
                   }
                 },
               ),

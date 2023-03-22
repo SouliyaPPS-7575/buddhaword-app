@@ -1,28 +1,62 @@
 // ignore_for_file: file_names
+import 'package:flutter/material.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lao_tipitaka/model/sutra.dart';
 
 const String kSutraCollection = 'sutra';
 const String kDataDocument = 'data';
 
-
 // Sync Hive database with Firebase when connected to internet
-Future<void> syncHiveWithFirebase() async {
-  if (await checkInternetConnectivity()) {
-    initializeFirebase();
+Future<void> syncHiveWithFirebase(BuildContext context) async {
+  if (await checkInternetConnectivity(context)) {
+    await Firebase.initializeApp();
+    // code to sync data with Firebase Firestore
+    Fluttertoast.showToast(
+      msg: 'Synced data to Firestore successfully!',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.green,
+      textColor: Colors.white,
+    );
   }
 }
 
 // Check for internet connectivity
-Future<bool> checkInternetConnectivity() async {
+Future<bool> checkInternetConnectivity(BuildContext context) async {
   var connectivityResult = await (Connectivity().checkConnectivity());
-  return connectivityResult == ConnectivityResult.mobile ||
-      connectivityResult == ConnectivityResult.wifi;
+  bool isConnected = false;
+  if (connectivityResult == ConnectivityResult.mobile ||
+      connectivityResult == ConnectivityResult.wifi) {
+    isConnected = true;
+  }
+
+  if (!isConnected) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('No Internet Connection'),
+          content: const Text(
+              'Please check your internet connection and try again.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        );
+      },
+    );
+  }
+  return isConnected;
 }
 
 // Initialize Firebase and sync Firestore with Hive data

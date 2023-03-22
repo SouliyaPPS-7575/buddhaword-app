@@ -1,5 +1,6 @@
 // ignore_for_file: unnecessary_const, non_constant_identifier_names, avoid_print, deprecated_member_use, prefer_const_constructors
-import 'package:lao_tipitaka/connectionUser.dart';
+// import 'package:lao_tipitaka/page/sutraL_list.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:lao_tipitaka/model/sutra.dart';
 import 'package:lao_tipitaka/page/home.dart';
@@ -9,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
 
   // Initialize Hive
   final dir = await path.getApplicationDocumentsDirectory();
@@ -17,9 +19,6 @@ void main() async {
   Hive.registerAdapter<Sutra>(SutraAdapter());
   await Hive.openBox<Sutra>("sutra");
   await Hive.openBox('settings');
-
-  // Call the createHiveListener function
-  syncHiveWithFirebase();
 
   runApp(const MyApp());
 }
@@ -45,6 +44,7 @@ class _MyAppState extends State<MyApp> {
           theme: ThemeData(
             brightness: isDark ? Brightness.dark : Brightness.light,
             visualDensity: VisualDensity.adaptivePlatformDensity,
+            fontFamily: 'NotoSerifLao',
           ),
           home: const HomePage(title: 'Buddha-Nature'),
         );
@@ -792,7 +792,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ),
                     ListTile(
                       title: Text(
-                        'ສັດ',
+                        'ສັຕ',
                         style: TextStyle(fontSize: 18),
                       ),
                       onTap: () => _openurlzut(),

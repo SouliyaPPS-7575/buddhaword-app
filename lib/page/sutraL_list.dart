@@ -1,6 +1,7 @@
-// ignore_for_file: file_names
+// ignore_for_file: file_names, import_of_legacy_library_into_null_safe
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lao_tipitaka/connectionAdmin.dart';
 import 'package:lao_tipitaka/main.dart';
@@ -52,6 +53,7 @@ class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
           title: sutra!.title.toString(),
           content: sutra.content.toString(),
           category: sutra.category.toString(),
+          id: sutra.id.toString(),
         ),
       ),
     );
@@ -110,15 +112,7 @@ class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
                                     child: const Text('Sync'),
                                     onPressed: () async {
                                       Navigator.of(context).pop();
-                                      await syncHiveWithFirebase();
-                                      Fluttertoast.showToast(
-                                        msg:
-                                            'Synced data to Firestore successfully!',
-                                        toastLength: Toast.LENGTH_SHORT,
-                                        gravity: ToastGravity.BOTTOM,
-                                        backgroundColor: Colors.green,
-                                        textColor: Colors.white,
-                                      );
+                                      await syncHiveWithFirebase(context);
                                     },
                                   ),
                                 ],
@@ -187,7 +181,7 @@ class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
                     itemCount: sutras.length,
                     itemBuilder: ((context, index) {
                       final sutra = sutras[index];
-      
+
                       return Card(
                         child: ListTile(
                           // How to add viewDetail function
@@ -241,9 +235,62 @@ class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
                                         child: const Text("Cancel"),
                                       ),
                                       TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                          sutraBox.deleteAt(index);
+                                        onPressed: () async {
+                                          try {
+                                            sutraBox.deleteAt(index);
+                                            await syncHiveWithFirebase(context);
+                                            // ignore: use_build_context_synchronously
+                                            Navigator.of(context).pop();
+                                          } catch (error) {
+                                            // Handle the error here, such as displaying an error message in an alert dialog
+                                            if (kDebugMode) {
+                                              print(
+                                                  'Error deleting data: $error');
+                                            }
+                                            if (error is SocketException) {
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return AlertDialog(
+                                                    title: const Text('Error'),
+                                                    content: const Text(
+                                                        'Please check your internet connection and try again.'),
+                                                    actions: <Widget>[
+                                                      TextButton(
+                                                        child: const Text('OK'),
+                                                        onPressed: () {
+                                                          Navigator.of(context)
+                                                              .pop();
+                                                        },
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              );
+                                            } else {
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return AlertDialog(
+                                                    title: const Text('Error'),
+                                                    content: const Text(
+                                                        'An error occurred while deleting data.'),
+                                                    actions: <Widget>[
+                                                      TextButton(
+                                                        child: const Text('OK'),
+                                                        onPressed: () {
+                                                          Navigator.of(context)
+                                                              .pop();
+                                                        },
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              );
+                                            }
+                                          }
                                         },
                                         child: const Text("Delete"),
                                       ),
@@ -257,7 +304,7 @@ class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
                               color: Color.fromARGB(241, 179, 93, 78),
                             ),
                           ),
-      
+
                           onTap: () => viewDetail(context, index),
                         ),
                       );
