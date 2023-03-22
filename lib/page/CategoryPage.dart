@@ -124,7 +124,7 @@ class _CategoryPageState extends State<CategoryPage>
                         IconButton(
                           icon: const Icon(Icons.sync),
                           onPressed: () async {
-                            await syncHiveWithFirebase(context);
+                            await syncHiveWithFirebase();
                           },
                         ),
                         Switch(

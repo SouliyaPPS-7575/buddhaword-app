@@ -140,7 +140,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         IconButton(
                           icon: const Icon(Icons.sync),
                           onPressed: () async {
-                            await syncHiveWithFirebase(context);
+                            await syncHiveWithFirebase();
                           },
                         ),
                         Switch(

@@ -112,7 +112,7 @@ class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
                                     child: const Text('Sync'),
                                     onPressed: () async {
                                       Navigator.of(context).pop();
-                                      await syncHiveWithFirebase(context);
+                                      await syncHiveWithFirebase();
                                     },
                                   ),
                                 ],
@@ -238,7 +238,7 @@ class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
                                         onPressed: () async {
                                           try {
                                             sutraBox.deleteAt(index);
-                                            await syncHiveWithFirebase(context);
+                                            await syncHiveWithFirebase();
                                             // ignore: use_build_context_synchronously
                                             Navigator.of(context).pop();
                                           } catch (error) {

@@ -1,7 +1,7 @@
 // ignore_for_file: unnecessary_const, non_constant_identifier_names, avoid_print, deprecated_member_use, prefer_const_constructors
 // import 'package:lao_tipitaka/page/sutraL_list.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:lao_tipitaka/connectionUser.dart';
 import 'package:lao_tipitaka/model/sutra.dart';
 import 'package:lao_tipitaka/page/home.dart';
 import 'package:path_provider/path_provider.dart' as path;
@@ -10,7 +10,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
 
   // Initialize Hive
   final dir = await path.getApplicationDocumentsDirectory();
@@ -19,6 +18,9 @@ void main() async {
   Hive.registerAdapter<Sutra>(SutraAdapter());
   await Hive.openBox<Sutra>("sutra");
   await Hive.openBox('settings');
+
+  // Call the createHiveListener function
+  await syncHiveWithFirebase();
 
   runApp(const MyApp());
 }

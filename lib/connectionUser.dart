@@ -13,9 +13,10 @@ const String kSutraCollection = 'sutra';
 const String kDataDocument = 'data';
 
 // Sync Hive database with Firebase when connected to internet
-Future<void> syncHiveWithFirebase(BuildContext context) async {
-  if (await checkInternetConnectivity(context)) {
-    await Firebase.initializeApp();
+Future<void> syncHiveWithFirebase() async {
+  if (await checkInternetConnectivity()) {
+    initializeFirebase();
+  
     // code to sync data with Firebase Firestore
     Fluttertoast.showToast(
       msg: 'Synced data to Firestore successfully!',
@@ -28,7 +29,7 @@ Future<void> syncHiveWithFirebase(BuildContext context) async {
 }
 
 // Check for internet connectivity
-Future<bool> checkInternetConnectivity(BuildContext context) async {
+Future<bool> checkInternetConnectivity() async {
   var connectivityResult = await (Connectivity().checkConnectivity());
   bool isConnected = false;
   if (connectivityResult == ConnectivityResult.mobile ||
@@ -37,23 +38,12 @@ Future<bool> checkInternetConnectivity(BuildContext context) async {
   }
 
   if (!isConnected) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('No Internet Connection'),
-          content: const Text(
-              'Please check your internet connection and try again.'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            )
-          ],
-        );
-      },
+    Fluttertoast.showToast(
+      msg: 'No internet connection!',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: Colors.red,
+      textColor: Colors.white,
     );
   }
   return isConnected;
