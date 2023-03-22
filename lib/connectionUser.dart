@@ -15,7 +15,7 @@ const String kDataDocument = 'data';
 // Sync Hive database with Firebase when connected to internet
 Future<void> syncHiveWithFirebase() async {
   if (await checkInternetConnectivity()) {
-    initializeFirebase();
+    await initializeFirebase();
   
     // code to sync data with Firebase Firestore
     Fluttertoast.showToast(
