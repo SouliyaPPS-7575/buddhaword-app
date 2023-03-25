@@ -225,9 +225,6 @@ class _CategoryPageState extends State<CategoryPage>
                             height: 1,
                             color: const Color.fromARGB(241, 179, 93, 78),
                           ),
-                          style: const TextStyle(
-                            fontSize: 15,
-                          ),
                           items: _getDropdownItems(),
                           onChanged: (String? value) {
                             onSelectCategory(value!);
