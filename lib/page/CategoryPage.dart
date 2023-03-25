@@ -98,14 +98,49 @@ class _CategoryPageState extends State<CategoryPage>
   List<DropdownMenuItem<String>> _getDropdownItems() {
     final dropdownItems = <DropdownMenuItem<String>>[];
     dropdownItems.add(_defaultCategory);
-    dropdownItems.addAll(_categories.map((value) {
-      return DropdownMenuItem<String>(
-        value: value,
-        child: Text(value),
-      );
-    }));
+    for (final value in category) {
+      if (_categories.contains(value)) {
+        dropdownItems.add(
+          DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          ),
+        );
+      }
+    }
     return dropdownItems;
   }
+
+  final category = [
+    'ທັມໃນເບື້ອງຕົ້ນ',
+    'ຄະຣາວາດຊັ້ນເລີດ',
+    'ສາທະຍາຍທັມ',
+    'ທານ',
+    'ປະຖົມທັມ',
+    'ຄູ່ມືໂສດາບັນ',
+    'ທັມໃນທ່າມກາງ',
+    'ແກ້ກັມ',
+    'ສະຕິປັຕຖານ',
+    'ອານາປານະສະຕິ',
+    'ຂໍ້ປະຕິບັດວິ​ທີ​ທີ່​ງ່າຍ',
+    'ອິນຊີສັງວອນ​',
+    'ຕາມຮອຍທັມ',
+    'ກ້າວຍ່າງຢ່າງພຸດທະ',
+    'ຕາຖາຄົດ',
+    'ປະຕິບັດສະມາທະ & ວິປັດຊະນາ',
+    'ພົບພູມ',
+    'ເດຍລະສານວິຊາ',
+    'ສະກະທາຄາມີ',
+    'ທັມໃນທີສຸດ',
+    'ຈິດ ມະໂນ ວິນຍານ',
+    'ສັຕ',
+    'ອະນາຄາມີ',
+    'ສັງໂຢດ',
+    'ອະຣິຍະສັດຈາກພຣະໂອດ ພາກຕົ້ນ',
+    'ອະຣິຍະສັດຈາກພຣະໂອດ ພາກປາຍ',
+    'ພຸດທະປະຫວັດຈາກພຣະໂອດ',
+    'ປະຕິຈະສະມຸບາດຈາກພຣະໂອດ'
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -149,10 +184,10 @@ class _CategoryPageState extends State<CategoryPage>
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 5.0),
               child: Row(
                 children: [
-                  Expanded(
+                  Flexible(
                     child: TextField(
                       controller: searchController,
                       style: const TextStyle(fontSize: 17.0),
@@ -177,22 +212,28 @@ class _CategoryPageState extends State<CategoryPage>
                       onChanged: (value) => performSearch(value),
                     ),
                   ),
-                  const SizedBox(width: 16.0),
+                  const SizedBox(width: 5.0),
                   Visibility(
                     visible: searchController.text.isNotEmpty,
-                    child: DropdownButton<String>(
-                      value: _selectedCategory,
-                      icon: const Icon(Icons.arrow_downward),
-                      iconSize: 20,
-                      elevation: 10,
-                      underline: Container(
-                        height: 2,
-                        color: const Color.fromARGB(241, 179, 93, 78),
+                    child: SizedBox(
+                      width: 150,
+                      child: Center(
+                        child: DropdownButton<String>(
+                          value: _selectedCategory,
+                          isExpanded: true,
+                          underline: Container(
+                            height: 1,
+                            color: const Color.fromARGB(241, 179, 93, 78),
+                          ),
+                          style: const TextStyle(
+                            fontSize: 15,
+                          ),
+                          items: _getDropdownItems(),
+                          onChanged: (String? value) {
+                            onSelectCategory(value!);
+                          },
+                        ),
                       ),
-                      items: _getDropdownItems(),
-                      onChanged: (String? value) {
-                        onSelectCategory(value!);
-                      },
                     ),
                   ),
                 ],
