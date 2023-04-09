@@ -1,10 +1,11 @@
-// ignore_for_file: file_names, must_be_immutable, unused_local_variable
+// ignore_for_file: file_names, must_be_immutable, unused_local_variable, deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lao_tipitaka/connectionUser.dart';
 import 'package:lao_tipitaka/main.dart';
 import 'package:lao_tipitaka/model/sutra.dart';
 import 'package:lao_tipitaka/page/detail_sutra.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CategoryPage extends StatefulWidget {
   String category;
@@ -336,6 +337,114 @@ class _CategoryPageState extends State<CategoryPage>
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          late String url;
+          switch (widget.category) {
+            case 'ທັມໃນເບື້ອງຕົ້ນ':
+              url = 'https://online.fliphtml5.com/pdhgx/nkee/';
+              break;
+            case 'ຄະຣາວາດຊັ້ນເລີດ':
+              url = 'https://online.fliphtml5.com/pdhgx/cjhz/';
+              break;
+            case 'ສາທະຍາຍທັມ':
+              url = 'https://online.fliphtml5.com/pdhgx/gwyc/';
+              break;
+            case 'ທານ':
+              url = 'https://online.fliphtml5.com/pdhgx/dpgf/';
+              break;
+            case 'ປະຖົມທັມ':
+              url = 'https://online.fliphtml5.com/pdhgx/yysj/';
+              break;
+            case 'ຄູ່ມືໂສດາບັນ':
+              url = 'https://online.fliphtml5.com/pdhgx/gipc/';
+              break;
+            case 'ທັມໃນທ່າມກາງ':
+              url = 'https://online.fliphtml5.com/pdhgx/vury/';
+              break;
+            case 'ແກ້ກັມ':
+              url = 'https://online.fliphtml5.com/pdhgx/fwqg/';
+              break;
+            case 'ສະຕິປັຕຖານ':
+              url = 'https://online.fliphtml5.com/pdhgx/zsqp/';
+              break;
+            case 'ອານາປານະສະຕິ':
+              url = 'https://online.fliphtml5.com/pdhgx/rrbn/';
+              break;
+            case 'ຂໍ້ປະຕິບັດວິ​ທີ​ທີ່​ງ່າຍ':
+              url = 'https://online.fliphtml5.com/pdhgx/brlf/';
+              break;
+            case 'ອິນຊີສັງວອນ​':
+              url = 'https://online.fliphtml5.com/pdhgx/xkyd/';
+              break;
+            case 'ຕາມຮອຍທັມ':
+              url = 'https://online.fliphtml5.com/pdhgx/xysv/';
+              break;
+            case 'ກ້າວຍ່າງຢ່າງພຸດທະ':
+              url = 'https://online.fliphtml5.com/pdhgx/rhco/';
+              break;
+            case 'ຕາຖາຄົດ':
+              url = 'https://online.fliphtml5.com/pdhgx/ubsc/';
+              break;
+            case 'ປະຕິບັດສະມາທະ & ວິປັດຊະນາ':
+              url =
+                  'https://drive.google.com/file/d/102Qsw2x--roLKbF0iZZEgZeh7gN2ll95/view?usp=sharing';
+              break;
+            case 'ພົບພູມ':
+              url =
+                  'https://drive.google.com/file/d/1bYarvzI-g8TLFSfCPrHXR8soOSeEbJPE/view?usp=sharing';
+              break;
+            case 'ເດຍລະສານວິຊາ':
+              url = 'https://online.fliphtml5.com/pdhgx/iqja/';
+              break;
+            case 'ສະກະທາຄາມີ':
+              url = 'https://online.fliphtml5.com/pdhgx/zkqf/';
+              break;
+            case 'ທັມໃນທີສຸດ':
+              url = 'https://online.fliphtml5.com/pdhgx/ncaq/';
+              break;
+            case 'ຈິດ ມະໂນ ວິນຍານ':
+              url = 'https://online.fliphtml5.com/pdhgx/cvqh/';
+              break;
+            case 'ສັຕ':
+              url = 'https://online.fliphtml5.com/pdhgx/dqxo/';
+              break;
+            case 'ອະນາຄາມີ':
+              url =
+                  'https://drive.google.com/file/d/1oWyN1REEvJI0wrO7jlwOPZzwX2c-LutE/view?usp=sharing';
+              break;
+            case 'ສັງໂຢດ':
+              url = 'https://online.fliphtml5.com/pdhgx/wmok/';
+              break;
+            case 'ອະຣິຍະສັດຈາກພຣະໂອດ ພາກຕົ້ນ':
+              url =
+                  'https://drive.google.com/file/d/1bmjODq-SUjqMpQuCPB96YCy6q4F2ZRWv/view?usp=sharing';
+              break;
+            case 'ອະຣິຍະສັດຈາກພຣະໂອດ ພາກປາຍ':
+              url =
+                  'https://drive.google.com/file/d/1MBm1qOvR9nZfJG9tQL2pwVi03s2UTRjO/view?usp=sharing';
+              break;
+            case 'ພຸດທະປະຫວັດຈາກພຣະໂອດ':
+              url =
+                  'https://drive.google.com/file/d/1SwwbWKaLZ3dAlK8n7DvSIcH-XmqwQpwy/view?usp=sharing';
+              break;
+            case 'ປະຕິຈະສະມຸບາດຈາກພຣະໂອດ':
+              url =
+                  'https://drive.google.com/file/d/11EINzGAtVA0xOUXcWA8OmPsqFdB0q_WH/view?usp=sharing';
+              break;
+            default:
+              throw 'Invalid category';
+          }
+
+          if (await canLaunch(url)) {
+            await launch(url);
+          } else {
+            throw 'Could not launch $url';
+          }
+        },
+        backgroundColor: const Color.fromARGB(241, 179, 93, 78),
+        child: const Icon(Icons.auto_stories_outlined),
       ),
     );
   }
