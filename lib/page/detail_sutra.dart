@@ -136,81 +136,76 @@ class _DetailSutraState extends State<DetailSutra>
               onScaleUpdate: _onScaleUpdate,
               onScaleEnd: _onScaleEnd,
               child: SingleChildScrollView(
-                child: InteractiveViewer(
-                  minScale: 1.0,
-                  maxScale: 5.0,
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        SelectableText(
-                          textAlign: TextAlign.center,
-                          toolbarOptions: const ToolbarOptions(
-                            copy: true,
-                            cut: true,
-                            paste: true,
-                            selectAll: true,
-                          ),
-                          showCursor: true,
-                          widget.title, // title
-                          style: const TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                          ),
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      SelectableText(
+                        textAlign: TextAlign.center,
+                        toolbarOptions: const ToolbarOptions(
+                          copy: true,
+                          cut: true,
+                          paste: true,
+                          selectAll: true,
                         ),
-                        const SizedBox(height: 10),
-                        const Divider(
-                            color: Colors.black, thickness: 1, height: 1),
-                        const SizedBox(height: 10),
-                        SingleChildScrollView(
-                          physics: const BouncingScrollPhysics(),
-                          child: Container(
-                            constraints: BoxConstraints(
-                              minHeight: MediaQuery.of(context).size.height,
+                        showCursor: true,
+                        widget.title, // title
+                        style: const TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Divider(
+                          color: Colors.black, thickness: 1, height: 1),
+                      const SizedBox(height: 10),
+                      SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        child: Container(
+                          constraints: BoxConstraints(
+                            minHeight: MediaQuery.of(context).size.height,
+                          ),
+                          child: SelectableText.rich(
+                            TextSpan(
+                              children: parseContent(widget.content), // content
                             ),
-                            child: SelectableText.rich(
-                              TextSpan(
-                                children:
-                                    parseContent(widget.content), // content
-                              ),
-                              toolbarOptions: const ToolbarOptions(
-                                copy: true,
-                                cut: true,
-                                paste: true,
-                                selectAll: true,
-                              ),
-                              showCursor: true,
-                              textAlign: TextAlign.start,
-                              style: TextStyle(
-                                fontSize: 20 * _scale,
-                                height: 1.8,
-                              ),
+                            toolbarOptions: const ToolbarOptions(
+                              copy: true,
+                              cut: true,
+                              paste: true,
+                              selectAll: true,
+                            ),
+                            showCursor: true,
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                              fontSize: 20 * _scale,
+                              height: 1.8,
                             ),
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        const Divider(
-                            color: Colors.black, thickness: 1, height: 1),
-                        const SizedBox(height: 10),
-                        SelectableText(
-                          toolbarOptions: const ToolbarOptions(
-                            copy: true,
-                            cut: true,
-                            paste: true,
-                            selectAll: true,
-                          ),
-                          showCursor: true,
-                          widget.category, // category
-                          textAlign: TextAlign.right,
-                          style: TextStyle(
-                            fontSize: 20 * _scale,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Divider(
+                          color: Colors.black, thickness: 1, height: 1),
+                      const SizedBox(height: 10),
+                      SelectableText(
+                        toolbarOptions: const ToolbarOptions(
+                          copy: true,
+                          cut: true,
+                          paste: true,
+                          selectAll: true,
                         ),
-                        const SizedBox(height: 80),
-                      ],
-                    ),
+                        showCursor: true,
+                        widget.category, // category
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                          fontSize: 20 * _scale,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 80),
+                    ],
                   ),
                 ),
               ),
@@ -221,13 +216,16 @@ class _DetailSutraState extends State<DetailSutra>
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          FloatingActionButton(
-            heroTag: 'fab1',
-            onPressed: _onZoomInPressed,
-            backgroundColor: const Color(0xFFF5F5F5),
-            child: const Icon(
-              Icons.add,
-              color: Color.fromARGB(241, 179, 93, 78),
+          SizedBox(
+            width: 100, // adjust the width as needed
+            child: FloatingActionButton(
+              heroTag: 'fab1',
+              onPressed: _onZoomInPressed,
+              backgroundColor: const Color(0xFFF5F5F5),
+              child: const Icon(
+                Icons.add,
+                color: Color.fromARGB(241, 179, 93, 78),
+              ),
             ),
           ),
           const SizedBox(width: 10),

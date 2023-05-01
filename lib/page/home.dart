@@ -451,88 +451,99 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       }),
                     );
                   } else {
-                    return GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        childAspectRatio: 0.8,
-                      ),
-                      itemCount:
-                          _getSutraCategories(sutraBox.values.toList()).length,
-                      itemBuilder: ((context, index) {
-                        final category = _getSutraCategories(
-                            sutraBox.values.toList())[index];
-                        String imageUrl = _getImageUrlForCategory(category);
-                        return GestureDetector(
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => CategoryPage(
-                                category: category,
-                                sutras: sutraBox.values
-                                    .toList()
-                                    .where(
-                                        (sutra) => sutra.category == category)
-                                    .toList(),
+                    return LayoutBuilder(
+                      builder:
+                          (BuildContext context, BoxConstraints constraints) {
+                        double screenWidth = constraints.maxWidth;
+                        int crossAxisCount = screenWidth < 600 ? 3 : 5;
+                        return GridView.builder(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: crossAxisCount,
+                            childAspectRatio: 0.8,
+                          ),
+                          itemCount:
+                              _getSutraCategories(sutraBox.values.toList())
+                                  .length,
+                          itemBuilder: ((context, index) {
+                            final category = _getSutraCategories(
+                                sutraBox.values.toList())[index];
+                            String imageUrl = _getImageUrlForCategory(category);
+                            return GestureDetector(
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CategoryPage(
+                                    category: category,
+                                    sutras: sutraBox.values
+                                        .toList()
+                                        .where((sutra) =>
+                                            sutra.category == category)
+                                        .toList(),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                          child: Card(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Expanded(
-                                  flex: 3,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: imageUrl.isNotEmpty
-                                        ? Image.network(
-                                            imageUrl,
-                                            width: double.infinity,
-                                            fit: BoxFit.cover,
-                                          )
-                                        : Image.network(
-                                            "https://i.ibb.co/HrJQV2g/Logo-App-Buddhaword.jpg",
-                                            width: double.infinity,
-                                            fit: BoxFit.cover,
-                                          ),
-                                  ),
-                                ),
-                                const SizedBox(height: 1),
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Expanded(
-                                          child: Container(
-                                            alignment: Alignment.center,
-                                            child: Text(
-                                              category,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
+                              child: Card(
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Expanded(
+                                      flex: 3,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: imageUrl.isNotEmpty
+                                            ? Image.network(
+                                                imageUrl,
+                                                width: double.infinity,
+                                                fit: BoxFit.cover,
+                                              )
+                                            : Image.network(
+                                                "https://i.ibb.co/HrJQV2g/Logo-App-Buddhaword.jpg",
+                                                width: double.infinity,
+                                                fit: BoxFit.cover,
                                               ),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
+                                    const SizedBox(height: 1),
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                alignment: Alignment.center,
+                                                child: Text(
+                                                  category,
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          ),
+                              ),
+                            );
+                          }),
                         );
-                      }),
+                      },
                     );
+
                     //
                   }
                 },
