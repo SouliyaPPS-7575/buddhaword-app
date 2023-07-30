@@ -162,9 +162,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         return 'https://i.ibb.co/Nxz78bz/Screenshot-20230326-094632.png';
       case 'ຄູ່ມືໂສດາບັນ':
         return 'https://i.ibb.co/8bZ583L/Screenshot-20230326-095038.png';
+      case 'ສິນ':
+        return 'https://i.ibb.co/1YCCycR/shutterstock-1135790816-scaled.jpg';
+      case 'ອານິສົງ':
+        return 'https://i.ibb.co/GPRYmHM/Screenshot-2023-07-30-at-18-57-22.png';
+      case 'ກາຍຍະຄະຕາສະຕິ':
+        return 'https://i.ibb.co/Wz5qDnG/walking-meditation.jpg';
+      case 'ອິດທິບາດ 4':
+        return 'https://i.ibb.co/SN6P4TQ/Screenshot-2023-07-30-at-18-42-31.png';
       case 'ທັມໃນທ່າມກາງ':
         return 'https://i.ibb.co/rQVN5gb/333710936-895573414918821-1390168713848511569-n.jpg';
-      case 'ແກ້ກັມ':
+      case 'ກໍາ':
         return 'https://i.ibb.co/smG9GL5/b.png';
       case 'ສະຕິປັຕຖານ':
         return 'https://i.ibb.co/qjd0N3h/Screenshot-20230326-112627.png';
@@ -228,7 +236,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   //       return 'assets/images/6.png';
   //     case 'ທັມໃນທ່າມກາງ':
   //       return 'assets/images/7.jpg';
-  //     case 'ແກ້ກັມ':
+  //     case 'ກໍາ':
   //       return 'assets/images/8.png';
   //     case 'ສະຕິປັຕຖານ':
   //       return 'assets/images/9.png';
@@ -282,8 +290,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     'ທານ',
     'ປະຖົມທັມ',
     'ຄູ່ມືໂສດາບັນ',
+    'ສິນ',
+    'ອານິສົງ',
+    'ກາຍຍະຄະຕາສະຕິ',
+    'ອິດທິບາດ 4',
     'ທັມໃນທ່າມກາງ',
-    'ແກ້ກັມ',
+    'ກໍາ',
     'ສະຕິປັຕຖານ',
     'ອານາປານະສະຕິ',
     'ຂໍ້ປະຕິບັດວິ​ທີ​ທີ່​ງ່າຍ',

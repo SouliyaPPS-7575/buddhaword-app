@@ -119,8 +119,12 @@ class _CategoryPageState extends State<CategoryPage>
     'ທານ',
     'ປະຖົມທັມ',
     'ຄູ່ມືໂສດາບັນ',
+    'ສິນ',
+    'ອານິສົງ',
+    'ກາຍຍະຄະຕາສະຕິ',
+    'ອິດທິບາດ 4',
     'ທັມໃນທ່າມກາງ',
-    'ແກ້ກັມ',
+    'ກໍາ',
     'ສະຕິປັຕຖານ',
     'ອານາປານະສະຕິ',
     'ຂໍ້ປະຕິບັດວິ​ທີ​ທີ່​ງ່າຍ',
@@ -363,7 +367,7 @@ class _CategoryPageState extends State<CategoryPage>
             case 'ທັມໃນທ່າມກາງ':
               url = 'https://online.fliphtml5.com/pdhgx/vury/';
               break;
-            case 'ແກ້ກັມ':
+            case 'ກໍາ':
               url = 'https://online.fliphtml5.com/pdhgx/fwqg/';
               break;
             case 'ສະຕິປັຕຖານ':

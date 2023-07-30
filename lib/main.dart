@@ -630,7 +630,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                   children: [
                     ListTile(
                       title: Text(
-                        'ແກ້ກັມ',
+                        'ກໍາ',
                         style: TextStyle(fontSize: 18),
                       ),
                       onTap: () => _openurlKaekam(),
