@@ -169,7 +169,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       case 'ກາຍຍະຄະຕາສະຕິ':
         return 'https://i.ibb.co/Wz5qDnG/walking-meditation.jpg';
       case 'ອິດທິບາດ 4':
-        return 'https://i.ibb.co/SN6P4TQ/Screenshot-2023-07-30-at-18-42-31.png';
+        return 'https://i.ibb.co/vvPBg7Y/1694526230352.jpg';
       case 'ທັມໃນທ່າມກາງ':
         return 'https://i.ibb.co/rQVN5gb/333710936-895573414918821-1390168713848511569-n.jpg';
       case 'ກໍາ':
