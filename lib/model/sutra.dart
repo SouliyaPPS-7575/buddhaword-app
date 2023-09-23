@@ -12,11 +12,15 @@ class Sutra extends HiveObject {
   final String content;
   @HiveField(3)
   final String category;
-  Sutra(
-      {required this.id,
-      required this.title,
-      required this.content,
-      required this.category});
+  @HiveField(4)
+  final String audio;
+  Sutra({
+    required this.id,
+    required this.title,
+    required this.content,
+    required this.category,
+    required this.audio,
+  });
 
   toJson() {}
 }

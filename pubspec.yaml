@@ -54,6 +54,7 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   fluttertoast: ^8.2.1
+  webview_flutter: ^3.0.0
 
 flutter_icons:
   android: "launcher_icon"

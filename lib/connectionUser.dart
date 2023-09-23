@@ -1,4 +1,4 @@
-// ignore_for_file: file_names
+// ignore_for_file: file_names, prefer_if_null_operators
 import 'package:flutter/material.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -16,7 +16,7 @@ const String kDataDocument = 'data';
 Future<void> syncHiveWithFirebase() async {
   if (await checkInternetConnectivity()) {
     await initializeFirebase();
-  
+
     // code to sync data with Firebase Firestore
     Fluttertoast.showToast(
       msg: 'Synced data to Firestore successfully!',
@@ -79,6 +79,7 @@ Future<void> initializeFirebase() async {
           final sutra = Sutra(
             id: doc['id'],
             title: doc['title'],
+            audio: doc['audio'] == null ? '' : doc['audio'],
             content: doc['content'],
             category: doc['category'],
           );

@@ -10,19 +10,21 @@ import 'package:lao_tipitaka/page/sutraL_list.dart';
 import 'package:html_editor_enhanced/html_editor.dart';
 
 class EditSutraList extends StatefulWidget {
-  const EditSutraList({
-    Key? key,
-    required this.index,
-    required this.id,
-    required this.title,
-    required this.content,
-    required this.category,
-  }) : super(key: key);
+  const EditSutraList(
+      {Key? key,
+      required this.index,
+      required this.id,
+      required this.title,
+      required this.content,
+      required this.category,
+      required this.audio})
+      : super(key: key);
   final int index;
   final String id;
   final String title;
   final String content;
   final String category;
+  final String audio;
 
   @override
   State<EditSutraList> createState() => _EditSutraListState();
@@ -32,6 +34,7 @@ class _EditSutraListState extends State<EditSutraList>
     with TickerProviderStateMixin {
   String? category;
   String? content;
+  String? audio;
   late String id =
       FirebaseFirestore.instance.collection(kSutraCollection).doc().id;
   late Box<Sutra> sutraBox;
@@ -43,6 +46,7 @@ class _EditSutraListState extends State<EditSutraList>
   void initState() {
     _idController.text = widget.id;
     _titleController.text = widget.title;
+    _audioController.text = widget.audio;
     _contentController.text = widget.content;
     _categoryController.text = widget.category;
 
@@ -70,6 +74,7 @@ class _EditSutraListState extends State<EditSutraList>
         Sutra(
           id: id.toString(),
           title: title.toString(),
+          audio: audio.toString(),
           content: content.toString(),
           category: category.toString(),
         ),
@@ -83,6 +88,7 @@ class _EditSutraListState extends State<EditSutraList>
     final value = Sutra(
       id: _idController.text,
       title: _titleController.text,
+      audio: _audioController.text,
       content: _contentController.text,
       category: _categoryController.text,
     );
@@ -94,6 +100,7 @@ class _EditSutraListState extends State<EditSutraList>
 
   final TextEditingController _idController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _audioController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
   final TextEditingController _categoryController = TextEditingController();
 

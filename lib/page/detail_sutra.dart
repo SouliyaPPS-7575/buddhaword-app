@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lao_tipitaka/main.dart';
+import 'package:lao_tipitaka/page/IframePlayerWidget.dart';
 
 class DetailSutra extends StatefulWidget {
   const DetailSutra({
     Key? key,
     required this.index,
     required this.title,
+    required this.audio,
     required this.content,
     required this.category,
   }) : super(key: key);
@@ -14,6 +16,7 @@ class DetailSutra extends StatefulWidget {
   final String category;
   final String content;
   final String title;
+  final String audio;
 
   @override
   State<DetailSutra> createState() => _DetailSutraState();
@@ -160,6 +163,18 @@ class _DetailSutraState extends State<DetailSutra>
                       const Divider(
                           color: Colors.black, thickness: 1, height: 1),
                       const SizedBox(height: 10),
+
+                      // Use the Html widget to display the parsed HTML content
+                      Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            IframePlayerWidget(iframeUrl: widget.audio)
+                          ],
+                        ),
+                      ),
+
                       SingleChildScrollView(
                         physics: const BouncingScrollPhysics(),
                         child: Container(

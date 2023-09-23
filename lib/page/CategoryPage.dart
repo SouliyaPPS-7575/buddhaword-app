@@ -51,6 +51,7 @@ class _CategoryPageState extends State<CategoryPage>
         builder: (_) => DetailSutra(
           index: index,
           title: sutra!.title.toString(),
+          audio: sutra.audio.toString(),
           content: sutra.content.toString(),
           category: sutra.category.toString(),
         ),

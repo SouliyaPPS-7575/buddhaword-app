@@ -21,13 +21,14 @@ class SutraAdapter extends TypeAdapter<Sutra> {
       title: fields[1] as String,
       content: fields[2] as String,
       category: fields[3] as String,
+      audio: fields[4] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, Sutra obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -35,7 +36,9 @@ class SutraAdapter extends TypeAdapter<Sutra> {
       ..writeByte(2)
       ..write(obj.content)
       ..writeByte(3)
-      ..write(obj.category);
+      ..write(obj.category)
+      ..writeByte(4)
+      ..write(obj.audio);
   }
 
   @override

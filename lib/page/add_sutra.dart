@@ -22,6 +22,7 @@ class _AddSutraListState extends State<AddSutraList>
     with TickerProviderStateMixin {
   String? category;
   String? content;
+  String? audio;
   late Box<Sutra> sutraBox;
   String? title;
   final _formkey = GlobalKey<FormBuilderState>();
@@ -46,6 +47,7 @@ class _AddSutraListState extends State<AddSutraList>
         Sutra(
           id: id.toString(),
           title: title.toString(),
+          audio: audio.toString(),
           content: content.toString(),
           category: category.toString(),
         ),

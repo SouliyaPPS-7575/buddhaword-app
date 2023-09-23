@@ -193,6 +193,7 @@ class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
                                     index: index,
                                     id: sutra.id.toString(),
                                     title: sutra.title.toString(),
+                                    audio: sutra.audio.toString(),
                                     content: sutra.content.toString(),
                                     category: sutra.category.toString(),
                                   ),
