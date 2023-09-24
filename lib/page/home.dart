@@ -169,6 +169,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         return 'https://i.ibb.co/GPRYmHM/Screenshot-2023-07-30-at-18-57-22.png';
       case 'ກາຍຍະຄະຕາສະຕິ':
         return 'https://i.ibb.co/Wz5qDnG/walking-meditation.jpg';
+      case 'ອະຣິຍະສັດ 4':
+        return 'https://i.ibb.co/5nKyvwF/Copy.jpg';
+      case 'ທຳມະຊາດ':
+        return 'https://i.ibb.co/YpgZsn8/381164666-330414002889865-75299089530994275-n.jpg';
       case 'ອິດທິບາດ 4':
         return 'https://i.ibb.co/vvPBg7Y/1694526230352.jpg';
       case 'ທັມໃນທ່າມກາງ':
@@ -294,6 +298,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     'ສິນ',
     'ອານິສົງ',
     'ກາຍຍະຄະຕາສະຕິ',
+    'ອະຣິຍະສັດ 4',
+    'ທຳມະຊາດ',
     'ອິດທິບາດ 4',
     'ທັມໃນທ່າມກາງ',
     'ກໍາ',
