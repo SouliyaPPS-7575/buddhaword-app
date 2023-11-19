@@ -28,6 +28,8 @@ class _DetailSutraState extends State<DetailSutra>
   late Animation<double> _scaleAnimation;
   late AnimationController _scaleController;
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   void dispose() {
     _scaleController.dispose();
@@ -106,15 +108,27 @@ class _DetailSutraState extends State<DetailSutra>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       drawer: const NavigationDrawer(),
       body: CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
             title: const Text("ພຣະສູດ"),
             backgroundColor: const Color.fromARGB(241, 179, 93, 78),
             floating: true,
             snap: true,
             actions: [
+              IconButton(
+                icon: const Icon(Icons.menu, color: Colors.white),
+                onPressed: () {
+                  _scaffoldKey.currentState?.openDrawer();
+                },
+              ),
+              const SizedBox(width: 8),
               ValueListenableBuilder(
                 valueListenable: Hive.box('settings').listenable(),
                 builder: (context, box, child) {

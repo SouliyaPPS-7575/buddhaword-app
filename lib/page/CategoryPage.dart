@@ -30,6 +30,8 @@ class _CategoryPageState extends State<CategoryPage>
   late String _selectedCategory;
   late List<String> _categories;
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   void initState() {
     super.initState();
@@ -153,11 +155,23 @@ class _CategoryPageState extends State<CategoryPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: searchText.isEmpty
           ? AppBar(
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
               title: Text(widget.category),
               backgroundColor: const Color.fromARGB(241, 179, 93, 78),
               actions: [
+                IconButton(
+                  icon: const Icon(Icons.menu, color: Colors.white),
+                  onPressed: () {
+                    _scaffoldKey.currentState?.openDrawer();
+                  },
+                ),
+                const SizedBox(width: 10),
                 ValueListenableBuilder(
                   valueListenable: Hive.box('settings').listenable(),
                   builder: (context, box, child) {
