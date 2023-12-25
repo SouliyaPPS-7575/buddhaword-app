@@ -526,8 +526,8 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
             ),
             ListTile(
               leading: _isChecked
-                  ? Icon(Icons.whatsapp, color: _checkColor)
-                  : Icon(Icons.whatsapp_outlined, color: _checkColor),
+                  ? Icon(Icons.message, color: _checkColor)
+                  : Icon(Icons.message_outlined, color: _checkColor),
               title: const Text(
                 'ສົນທະນາທັມ',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),

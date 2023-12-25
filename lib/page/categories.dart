@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lao_tipitaka/main.dart';
+import '../main.dart';
 
 class Categories extends StatelessWidget {
   const Categories({Key? key}) : super(key: key);
