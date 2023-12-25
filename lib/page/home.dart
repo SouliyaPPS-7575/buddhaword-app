@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lao_tipitaka/connectionUser.dart';
-import 'package:lao_tipitaka/main.dart';
 import 'package:lao_tipitaka/model/sutra.dart';
 import 'package:lao_tipitaka/page/detail_sutra.dart';
+import '../main.dart';
 import 'CategoryPage.dart';
 
 class HomePage extends StatefulWidget {

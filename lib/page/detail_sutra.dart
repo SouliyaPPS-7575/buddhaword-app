@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:lao_tipitaka/main.dart';
 import 'package:lao_tipitaka/page/IframePlayerWidget.dart';
+
+import '../main.dart';
 
 class DetailSutra extends StatefulWidget {
   const DetailSutra({

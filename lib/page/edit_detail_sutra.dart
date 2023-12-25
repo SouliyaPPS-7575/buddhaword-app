@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:lao_tipitaka/main.dart';
 import 'package:lao_tipitaka/model/sutra.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+
+import '../main.dart';
 
 class EditDetailSutra extends StatefulWidget {
   const EditDetailSutra({

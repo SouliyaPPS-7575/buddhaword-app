@@ -2,10 +2,11 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lao_tipitaka/connectionUser.dart';
-import 'package:lao_tipitaka/main.dart';
 import 'package:lao_tipitaka/model/sutra.dart';
 import 'package:lao_tipitaka/page/detail_sutra.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../main.dart';
 
 class CategoryPage extends StatefulWidget {
   String category;

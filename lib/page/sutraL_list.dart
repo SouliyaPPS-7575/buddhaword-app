@@ -4,11 +4,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lao_tipitaka/connectionAdmin.dart';
-import 'package:lao_tipitaka/main.dart';
 import 'package:lao_tipitaka/model/sutra.dart';
 import 'package:lao_tipitaka/page/add_sutra.dart';
 import 'package:lao_tipitaka/page/edit_detail_sutra.dart';
 import 'package:lao_tipitaka/page/edit_sutra.dart';
+
+import '../main.dart';
 
 class SutraList extends StatefulWidget {
   const SutraList({Key? key, required this.title}) : super(key: key);
