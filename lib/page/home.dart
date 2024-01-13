@@ -151,10 +151,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   String _getImageUrlForCategory(String category) {
     switch (category) {
-      case 'ທັມໃນເບື້ອງຕົ້ນ':
+    case 'ທັມໃນເບື້ອງຕົ້ນ':
         return 'https://i.ibb.co/jVbqh2t/a-HR0c-HM6-Ly9z-Lmlz-YW5vb2su-Y29t-L2hl-Lz-Avd-WQv-Mi8x-NDg3-My9mb29k-LW1vbmsuan-Bn.jpg';
       case 'ຄະຣາວາດຊັ້ນເລີດ':
-        return 'https://i.ibb.co/6nGdjY1/s.png';
+        return 'https://i.ibb.co/GstLsSJ/3.png';
       case 'ສາທະຍາຍທັມ':
         return 'https://i.ibb.co/J7pwgkv/Screenshot-20230326-094953.png';
       case 'ທານ':
@@ -166,11 +166,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       case 'ສິນ':
         return 'https://i.ibb.co/1YCCycR/shutterstock-1135790816-scaled.jpg';
       case 'ອານິສົງ':
-        return 'https://i.ibb.co/GPRYmHM/Screenshot-2023-07-30-at-18-57-22.png';
+        return 'https://i.ibb.co/vx2CvYY/Screenshot-2023-07-30-at-18-57-22-1.png';
       case 'ກາຍຍະຄະຕາສະຕິ':
         return 'https://i.ibb.co/Wz5qDnG/walking-meditation.jpg';
       case 'ອະຣິຍະສັດ 4':
-        return 'https://i.ibb.co/5nKyvwF/Copy.jpg';
+        return 'https://i.ibb.co/V3stjt7/Copy-1.jpg';
       case 'ທຳມະຊາດ':
         return 'https://i.ibb.co/YpgZsn8/381164666-330414002889865-75299089530994275-n.jpg';
       case 'ອິດທິບາດ 4':
@@ -178,11 +178,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       case 'ທັມໃນທ່າມກາງ':
         return 'https://i.ibb.co/rQVN5gb/333710936-895573414918821-1390168713848511569-n.jpg';
       case 'ກໍາ':
-        return 'https://i.ibb.co/smG9GL5/b.png';
+        return 'https://i.ibb.co/VMZJwqd/5.png';
       case 'ສະຕິປັຕຖານ':
         return 'https://i.ibb.co/qjd0N3h/Screenshot-20230326-112627.png';
       case 'ອານາປານະສະຕິ':
-        return 'https://i.ibb.co/QHnfvR2/Screenshot-20230326-113727.png';
+        return 'https://i.ibb.co/SwSwsK7/6.png';
       case 'ຂໍ້ປະຕິບັດວິ​ທີ​ທີ່​ງ່າຍ':
         return 'https://i.ibb.co/3TJSWr2/Screenshot-20230326-112954.png';
       case 'ອິນຊີສັງວອນ​':
@@ -442,7 +442,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   Text(
                                     sutra.title.toString(),
                                     style: const TextStyle(
-                                      fontSize: 20,
+                                      fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),

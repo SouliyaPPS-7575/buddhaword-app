@@ -282,7 +282,7 @@ class _CategoryPageState extends State<CategoryPage>
                                   Text(
                                     sutra.title.toString(),
                                     style: const TextStyle(
-                                      fontSize: 20,
+                                      fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),

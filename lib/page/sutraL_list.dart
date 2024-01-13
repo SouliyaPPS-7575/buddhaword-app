@@ -209,7 +209,7 @@ class _SutraListState extends State<SutraList> with TickerProviderStateMixin {
                           title: Text(
                             sutra.title.toString(),
                             style: const TextStyle(
-                              fontSize: 20,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
