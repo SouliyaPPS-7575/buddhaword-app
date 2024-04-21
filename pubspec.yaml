@@ -92,6 +92,25 @@ flutter:
     - assets/ທັມໃນທີ່ສຸດ.jpg
     - assets/ທານ.jpg
     - assets/default_image.jpg
+    - assets/ກຳ.jpg
+    - assets/ຄາຣະວາດຊັ້ນເລີດ.jpg
+    - assets/ຈິດ ມະໂນ ວິນຍານ.jpg
+    - assets/ສະຕິປະຖານ 4.jpg
+    - assets/ສະມະຖະ ແລະ ວິປັດສະນາ.jpg
+    - assets/ສັງໂຍດ.jpg
+    - assets/ສັດ.jpg
+    - assets/ສິນ.jpg
+    - assets/ໂສດາບັນ.jpg
+    - assets/ເດຣະສານວິຊາ.jpg
+    - assets/ຕາມຮອຍທຳ.jpg
+    - assets/ທຳມະຊາດ.jpg
+    - assets/ປະຕິຈະສະມຸບາດ.jpg
+    - assets/ພົບພູມ.jpg
+    - assets/ມັກວິທີທີ່ງ່າຍ.jpg
+    - assets/ອະຣິຍະສັດ 4.jpg
+    - assets/ອານາປານະສະຕິ.jpg
+    - assets/ອານິສົງ.jpg
+    - assets/ອິນຊີສັງວອນ.jpg
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
