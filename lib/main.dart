@@ -1,936 +1,794 @@
-// ignore_for_file: unnecessary_const, non_constant_identifier_names, avoid_print, deprecated_member_use, prefer_const_constructors
-// import 'package:lao_tipitaka/page/sutraL_list.dart';
+// ignore_for_file: library_private_types_in_public_api, use_key_in_widget_constructors, depend_on_referenced_packages
+
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:lao_tipitaka/connectionUser.dart';
-import 'package:lao_tipitaka/model/sutra.dart';
-import 'package:lao_tipitaka/page/home.dart';
-import 'package:path_provider/path_provider.dart' as path;
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:connectivity/connectivity.dart';
+import 'dart:async';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+import 'CategoryListPage.dart';
+import 'NavigationDrawer.dart';
 
-  // Initialize Hive
-  final dir = await path.getApplicationDocumentsDirectory();
-  Hive.init(dir.path);
-  Hive.initFlutter('hive_db');
-  Hive.registerAdapter<Sutra>(SutraAdapter());
-  await Hive.openBox<Sutra>("sutra");
-  await Hive.openBox('settings');
-
-  // Call the createHiveListener function
-  await syncHiveWithFirebase();
-
-  runApp(const MyApp());
+void main() {
+  runApp(MyApp());
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  // This widget is the root of your application.
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: Hive.box('settings').listenable(),
-      builder: (context, Box box, child) {
-        final isDark = box.get('isDark', defaultValue: false);
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'Buddha-Nature',
-          theme: ThemeData(
-            brightness: isDark ? Brightness.dark : Brightness.light,
-            visualDensity: VisualDensity.adaptivePlatformDensity,
-            fontFamily: 'NotoSerifLao',
-          ),
-          home: const HomePage(title: 'Buddha-Nature'),
-        );
-      },
+    return ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'Buddha Nature',
+            theme: ThemeData(
+              primarySwatch: Colors.brown,
+              fontFamily: 'NotoSerifLao',
+            ),
+            darkTheme: ThemeData(
+              brightness: Brightness.dark,
+              primarySwatch: Colors.brown,
+              fontFamily: 'NotoSerifLao',
+            ),
+            themeMode:
+                themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+            home: MyHomePage(),
+          );
+        },
+      ),
     );
   }
 }
 
-class NavigationDrawer extends StatefulWidget {
-  const NavigationDrawer({super.key});
-
+class MyHomePage extends StatefulWidget {
   @override
-  State<NavigationDrawer> createState() => _NavigationDrawerState();
+  _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _NavigationDrawerState extends State<NavigationDrawer> {
-  late final bool _isChecked = false;
-  late final Color _checkColor = const Color.fromARGB(255, 175, 93, 78);
+class _MyHomePageState extends State<MyHomePage> {
+  final TextEditingController _searchController = TextEditingController();
 
-  // Menu
-  final String urlWebapp = "https://dhama-sutra.netlify.app";
-  final String urlBooks =
-      "https://drive.google.com/drive/folders/1z6vIdR-fzXxxhCM-rjqq8F7ZHLNlP5E3?usp=sharing";
-  final String urlDhamma =
-      "https://buddhaword.vercel.app/4d1689680be74b6f96071c8dda16db9e";
-  final String urlEnglish = "https://buddhaword-english.blogspot.com";
-  final String urlCalendar = "https://bit.ly/LaosCalendar";
-  final String urlArnuta = "https://arnuta.blogspot.com/";
-  final String urlChat = "https://chat.whatsapp.com/CZ7j5fhSatK37v76zmmVCK";
+  List<List<dynamic>> _data = [];
+  List<String> _categories = [];
+  List<List<dynamic>> _filteredData = [];
+  String _searchTerm = '';
 
-  void _openLinkWebapp() async {
-    if (await canLaunch(urlWebapp)) {
-      await launch(urlWebapp);
+  @override
+  void initState() {
+    super.initState();
+    fetchData(_searchTerm);
+  }
+
+  Future<void> fetchData(String searchTerm) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? cachedData = prefs.getString('cachedData');
+
+    var connectivityResult = await (Connectivity().checkConnectivity());
+
+    if (connectivityResult != ConnectivityResult.none) {
+      try {
+        final response = await http.get(Uri.parse(
+            'https://sheets.googleapis.com/v4/spreadsheets/1mKtgmZ_Is4e6P3P5lvOwIplqx7VQ3amicgienGN9zwA/values/Sheet1!1:1000000?key=AIzaSyDFjIl-SEHUsgK0sjMm7x0awpf8tTEPQjs'));
+
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> jsonResponse = json.decode(response.body);
+          final List<dynamic> sheetValues =
+              jsonResponse['values'] as List<dynamic>;
+
+          final List<List<dynamic>> values = sheetValues
+              .skip(1)
+              .map((row) => List<dynamic>.from(row))
+              .toList();
+
+          _data = values;
+          prefs.setString('cachedData', json.encode(_data));
+
+          // Update data with fetched values
+          updateData(searchTerm); // Update data here
+        } else {
+          if (kDebugMode) {
+            print('Failed to load data: ${response.statusCode}');
+          }
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print('Error fetching data: $e');
+        }
+      }
     } else {
-      throw 'Could not launch $urlWebapp';
+      // If no internet, load data from cache
+      if (cachedData != null && cachedData.isNotEmpty) {
+        final List<dynamic> cachedValues = json.decode(cachedData);
+        _data = cachedValues.cast<List<dynamic>>();
+
+        // Update data with cached values
+        updateData(searchTerm); // Update data here
+      }
     }
   }
 
-  void _openLinkBooks() async {
-    if (await canLaunch(urlBooks)) {
-      await launch(urlBooks);
-    } else {
-      throw 'Could not launch $urlBooks';
-    }
-  }
+  void updateData(String searchTerm) {
+    _categories = _data
+        .map((row) => row.length > 4 ? row[4].toString() : '')
+        .toSet()
+        .toList();
 
-  void _openLinkDhamma() async {
-    if (await canLaunch(urlDhamma)) {
-      await launch(urlDhamma);
-    } else {
-      throw 'Could not launch $urlDhamma';
-    }
-  }
+    _filteredData = _data
+        .where((row) {
+          return row.any((cell) =>
+              cell.toString().toLowerCase().contains(searchTerm.toLowerCase()));
+        })
+        .where((row) => row.isNotEmpty && row[0] != '0')
+        .toList();
 
-  void _openLinkEnglish() async {
-    if (await canLaunch(urlEnglish)) {
-      await launch(urlEnglish);
-    } else {
-      throw 'Could not launch $urlEnglish';
-    }
-  }
-
-  void _openLinkCalendar() async {
-    if (await canLaunch(urlCalendar)) {
-      await launch(urlCalendar);
-    } else {
-      throw 'Could not launch $urlCalendar';
-    }
-  }
-
-  void _openLinkArnuta() async {
-    if (await canLaunch(urlArnuta)) {
-      await launch(urlArnuta);
-    } else {
-      throw 'Could not launch $urlArnuta';
-    }
-  }
-
-  void _openLinkChat() async {
-    if (await canLaunch(urlChat)) {
-      await launch(urlChat);
-    } else {
-      throw 'Could not launch $urlChat';
-    }
-  }
-
-  // Sound
-  final String urlSoundKarawatSunlert =
-      "https://buddhaword.siteoly.com/%E0%BA%84%E0%BA%B0%E0%BA%A3%E0%BA%B2%E0%BA%A7%E0%BA%B2%E0%BA%AA%E0%BA%8A%E0%BA%B1%E0%BB%89%E0%BA%99%E0%BB%80%E0%BA%A5%E0%BA%B5%E0%BA%94(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urlSathayaiytham =
-      "https://buddhaword.siteoly.com/%E0%BA%AA%E0%BA%B2%E0%BA%97%E0%BA%B0%E0%BA%8D%E0%BA%B2%E0%BA%8D%E0%BA%97%E0%BA%B1%E0%BA%A1(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urlTarn =
-      "https://buddhaword.siteoly.com/%E0%BA%97%E0%BA%B2%E0%BA%99(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urlPathomtham =
-      "https://buddhaword.siteoly.com/%E0%BA%9B%E0%BA%B0%E0%BA%96%E0%BA%BB%E0%BA%A1%E0%BA%97%E0%BA%B1%E0%BA%A1(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urlSodabun =
-      "https://buddhaword.siteoly.com/%E0%BA%84%E0%BA%B9%E0%BB%88%E0%BA%A1%E0%BA%B7%E0%BB%82%E0%BA%AA%E0%BA%94%E0%BA%B2%E0%BA%9A%E0%BA%B1%E0%BA%99(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urlBuddhawajana =
-      "https://buddhaword.siteoly.com/%E0%BA%9E%E0%BA%B8%E0%BA%94%E0%BA%97%E0%BA%B0%E0%BA%A7%E0%BA%B0%E0%BA%88%E0%BA%B0%E0%BA%99%E0%BA%B0(%E0%BB%82%E0%BA%94%E0%BA%8D%E0%BA%9E%E0%BA%B2%E0%BA%9A%E0%BA%A5%E0%BA%A7%E0%BA%A1)(%E0%BA%9B%E0%BA%B7%E0%BB%89%E0%BA%A1)";
-  final String urlKaekam =
-      "https://buddhaword.siteoly.com/%E0%BB%81%E0%BA%81%E0%BB%89%E0%BA%81%E0%BA%B1%E0%BA%A1(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urlStiputarn_4 =
-      "https://buddhaword.siteoly.com/%E0%BA%AA%E0%BA%B0%E0%BA%95%E0%BA%B4%E0%BA%9B%E0%BA%B1%E0%BA%95%E0%BA%96%E0%BA%B2%E0%BA%99(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urlRnapa =
-      "https://buddhaword.siteoly.com/%E0%BA%AD%E0%BA%B2%E0%BA%99%E0%BA%B2%E0%BA%9B%E0%BA%B2%E0%BA%99%E0%BA%B0%E0%BA%AA%E0%BA%B0%E0%BA%95%E0%BA%B4(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urlKorpatibutngaiy =
-      "https://buddhaword.siteoly.com/%E0%BA%82%E0%BB%8D%E0%BB%89%E0%BA%9B%E0%BA%B0%E0%BA%95%E0%BA%B4%E0%BA%9A%E0%BA%B1%E0%BA%94%E0%BA%A7%E0%BA%B4%E2%80%8B%E0%BA%97%E0%BA%B5%E2%80%8B%E0%BA%97%E0%BA%B5%E0%BB%88%E2%80%8B%E0%BA%87%E0%BB%88%E0%BA%B2%E0%BA%8D%E2%80%8B(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urlInseesungvone =
-      "https://buddhaword.siteoly.com/%E0%BA%AD%E0%BA%B4%E0%BA%99%E0%BA%8A%E0%BA%B5%E0%BA%AA%E0%BA%B1%E0%BA%87%E0%BA%A7%E0%BA%AD%E0%BA%99%E2%80%8B(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urlTarmhoytham =
-      "https://buddhaword.siteoly.com/%E0%BA%95%E0%BA%B2%E0%BA%A1%E0%BA%AE%E0%BA%AD%E0%BA%8D%E0%BA%97%E0%BA%B1%E0%BA%A1%E2%80%8B(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urlKaoyangyabuddha =
-      "https://buddhaword.siteoly.com/%E0%BA%81%E0%BB%89%E0%BA%B2%E0%BA%A7%E0%BA%8D%E0%BB%88%E0%BA%B2%E0%BA%87%E0%BA%A2%E0%BB%88%E0%BA%B2%E0%BA%87%E0%BA%9E%E0%BA%B8%E0%BA%94%E0%BA%97%E0%BA%B0(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urlTatarkod =
-      "https://buddhaword.siteoly.com/%E0%BA%95%E0%BA%B2%E0%BA%96%E0%BA%B2%E0%BA%84%E0%BA%BB%E0%BA%94(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urlSmataviputsna =
-      "https://buddhaword.siteoly.com/%E0%BA%9B%E0%BA%B0%E0%BA%95%E0%BA%B4%E0%BA%9A%E0%BA%B1%E0%BA%94%E0%BA%AA%E0%BA%B0%E0%BA%A1%E0%BA%B2%E0%BA%97%E0%BA%B0&%E0%BA%A7%E0%BA%B4%E0%BA%9B%E0%BA%B1%E0%BA%94%E0%BA%8A%E0%BA%B0%E0%BA%99%E0%BA%B2(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urlpobpoum =
-      "https://buddhaword.siteoly.com/%E0%BA%9E%E0%BA%BB%E0%BA%9A%E0%BA%9E%E0%BA%B9%E0%BA%A1(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urldaylasarnvisa =
-      "https://buddhaword.siteoly.com/%E0%BB%80%E0%BA%94%E0%BA%8D%E0%BA%A5%E0%BA%B0%E0%BA%AA%E0%BA%B2%E0%BA%99%E0%BA%A7%E0%BA%B4%E0%BA%8A%E0%BA%B2(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urlskatakarmi =
-      "https://buddhaword.siteoly.com/%E0%BA%AA%E0%BA%B0%E0%BA%81%E0%BA%B0%E0%BA%97%E0%BA%B2%E0%BA%84%E0%BA%B2%E0%BA%A1%E0%BA%B5(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urljitmanovinyarn =
-      "https://buddhaword.siteoly.com/%E0%BA%88%E0%BA%B4%E0%BA%94%20%E0%BA%A1%E0%BA%B0%E0%BB%82%E0%BA%99%20%E0%BA%A7%E0%BA%B4%E0%BA%99%E0%BA%8D%E0%BA%B2%E0%BA%99(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urlzut =
-      "https://buddhaword.siteoly.com/%E0%BA%AA%E0%BA%B1%E0%BA%94(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urlRnakarmi =
-      "https://buddhaword.siteoly.com/%E0%BA%AD%E0%BA%B0%E0%BA%99%E0%BA%B2%E0%BA%84%E0%BA%B2%E0%BA%A1%E0%BA%B5(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urlSangyort =
-      "https://buddhaword.siteoly.com/%E0%BA%AA%E0%BA%B1%E0%BA%87%E0%BB%82%E0%BA%A2%E0%BA%94(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urlpartton =
-      "https://buddhaword.siteoly.com/%E0%BA%AD%E0%BA%B0%E0%BA%A3%E0%BA%B4%E0%BA%8D%E0%BA%B0%E0%BA%AA%E0%BA%B1%E0%BA%94%E0%BA%88%E0%BA%B2%E0%BA%81%E0%BA%9E%E0%BA%A3%E0%BA%B0%E0%BB%82%E0%BA%AD%E0%BA%94%20%E0%BA%9E%E0%BA%B2%E0%BA%81%E0%BA%95%E0%BA%BB%E0%BB%89%E0%BA%99(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urlpartpaiy =
-      "https://buddhaword.siteoly.com/%E0%BA%AD%E0%BA%B0%E0%BA%A3%E0%BA%B4%E0%BA%8D%E0%BA%B0%E0%BA%AA%E0%BA%B1%E0%BA%94%E0%BA%88%E0%BA%B2%E0%BA%81%E0%BA%9E%E0%BA%A3%E0%BA%B0%E0%BB%82%E0%BA%AD%E0%BA%94%20%E0%BA%9E%E0%BA%B2%E0%BA%81%E0%BA%9B%E0%BA%B2%E0%BA%8D(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urlphutapawat =
-      "https://buddhaword.siteoly.com/%E0%BA%9E%E0%BA%B8%E0%BA%94%E0%BA%97%E0%BA%B0%E0%BA%9B%E0%BA%B0%E0%BA%AB%E0%BA%A7%E0%BA%B1%E0%BA%94%E0%BA%88%E0%BA%B2%E0%BA%81%E0%BA%9E%E0%BA%A3%E0%BA%B0%E0%BB%82%E0%BA%AD%E0%BA%94(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urlpatijasmobard =
-      "https://buddhaword.siteoly.com/%E0%BA%9B%E0%BA%B0%E0%BA%95%E0%BA%B4%E0%BA%88%E0%BA%B0%E0%BA%AA%E0%BA%B0%E0%BA%A1%E0%BA%B8%E0%BA%9A%E0%BA%B2%E0%BA%94%E0%BA%88%E0%BA%B2%E0%BA%81%E0%BA%9E%E0%BA%A3%E0%BA%B0%E0%BB%82%E0%BA%AD%E0%BA%94(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urlluambunyaiy =
-      "https://buddhaword.siteoly.com/%E0%BA%A5%E0%BA%A7%E0%BA%A1%E0%BA%9E%E0%BA%B8%E0%BA%94%E0%BA%97%E0%BA%B0%E0%BA%A7%E0%BA%B0%E0%BA%88%E0%BA%B0%E0%BA%99%E0%BA%B0%E0%BA%9A%E0%BA%B1%E0%BA%99%E0%BA%A5%E0%BA%B0%E0%BA%8D%E0%BA%B2%E0%BA%8D(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urletc =
-      "https://buddhaword.siteoly.com/%E0%BA%A5%E0%BA%A7%E0%BA%A1%E0%BA%9E%E0%BA%B8%E0%BA%94%E0%BA%97%E0%BA%B0%E0%BA%A7%E0%BA%B0%E0%BA%88%E0%BA%B0%E0%BA%99%E0%BA%B0%E0%BB%9D%E0%BA%A7%E0%BA%94%E0%BA%AD%E0%BA%B7%E0%BB%88%E0%BA%99%E0%BB%86(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-  final String urlFAQ =
-      "https://buddhaword.siteoly.com/%E0%BA%A5%E0%BA%B2%E0%BA%8D%E0%BA%81%E0%BA%B2%E0%BA%99%20FAQ%20%E0%BA%9E%E0%BA%B8%E0%BA%94%E0%BA%97%E0%BA%B0%E0%BA%A7%E0%BA%B0%E0%BA%88%E0%BA%B0%E0%BA%99%E0%BA%B0%E0%BA%88%E0%BA%B2%E0%BA%81%E0%BA%9E%E0%BA%A3%E0%BA%B0%E0%BB%82%E0%BA%AD%E0%BA%94(%E0%BA%AA%E0%BA%BD%E0%BA%87&%E0%BA%A7%E0%BA%B5%E0%BA%94%E0%BA%B5%E0%BB%82%E0%BA%AD)";
-
-  void _openSoundKarawatSunlert() async {
-    if (await canLaunch(urlSoundKarawatSunlert)) {
-      await launch(urlSoundKarawatSunlert);
-    } else {
-      throw 'Could not launch $urlSoundKarawatSunlert';
-    }
-  }
-
-  void _openLinkSathayaiytham() async {
-    if (await canLaunch(urlSathayaiytham)) {
-      await launch(urlSathayaiytham);
-    } else {
-      throw 'Could not launch $urlSathayaiytham';
-    }
-  }
-
-  void _openLinkTarn() async {
-    if (await canLaunch(urlTarn)) {
-      await launch(urlTarn);
-    } else {
-      throw 'Could not launch $urlTarn';
-    }
-  }
-
-  void _openPathomtham() async {
-    if (await canLaunch(urlPathomtham)) {
-      await launch(urlPathomtham);
-    } else {
-      throw 'Could not launch $urlPathomtham';
-    }
-  }
-
-  void _openSodabun() async {
-    if (await canLaunch(urlSodabun)) {
-      await launch(urlSodabun);
-    } else {
-      throw 'Could not launch $urlSodabun';
-    }
-  }
-
-  void _openBuddhawajana() async {
-    if (await canLaunch(urlBuddhawajana)) {
-      await launch(urlBuddhawajana);
-    } else {
-      throw 'Could not launch $urlBuddhawajana';
-    }
-  }
-
-  void _openurlKaekam() async {
-    if (await canLaunch(urlKaekam)) {
-      await launch(urlKaekam);
-    } else {
-      throw 'Could not launch $urlKaekam';
-    }
-  }
-
-  void _openurlStiputarn_4() async {
-    if (await canLaunch(urlStiputarn_4)) {
-      await launch(urlStiputarn_4);
-    } else {
-      throw 'Could not launch $urlStiputarn_4';
-    }
-  }
-
-  void _openurlRnapa() async {
-    if (await canLaunch(urlRnapa)) {
-      await launch(urlRnapa);
-    } else {
-      throw 'Could not launch $urlRnapa';
-    }
-  }
-
-  void _openurlKorpatibutngaiy() async {
-    if (await canLaunch(urlKorpatibutngaiy)) {
-      await launch(urlKorpatibutngaiy);
-    } else {
-      throw 'Could not launch $urlKorpatibutngaiy';
-    }
-  }
-
-  void _openurlInseesungvone() async {
-    if (await canLaunch(urlInseesungvone)) {
-      await launch(urlInseesungvone);
-    } else {
-      throw 'Could not launch $urlInseesungvone';
-    }
-  }
-
-  void _openurlTarmhoytham() async {
-    if (await canLaunch(urlTarmhoytham)) {
-      await launch(urlTarmhoytham);
-    } else {
-      throw 'Could not launch $urlTarmhoytham';
-    }
-  }
-
-  void _openurlKaoyangyabuddha() async {
-    if (await canLaunch(urlKaoyangyabuddha)) {
-      await launch(urlKaoyangyabuddha);
-    } else {
-      throw 'Could not launch $urlKaoyangyabuddha';
-    }
-  }
-
-  void _openurlTatarkod() async {
-    if (await canLaunch(urlTatarkod)) {
-      await launch(urlTatarkod);
-    } else {
-      throw 'Could not launch $urlTatarkod';
-    }
-  }
-
-  void _openurlSmataviputsna() async {
-    if (await canLaunch(urlSmataviputsna)) {
-      await launch(urlSmataviputsna);
-    } else {
-      throw 'Could not launch $urlSmataviputsna';
-    }
-  }
-
-  void _openurlpobpoum() async {
-    if (await canLaunch(urlpobpoum)) {
-      await launch(urlpobpoum);
-    } else {
-      throw 'Could not launch $urlpobpoum';
-    }
-  }
-
-  void _openurldaylasarnvisa() async {
-    if (await canLaunch(urldaylasarnvisa)) {
-      await launch(urldaylasarnvisa);
-    } else {
-      throw 'Could not launch $urldaylasarnvisa';
-    }
-  }
-
-  void _openurlskatakarmi() async {
-    if (await canLaunch(urlskatakarmi)) {
-      await launch(urlskatakarmi);
-    } else {
-      throw 'Could not launch $urlskatakarmi';
-    }
-  }
-
-  void _openurljitmanovinyarn() async {
-    if (await canLaunch(urljitmanovinyarn)) {
-      await launch(urljitmanovinyarn);
-    } else {
-      throw 'Could not launch $urljitmanovinyarn';
-    }
-  }
-
-  void _openurlzut() async {
-    if (await canLaunch(urlzut)) {
-      await launch(urlzut);
-    } else {
-      throw 'Could not launch $urlzut';
-    }
-  }
-
-  void _openurlRnakarmi() async {
-    if (await canLaunch(urlRnakarmi)) {
-      await launch(urlRnakarmi);
-    } else {
-      throw 'Could not launch $urlRnakarmi';
-    }
-  }
-
-  void _openurlSangyort() async {
-    if (await canLaunch(urlSangyort)) {
-      await launch(urlSangyort);
-    } else {
-      throw 'Could not launch $urlSangyort';
-    }
-  }
-
-  void _openurlpartton() async {
-    if (await canLaunch(urlpartton)) {
-      await launch(urlpartton);
-    } else {
-      throw 'Could not launch $urlpartton';
-    }
-  }
-
-  void _openurlpartpaiy() async {
-    if (await canLaunch(urlpartpaiy)) {
-      await launch(urlpartpaiy);
-    } else {
-      throw 'Could not launch $urlpartpaiy';
-    }
-  }
-
-  void _openurlphutapawat() async {
-    if (await canLaunch(urlphutapawat)) {
-      await launch(urlphutapawat);
-    } else {
-      throw 'Could not launch $urlphutapawat';
-    }
-  }
-
-  void _openurlpatijasmobard() async {
-    if (await canLaunch(urlpatijasmobard)) {
-      await launch(urlpatijasmobard);
-    } else {
-      throw 'Could not launch $urlpatijasmobard';
-    }
-  }
-
-  void _openurlluambunyaiy() async {
-    if (await canLaunch(urlluambunyaiy)) {
-      await launch(urlluambunyaiy);
-    } else {
-      throw 'Could not launch $urlluambunyaiy';
-    }
-  }
-
-  void _openurletc() async {
-    if (await canLaunch(urletc)) {
-      await launch(urletc);
-    } else {
-      throw 'Could not launch $urletc';
-    }
-  }
-
-  void _openurlFAQ() async {
-    if (await canLaunch(urlFAQ)) {
-      await launch(urlFAQ);
-    } else {
-      throw 'Could not launch $urlFAQ';
-    }
+    setState(() {
+      _filteredData = _filteredData.reversed.toList();
+    });
   }
 
   @override
-  Widget build(BuildContext context) => Drawer(
-        child: SingleChildScrollView(
-            child: Column(
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    int crossAxisCount = screenWidth < 600 ? 3 : (screenWidth > 900 ? 5 : 4);
+    double aspectRatio = screenWidth < 900 ? 0.8 : 1;
+    double cardHeight = screenWidth < 900 ? 200.0 : 250.0;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Buddha Nature'),
+        actions: [
+          Consumer<ThemeProvider>(
+            builder: (context, themeProvider, child) {
+              return Switch(
+                value: themeProvider.isDarkMode,
+                onChanged: (isDarkMode) {
+                  themeProvider.toggleTheme(isDarkMode);
+                },
+                activeColor: Theme.of(context).colorScheme.secondary,
+              );
+            },
+          ),
+        ],
+      ),
+      drawer: const NavigationDrawer(),
+      body: Padding(
+        padding: const EdgeInsets.all(1.0),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            buildHeader(context),
-            buildMenuItems(context),
-          ],
-        )),
-      );
-
-  Widget buildHeader(BuildContext context) => Container(
-        padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-      );
-
-  Widget buildMenuItems(BuildContext context) => Container(
-        padding: const EdgeInsets.all(24),
-        child: Wrap(
-          runSpacing: 0, //verticalSpacing
           children: [
-            ListTile(
-              leading: _isChecked
-                  ? Icon(Icons.library_books, color: _checkColor)
-                  : Icon(Icons.library_books_outlined, color: _checkColor),
-              title: const Text(
-                'ພຣະສູດ',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            TextField(
+              controller: _searchController,
+              style: const TextStyle(fontSize: 17.0),
+              decoration: InputDecoration(
+                hintText: 'ຄົ້ນຫາສຸດຕັນຕະສູນຍະຕາສູດ...',
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          setState(() {
+                            _searchController.clear();
+                            _searchTerm = '';
+                            updateData(_searchTerm); // Update data directly
+                          });
+                        },
+                      )
+                    : null,
               ),
-              onTap: () => {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => const HomePage(
-                      title: 'Buddha-Nature',
-                    ),
-                  ),
-                ),
+              onChanged: (value) {
+                setState(() {
+                  _searchTerm = value;
+                  updateData(
+                      _searchTerm); // Update data when search term changes
+                });
               },
             ),
-            ListTile(
-              leading: _isChecked
-                  ? Icon(Icons.book, color: _checkColor)
-                  : Icon(Icons.book_outlined, color: _checkColor),
-              title: const Text(
-                'ປື້ມ & ເເຜນຜັງ',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              onTap: () => _openLinkBooks(),
+            const SizedBox(height: 2),
+            Expanded(
+              child: _searchTerm.isEmpty
+                  ? GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: crossAxisCount,
+                        mainAxisSpacing: 1.0,
+                        crossAxisSpacing: 1.0,
+                        childAspectRatio: aspectRatio,
+                      ),
+                      itemCount: _categories.length,
+                      itemBuilder: (context, index) {
+                        final category = _categories[index];
+                        final imageAsset = 'assets/$category.jpg';
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CategoryListPage(
+                                  data: _data,
+                                  selectedCategory: category,
+                                  searchTerm: _searchTerm,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Card(
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: AspectRatio(
+                              aspectRatio: aspectRatio,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Expanded(
+                                    child: ClipRRect(
+                                      borderRadius: const BorderRadius.vertical(
+                                        top: Radius.circular(2),
+                                      ),
+                                      child: AspectRatio(
+                                        aspectRatio: aspectRatio,
+                                        child: FutureBuilder<bool>(
+                                          future: _checkAssetExists(imageAsset),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.waiting) {
+                                              // Loading state
+                                              return const Center(
+                                                  child:
+                                                      CircularProgressIndicator());
+                                            } else if (snapshot.hasData &&
+                                                snapshot.data!) {
+                                              // Asset exists, load it
+                                              return Image.asset(
+                                                imageAsset,
+                                                fit: BoxFit.cover,
+                                                width: double.infinity,
+                                                height: cardHeight,
+                                              );
+                                            } else {
+                                              // Asset doesn't exist, load default image
+                                              return Image.asset(
+                                                'assets/default_image.jpg',
+                                                fit: BoxFit.cover,
+                                                width: double.infinity,
+                                                height: cardHeight,
+                                              );
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 1),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 2),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Expanded(
+                                          child: Container(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              category,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    )
+                  : ListView.builder(
+                      itemCount: _filteredData.length,
+                      itemBuilder: (context, index) {
+                        final rowData = _filteredData[index];
+                        final title = rowData[1].toString();
+                        final detailLink = rowData[3].toString();
+
+                        return Card(
+                          child: ListTile(
+                            title: Text(
+                              title,
+                              style: const TextStyle(
+                                fontSize: 18, // Adjust the font size as needed
+                                fontWeight:
+                                    FontWeight.bold, // Make the title bold
+                              ),
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => DetailPage(
+                                    title: title,
+                                    detailLink: detailLink,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ),
             ),
-            ListTile(
-              leading: _isChecked
-                  ? Icon(Icons.open_in_browser_rounded, color: _checkColor)
-                  : Icon(Icons.open_in_browser_outlined, color: _checkColor),
-              title: const Text(
-                'ພຣະສູດ Web',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              onTap: () => _openLinkWebapp(),
-            ),
-            ListTile(
-              leading: _isChecked
-                  ? Icon(Icons.filter_vintage, color: _checkColor)
-                  : Icon(Icons.sunny, color: _checkColor),
-              title: const Text(
-                'ພຣະທັມ',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              onTap: () => _openLinkDhamma(),
-            ),
-            ListTile(
-              leading: _isChecked
-                  ? Icon(Icons.language, color: _checkColor)
-                  : Icon(Icons.language_outlined, color: _checkColor),
-              title: const Text(
-                'Buddhaword English',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              onTap: () => _openLinkEnglish(),
-            ),
-            ListTile(
-              leading: _isChecked
-                  ? Icon(Icons.calendar_month, color: _checkColor)
-                  : Icon(Icons.calendar_month_outlined, color: _checkColor),
-              title: const Text(
-                'ປະຕິທິນທັມ',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              onTap: () => _openLinkCalendar(),
-            ),
-            ListTile(
-              leading: _isChecked
-                  ? Icon(Icons.video_library, color: _checkColor)
-                  : Icon(Icons.video_collection_outlined, color: _checkColor),
-              title: const Text(
-                'ອະນັດຕາ',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              onTap: () => _openLinkArnuta(),
-            ),
-            ListTile(
-              leading: _isChecked
-                  ? Icon(Icons.message, color: _checkColor)
-                  : Icon(Icons.message_outlined, color: _checkColor),
-              title: const Text(
-                'ສົນທະນາທັມ',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              onTap: () => _openLinkChat(),
-            ),
-            ExpansionTile(
-              leading: Icon(Icons.hearing,
-                  color: const Color.fromARGB(241, 179, 93, 78)),
-              title: Text(
-                'ສຽງທັມ',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              children: [
-                ExpansionTile(
-                  title: Text(
-                    'ທັມໃນເບື້ອງຕົ້ນ',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                  children: [
-                    ListTile(
-                      title: Text(
-                        'ຄະຣາວາດຊັ້ນເລີດ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openSoundKarawatSunlert(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ສາທະຍາຍທັມ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openLinkSathayaiytham(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ທານ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openLinkTarn(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ປະຖົມທັມ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openPathomtham(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ຄູ່ມືໂສດາບັນ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openSodabun(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ພຸດທະວະຈະນະ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openBuddhawajana(),
-                    ),
-                  ],
-                ),
-                const Divider(
-                  color: Color.fromARGB(255, 221, 220, 217),
-                  thickness: 1,
-                  height: 1,
-                ),
-                ExpansionTile(
-                  title: Text(
-                    'ທັມໃນທ່າມກາງ',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                  children: [
-                    ListTile(
-                      title: Text(
-                        'ກໍາ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openurlKaekam(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ສະຕິປັຕຖານ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openurlStiputarn_4(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ອານາປານະສະຕິ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openurlRnapa(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ຂໍ້ປະຕິບັດວິ​ທີ​ທີ່​ງ່າຍ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openurlKorpatibutngaiy(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ອິນຊີສັງວອນ​',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openurlInseesungvone(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ຕາມຮອຍທັມ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openurlTarmhoytham(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ກ້າວຍ່າງຢ່າງພຸດທະ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openurlKaoyangyabuddha(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ຕາຖາຄົດ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openurlTatarkod(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ປະຕິບັດສະມາທະ&ວິປັດຊະນາ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openurlSmataviputsna(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ພົບພູມ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openurlpobpoum(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ເດຍລະສານວິຊາ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openurldaylasarnvisa(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ສະກະທາຄາມີ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openurlskatakarmi(),
-                    ),
-                  ],
-                ),
-                const Divider(
-                  color: Color.fromARGB(255, 221, 220, 217),
-                  thickness: 1,
-                  height: 1,
-                ),
-                ExpansionTile(
-                  title: Text(
-                    'ທັມໃນທີສຸດ',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                  children: [
-                    ListTile(
-                      title: Text(
-                        'ຈິດ ມະໂນ ວິນຍານ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openurljitmanovinyarn(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ສັຕ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openurlzut(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ອະນາຄາມີ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openurlRnakarmi(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ສັງໂຢດ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openurlSangyort(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ອະຣິຍະສັດຈາກພຣະໂອດ ພາກຕົ້ນ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openurlpartton(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ອະຣິຍະສັດຈາກພຣະໂອດ ພາກປາຍ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openurlpartpaiy(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ພຸດທະປະຫວັດຈາກພຣະໂອດ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openurlphutapawat(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ປະຕິຈະສະມຸບາດຈາກພຣະໂອດ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openurlpatijasmobard(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ລວມພຸດທະວະຈະນະບັນລະຍາຍ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openurlluambunyaiy(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ລວມພຸດທະວະຈະນະໝວດອື່ນໆ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openurletc(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ລາຍການ FAQ ພຸດທະວະຈະນະຈາກພຣະໂອດ',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () => _openurlFAQ(),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            // const Divider(
-            //   color: Colors.black54,
-            // ),
-            // ListTile(
-            //   leading: _isChecked
-            //       ? Icon(Icons.add, color: _checkColor)
-            //       : Icon(Icons.add_outlined, color: _checkColor),
-            //   title: const Text(
-            //     'ເພີ່ມພຣະສູດ',
-            //     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            //   ),
-            //   onTap: () => Navigator.of(context).pushReplacement(
-            //     MaterialPageRoute(
-            //       builder: (context) => const SutraList(
-            //         title: 'ລາຍການພຣະສູດ',
-            //       ),
-            //     ),
-            //   ),
-            // ),
           ],
         ),
-      );
+      ),
+    );
+  }
+
+  Future<bool> _checkAssetExists(String assetName) async {
+    try {
+      // Load the asset as a byte list
+      final ByteData data = await rootBundle.load(assetName);
+      return data.buffer.asUint8List().isNotEmpty; // If not empty, asset exists
+    } catch (e) {
+      return false; // Error loading asset, asset doesn't exist
+    }
+  }
+}
+
+class DetailPage extends StatefulWidget {
+  final String title;
+  final String detailLink;
+
+  const DetailPage({
+    required this.title,
+    required this.detailLink,
+  });
+
+  @override
+  _DetailPageState createState() => _DetailPageState();
+}
+
+class _DetailPageState extends State<DetailPage> {
+  double _fontSize = 18.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('ສຸດຕັນຕະ'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search, color: Colors.white),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SearchPage(),
+                ),
+              );
+            },
+          ),
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.menu, color: Colors.white),
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+            ),
+          ),
+          Consumer<ThemeProvider>(
+            builder: (context, themeProvider, child) {
+              return Switch(
+                value: themeProvider.isDarkMode,
+                onChanged: (isDarkMode) {
+                  themeProvider.toggleTheme(isDarkMode);
+                },
+                activeColor: Theme.of(context).colorScheme.secondary,
+              );
+            },
+          ),
+        ],
+      ),
+      drawer: const NavigationDrawer(),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Container(
+          constraints: BoxConstraints(
+            minHeight: MediaQuery.of(context).size.height,
+          ),
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: SelectableText(
+                  widget.title,
+                  textAlign: TextAlign.center,
+                  toolbarOptions: const ToolbarOptions(
+                    copy: true,
+                    cut: true,
+                    paste: true,
+                    selectAll: true,
+                  ),
+                  showCursor: true,
+                  style: const TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Divider(color: Colors.black, thickness: 1, height: 1),
+              const SizedBox(height: 10),
+              FutureBuilder<String>(
+                future: _fetchData(widget.detailLink),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (snapshot.hasData) {
+                    return SingleChildScrollView(
+                      physics: const ClampingScrollPhysics(),
+                      child: SelectableText.rich(
+                        TextSpan(
+                          children: parseContent(widget.detailLink),
+                        ),
+                        toolbarOptions: const ToolbarOptions(
+                          copy: true,
+                          cut: true,
+                          paste: true,
+                          selectAll: true,
+                        ),
+                        showCursor: true,
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                          fontSize: _fontSize,
+                          height: 1.8,
+                        ),
+                      ),
+                    );
+                  } else if (snapshot.hasError) {
+                    return Center(
+                      child: Text('Error: ${snapshot.error}'),
+                    );
+                  }
+                  return Container();
+                },
+              ),
+              const SizedBox(height: 80),
+            ],
+          ),
+        ),
+      ),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          SizedBox(
+            width: 100,
+            child: FloatingActionButton(
+              heroTag: 'fab1',
+              onPressed: _increaseFontSize,
+              backgroundColor: const Color(0xFFF5F5F5),
+              child: const Icon(
+                Icons.add,
+                color: Color.fromARGB(241, 179, 93, 78),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          FloatingActionButton(
+            heroTag: 'fab2',
+            onPressed: _decreaseFontSize,
+            backgroundColor: const Color(0xFFF5F5F5),
+            child: const Icon(
+              Icons.remove,
+              color: Color.fromARGB(241, 179, 93, 78),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<String> _fetchData(String url) async {
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        return response.body;
+      } else {
+        return '';
+      }
+    } catch (e) {
+      return '';
+    }
+  }
+
+  void _increaseFontSize() {
+    setState(() {
+      _fontSize += 2.0;
+    });
+  }
+
+  void _decreaseFontSize() {
+    setState(() {
+      _fontSize = _fontSize > 2.0 ? _fontSize - 2.0 : _fontSize;
+    });
+  }
+}
+
+List<TextSpan> parseContent(String content) {
+  final List<TextSpan> children = [];
+
+  final List<String> chunks = content.split(RegExp(r'<\/?b>'));
+
+  for (int i = 0; i < chunks.length; i++) {
+    final String chunk = chunks[i];
+    if (i % 2 == 0) {
+      children.add(TextSpan(text: chunk));
+    } else {
+      children.add(TextSpan(
+        text: chunk,
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ));
+    }
+  }
+
+  return children;
+}
+
+class ThemeProvider extends ChangeNotifier {
+  bool _isDarkMode = false;
+
+  bool get isDarkMode => _isDarkMode;
+
+  void toggleTheme(bool isDarkMode) {
+    _isDarkMode = isDarkMode;
+    notifyListeners();
+  }
+}
+
+class SearchPage extends StatefulWidget {
+  @override
+  _SearchPageState createState() => _SearchPageState();
+}
+
+class _SearchPageState extends State<SearchPage> {
+  final TextEditingController _searchController = TextEditingController();
+
+  List<List<dynamic>> _data = [];
+  List<List<dynamic>> _filteredData = [];
+  String _searchTerm = '';
+  String _selectedCategory = ''; // Define _selectedCategory
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData(_searchTerm);
+  }
+
+  Future<void> fetchData(String searchTerm) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? cachedData = prefs.getString('cachedData');
+
+    if (cachedData != null && cachedData.isNotEmpty) {
+      final List<dynamic> cachedValues = json.decode(cachedData);
+      _data = cachedValues.cast<List<dynamic>>();
+    }
+
+    // Call updateData without _selectedCategory
+    updateData(searchTerm, _selectedCategory);
+  }
+
+  void updateData(String searchTerm, String selectedCategory) {
+    _filteredData = _data
+        .where((row) {
+          return row.any((cell) =>
+              cell.toString().toLowerCase().contains(searchTerm.toLowerCase()));
+        })
+        .where((row) => row.isNotEmpty && row[0] != '0')
+        .where((row) =>
+            selectedCategory.isEmpty ||
+            row.length > 4 && row[4] == selectedCategory)
+        .toList();
+
+    setState(() {
+      _filteredData = _filteredData.reversed.toList();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('ຄົ້ນຫາ'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        actions: [
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.menu, color: Colors.white),
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+            ),
+          ),
+          Consumer<ThemeProvider>(
+            builder: (context, themeProvider, child) {
+              return Switch(
+                value: themeProvider.isDarkMode,
+                onChanged: (isDarkMode) {
+                  themeProvider.toggleTheme(isDarkMode);
+                },
+                activeColor: Theme.of(context).colorScheme.secondary,
+              );
+            },
+          ),
+        ],
+      ),
+      drawer: const NavigationDrawer(),
+      body: Padding(
+        padding: const EdgeInsets.all(2.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context)
+                      .size
+                      .width), // Constrain width of the row
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: TextField(
+                      controller: _searchController,
+                      style: const TextStyle(fontSize: 17.0),
+                      decoration: InputDecoration(
+                        hintText: 'ຄົ້ນຫາ...',
+                        prefixIcon: const Icon(Icons.search),
+                        suffixIcon: _searchController.text.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear),
+                                onPressed: () {
+                                  setState(() {
+                                    _searchController.clear();
+                                    _searchTerm = '';
+                                    fetchData(_searchTerm);
+                                  });
+                                },
+                              )
+                            : null,
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          _searchTerm = value;
+                          fetchData(_searchTerm);
+                        });
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 2),
+                  Expanded(
+                    flex: 2,
+                    child: DropdownButtonFormField<String>(
+                      value: _selectedCategory.isNotEmpty
+                          ? _selectedCategory
+                          : null,
+                      decoration: InputDecoration(
+                        hintText: 'ໝວດທັມ',
+                        suffixIcon: _selectedCategory.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear),
+                                onPressed: () {
+                                  setState(() {
+                                    _selectedCategory = '';
+                                    if (_searchTerm.isEmpty) {
+                                      updateData(
+                                          _searchTerm, _selectedCategory);
+                                    } else {
+                                      fetchData(_searchTerm);
+                                    }
+                                  });
+                                },
+                              )
+                            : null,
+                      ),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedCategory = newValue ?? '';
+                          if (_searchTerm.isEmpty) {
+                            updateData(_searchTerm, _selectedCategory);
+                          } else {
+                            fetchData(_searchTerm);
+                          }
+                        });
+                      },
+                      items: _data.isEmpty
+                          ? null
+                          : _data
+                              .map((row) =>
+                                  row.length > 4 ? row[4].toString() : '')
+                              .toSet()
+                              .toList()
+                              .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 2),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _filteredData.length,
+                itemBuilder: (context, index) {
+                  final rowData = _filteredData[index];
+                  final title = rowData[1].toString();
+                  final detailLink = rowData[3].toString();
+
+                  return Card(
+                    child: ListTile(
+                      title: Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 18, // Adjust the font size as needed
+                          fontWeight: FontWeight.bold, // Make the title bold
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DetailPage(
+                              title: title,
+                              detailLink: detailLink,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
