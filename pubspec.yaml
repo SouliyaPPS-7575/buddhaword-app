@@ -87,9 +87,9 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/ທັມໃນເບື້ອງຕົ້ນ.jpg
-    - assets/ທັມໃນທ່າມກາງ.jpg
-    - assets/ທັມໃນທີ່ສຸດ.jpg
+    - assets/ທໍາໃນເບື້ອງຕົ້ນ.jpg
+    - assets/ທໍາໃນທ່າມກາງ.jpg
+    - assets/ທໍາໃນທີສຸດ.jpg
     - assets/ທານ.jpg
     - assets/default_image.jpg
     - assets/ກຳ.jpg
