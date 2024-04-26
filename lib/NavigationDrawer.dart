@@ -1,9 +1,11 @@
 // ignore_for_file: unnecessary_const, non_constant_identifier_names, avoid_print, deprecated_member_use, prefer_const_constructors, unused_import, file_names
 
 import 'package:flutter/material.dart';
-import 'ContactInfoPage.dart';
-import 'main.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import 'ContactInfoPage.dart';
+import 'FavoritePage.dart';
+import 'main.dart';
 
 class NavigationDrawer extends StatefulWidget {
   const NavigationDrawer({super.key});
@@ -408,6 +410,22 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
                     builder: (context) => MyHomePage(),
+                  ),
+                ),
+              },
+            ),
+            ListTile(
+              leading: _isChecked
+                  ? Icon(Icons.favorite, color: _checkColor)
+                  : Icon(Icons.favorite, color: _checkColor),
+              title: const Text(
+                'ພຣະສູດທີຖືກໃຈ',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              onTap: () => {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => FavoritePage(),
                   ),
                 ),
               },

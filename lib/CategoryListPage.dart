@@ -118,6 +118,7 @@ class _CategoryListPageState extends State<CategoryListPage> {
                     .toString(); // Assuming the first column contains the title
                 final detailLink = rowData[3]
                     .toString(); // Assuming the second column contains the detail link
+                final category = rowData[4].toString();
 
                 return Card(
                   child: ListTile(
@@ -134,9 +135,9 @@ class _CategoryListPageState extends State<CategoryListPage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => DetailPage(
-                            title: title,
-                            detailLink: detailLink,
-                          ),
+                              title: title,
+                              detais: detailLink,
+                              category: category),
                         ),
                       );
                     },

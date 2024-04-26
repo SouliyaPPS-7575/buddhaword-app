@@ -311,6 +311,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         final rowData = _filteredData[index];
                         final title = rowData[1].toString();
                         final detailLink = rowData[3].toString();
+                        final category = rowData[4].toString();
 
                         return Card(
                           child: ListTile(
@@ -328,7 +329,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                 MaterialPageRoute(
                                   builder: (context) => DetailPage(
                                     title: title,
-                                    detailLink: detailLink,
+                                    detais: detailLink,
+                                    category: category,
                                   ),
                                 ),
                               );
@@ -357,11 +359,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
 class DetailPage extends StatefulWidget {
   final String title;
-  final String detailLink;
+  final String detais;
+  final String category;
 
   const DetailPage({
     required this.title,
-    required this.detailLink,
+    required this.detais,
+    required this.category,
   });
 
   @override
@@ -370,6 +374,45 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
   double _fontSize = 18.0;
+  bool _isFavorited = false; // Add this line
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFavoriteState();
+  }
+
+  Future<void> _loadFavoriteState() async {
+    final prefs = await SharedPreferences.getInstance();
+    // Load the favorite state based on both title and detailLink
+    setState(() {
+      _isFavorited = prefs.getBool('${widget.title}_${widget.detais}_${widget.category}') ?? false;
+    });
+  }
+
+  Future<void> _toggleFavorite() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isFavorited = !_isFavorited;
+      // Save the current state of _isFavorited for the title and detailLink
+      prefs.setBool('${widget.title}_${widget.detais}_${widget.category}', _isFavorited);
+
+      // Load the current favorites list, add/remove the title and detailLink, and save it back
+      List<String> currentFavorites = prefs.getStringList('favorites') ?? [];
+      if (_isFavorited) {
+        currentFavorites.add(
+            json.encode({'title': widget.title, 'details': widget.detais, 'category': widget.category}));
+      } else {
+        currentFavorites.removeWhere((item) {
+          Map<String, dynamic> current = json.decode(item);
+          return current['title'] == widget.title &&
+              current['details'] == widget.detais &&
+              current['category'] == widget.category;
+        });
+      }
+      prefs.setStringList('favorites', currentFavorites);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -383,6 +426,13 @@ class _DetailPageState extends State<DetailPage> {
           },
         ),
         actions: [
+          IconButton(
+            icon: Icon(
+              _isFavorited ? Icons.favorite : Icons.favorite_border,
+              color: Colors.white,
+            ),
+            onPressed: _toggleFavorite,
+          ),
           IconButton(
             icon: const Icon(Icons.search, color: Colors.white),
             onPressed: () {
@@ -447,7 +497,7 @@ class _DetailPageState extends State<DetailPage> {
               const Divider(color: Colors.black, thickness: 1, height: 1),
               const SizedBox(height: 10),
               FutureBuilder<String>(
-                future: _fetchData(widget.detailLink),
+                future: _fetchData(widget.detais),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
@@ -458,7 +508,7 @@ class _DetailPageState extends State<DetailPage> {
                       physics: const ClampingScrollPhysics(),
                       child: SelectableText.rich(
                         TextSpan(
-                          children: parseContent(widget.detailLink),
+                          children: parseContent(widget.detais),
                         ),
                         toolbarOptions: const ToolbarOptions(
                           copy: true,
@@ -760,6 +810,7 @@ class _SearchPageState extends State<SearchPage> {
                   final rowData = _filteredData[index];
                   final title = rowData[1].toString();
                   final detailLink = rowData[3].toString();
+                  final category = rowData[4].toString();
 
                   return Card(
                     child: ListTile(
@@ -776,7 +827,8 @@ class _SearchPageState extends State<SearchPage> {
                           MaterialPageRoute(
                             builder: (context) => DetailPage(
                               title: title,
-                              detailLink: detailLink,
+                              detais: detailLink,
+                              category: category,
                             ),
                           ),
                         );
