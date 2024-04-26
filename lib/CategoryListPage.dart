@@ -136,7 +136,7 @@ class _CategoryListPageState extends State<CategoryListPage> {
                         MaterialPageRoute(
                           builder: (context) => DetailPage(
                               title: title,
-                              detais: detailLink,
+                              details: detailLink,
                               category: category),
                         ),
                       );

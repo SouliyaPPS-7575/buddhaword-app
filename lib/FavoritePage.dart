@@ -22,7 +22,6 @@ class _FavoritePageState extends State<FavoritePage> {
   List<String> _favorites = [];
   List<String> _filteredFavorites = []; // Add a list for filtered favorites
   String _searchTerm = '';
-  // String _selectedCategory = ''; // Define _selectedCategory
 
   @override
   void initState() {
@@ -149,7 +148,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                 MaterialPageRoute(
                                   builder: (context) => DetailPage(
                                     title: title,
-                                    detais: detailLink,
+                                    details: detailLink,
                                     category: category,
                                   ),
                                 ),

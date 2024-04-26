@@ -329,7 +329,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 MaterialPageRoute(
                                   builder: (context) => DetailPage(
                                     title: title,
-                                    detais: detailLink,
+                                    details: detailLink,
                                     category: category,
                                   ),
                                 ),
@@ -359,12 +359,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
 class DetailPage extends StatefulWidget {
   final String title;
-  final String detais;
+  final String details;
   final String category;
 
   const DetailPage({
     required this.title,
-    required this.detais,
+    required this.details,
     required this.category,
   });
 
@@ -386,7 +386,9 @@ class _DetailPageState extends State<DetailPage> {
     final prefs = await SharedPreferences.getInstance();
     // Load the favorite state based on both title and detailLink
     setState(() {
-      _isFavorited = prefs.getBool('${widget.title}_${widget.detais}_${widget.category}') ?? false;
+      _isFavorited = prefs.getBool(
+              '${widget.title}_${widget.details}_${widget.category}') ??
+          false;
     });
   }
 
@@ -395,18 +397,23 @@ class _DetailPageState extends State<DetailPage> {
     setState(() {
       _isFavorited = !_isFavorited;
       // Save the current state of _isFavorited for the title and detailLink
-      prefs.setBool('${widget.title}_${widget.detais}_${widget.category}', _isFavorited);
+      prefs.setBool(
+          '${widget.title}_${widget.details}_${widget.category}', _isFavorited);
 
       // Load the current favorites list, add/remove the title and detailLink, and save it back
       List<String> currentFavorites = prefs.getStringList('favorites') ?? [];
       if (_isFavorited) {
         currentFavorites.add(
-            json.encode({'title': widget.title, 'details': widget.detais, 'category': widget.category}));
+            json.encode({
+          'title': widget.title,
+          'details': widget.details,
+          'category': widget.category
+        }));
       } else {
         currentFavorites.removeWhere((item) {
           Map<String, dynamic> current = json.decode(item);
           return current['title'] == widget.title &&
-              current['details'] == widget.detais &&
+              current['details'] == widget.details &&
               current['category'] == widget.category;
         });
       }
@@ -497,7 +504,7 @@ class _DetailPageState extends State<DetailPage> {
               const Divider(color: Colors.black, thickness: 1, height: 1),
               const SizedBox(height: 10),
               FutureBuilder<String>(
-                future: _fetchData(widget.detais),
+                future: _fetchData(widget.details),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
@@ -508,7 +515,7 @@ class _DetailPageState extends State<DetailPage> {
                       physics: const ClampingScrollPhysics(),
                       child: SelectableText.rich(
                         TextSpan(
-                          children: parseContent(widget.detais),
+                          children: parseContent(widget.details),
                         ),
                         toolbarOptions: const ToolbarOptions(
                           copy: true,
@@ -827,7 +834,7 @@ class _SearchPageState extends State<SearchPage> {
                           MaterialPageRoute(
                             builder: (context) => DetailPage(
                               title: title,
-                              detais: detailLink,
+                              details: detailLink,
                               category: category,
                             ),
                           ),
