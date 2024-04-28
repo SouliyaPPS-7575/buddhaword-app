@@ -58,6 +58,8 @@ dependencies:
   shared_preferences_riverpod: ^0.3.0
   http_mock_adapter: ^0.4.4
   http: ^0.13.3
+  app_upgrade_flutter_sdk: ^2.0.2
+  upgrader: ^6.5.0
 
 flutter_icons:
   android: "launcher_icon"
@@ -112,6 +114,11 @@ flutter:
     - assets/ອານິສົງ.jpg
     - assets/ອິນຊີສັງວອນ.jpg
     - assets/ສະມາທິ.jpg
+    - assets/ແກ່ ເຈັບ ຕາຍ.jpg
+    - assets/ຂັນ 5.jpg
+    - assets/ພຣະຣັດຕະນະໄຕຣ.jpg
+    - assets/ພຣົມວິຫານ 4.jpg
+    - assets/ອະກຸສົນ.jpg
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

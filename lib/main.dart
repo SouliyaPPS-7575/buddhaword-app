@@ -1,14 +1,16 @@
 // ignore_for_file: library_private_types_in_public_api, use_key_in_widget_constructors, depend_on_referenced_packages
 
+import 'dart:async';
 import 'dart:convert';
+
+import 'package:app_upgrade_flutter_sdk/app_upgrade_flutter_sdk.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:connectivity/connectivity.dart';
-import 'dart:async';
 
 import 'CategoryListPage.dart';
 import 'NavigationDrawer.dart';
@@ -20,26 +22,40 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    AppInfo appInfo = AppInfo(
+        appId: 'com.buddha.lao_tipitaka',
+        appName: 'buddha nature', // Your app name
+        appVersion: '3.0.1', // Your app version
+        platform: 'android', // App Platform, android or ios
+        environment:
+            'production', // Environment in which app is running, production, staging or development etc.
+        appLanguage: 'es' //Your app language ex: en, es etc. //Optional
+        );
+
     return ChangeNotifierProvider(
       create: (context) => ThemeProvider(),
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {
           return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'Buddha Nature',
-            theme: ThemeData(
-              primarySwatch: Colors.brown,
-              fontFamily: 'NotoSerifLao',
-            ),
-            darkTheme: ThemeData(
-              brightness: Brightness.dark,
-              primarySwatch: Colors.brown,
-              fontFamily: 'NotoSerifLao',
-            ),
-            themeMode:
-                themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-            home: MyHomePage(),
-          );
+              debugShowCheckedModeBanner: false,
+              title: 'Buddha Nature',
+              theme: ThemeData(
+                primarySwatch: Colors.brown,
+                fontFamily: 'NotoSerifLao',
+              ),
+              darkTheme: ThemeData(
+                brightness: Brightness.dark,
+                primarySwatch: Colors.brown,
+                fontFamily: 'NotoSerifLao',
+              ),
+              themeMode:
+                  themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+              // home: MyHomePage(),
+              home: AppUpgradeAlert(
+                  xApiKey:
+                      'ZmRmNjE3ZDQtZmQwYS00OTgxLWIzZjAtNGE5Mzk4YWU1ZTYx', // Your x-api-key
+                  appInfo: appInfo,
+                  child: MyHomePage()));
         },
       ),
     );
@@ -403,8 +419,7 @@ class _DetailPageState extends State<DetailPage> {
       // Load the current favorites list, add/remove the title and detailLink, and save it back
       List<String> currentFavorites = prefs.getStringList('favorites') ?? [];
       if (_isFavorited) {
-        currentFavorites.add(
-            json.encode({
+        currentFavorites.add(json.encode({
           'title': widget.title,
           'details': widget.details,
           'category': widget.category
