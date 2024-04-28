@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
     AppInfo appInfo = AppInfo(
         appId: 'com.buddha.lao_tipitaka',
         appName: 'buddha nature', // Your app name
-        appVersion: '3.0.1', // Your app version
+        appVersion: '4.0.0', // Your app version
         platform: 'android', // App Platform, android or ios
         environment:
             'production', // Environment in which app is running, production, staging or development etc.
