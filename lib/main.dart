@@ -554,7 +554,7 @@ class _DetailPageState extends State<DetailPage> {
                   return Container();
                 },
               ),
-              const SizedBox(height: 80),
+              const SizedBox(height: 150),
             ],
           ),
         ),
@@ -584,6 +584,16 @@ class _DetailPageState extends State<DetailPage> {
               color: Color.fromARGB(241, 179, 93, 78),
             ),
           ),
+          const SizedBox(width: 10),
+          FloatingActionButton(
+            heroTag: 'fab3',
+            onPressed: _copyContentToClipboard,
+            backgroundColor: const Color(0xFFF5F5F5),
+            child: const Icon(
+              Icons.content_copy,
+              color: Color.fromARGB(241, 179, 93, 78),
+            ),
+          ),
         ],
       ),
     );
@@ -600,6 +610,13 @@ class _DetailPageState extends State<DetailPage> {
     } catch (e) {
       return '';
     }
+  }
+
+  Future<void> _copyContentToClipboard() async {
+    Clipboard.setData(ClipboardData(text: widget.details));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Content copied to clipboard')),
+    );
   }
 
   void _increaseFontSize() {
