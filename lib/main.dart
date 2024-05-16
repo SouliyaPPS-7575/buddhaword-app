@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
         builder: (context, themeProvider, child) {
           return MaterialApp(
               debugShowCheckedModeBanner: false,
-              title: 'Buddha Nature',
+              title: 'ທັມມະ',
               theme: ThemeData(
                 primarySwatch: Colors.brown,
                 fontFamily: 'NotoSerifLao',
@@ -163,7 +163,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Buddha Nature'),
+        title: const Text('ທັມມະ'),
         actions: [
           Consumer<ThemeProvider>(
             builder: (context, themeProvider, child) {
@@ -613,7 +613,9 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Future<void> _copyContentToClipboard() async {
-    Clipboard.setData(ClipboardData(text: widget.details));
+    String copiedText = widget.details
+        .replaceAll(RegExp(r'<\/?b>'), ''); // Remove <b> and </b> tags
+    Clipboard.setData(ClipboardData(text: copiedText));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Content copied to clipboard')),
     );
@@ -670,6 +672,7 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
 
   List<List<dynamic>> _data = [];
   List<List<dynamic>> _filteredData = [];
@@ -680,6 +683,18 @@ class _SearchPageState extends State<SearchPage> {
   void initState() {
     super.initState();
     fetchData(_searchTerm);
+
+    // Request focus on the TextField when the widget builds
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNode.requestFocus();
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _focusNode.dispose();
+    super.dispose();
   }
 
   Future<void> fetchData(String searchTerm) async {
@@ -759,9 +774,10 @@ class _SearchPageState extends State<SearchPage> {
               child: Row(
                 children: [
                   Expanded(
-                    flex: 2,
+                    flex: 1,
                     child: TextField(
                       controller: _searchController,
+                      focusNode: _focusNode,
                       style: const TextStyle(fontSize: 17.0),
                       decoration: InputDecoration(
                         hintText: 'ຄົ້ນຫາ...',
@@ -789,7 +805,7 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                   const SizedBox(width: 2),
                   Expanded(
-                    flex: 2,
+                    flex: 1,
                     child: DropdownButtonFormField<String>(
                       value: _selectedCategory.isNotEmpty
                           ? _selectedCategory
@@ -797,19 +813,34 @@ class _SearchPageState extends State<SearchPage> {
                       decoration: InputDecoration(
                         hintText: 'ໝວດທັມ',
                         suffixIcon: _selectedCategory.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(Icons.clear),
-                                onPressed: () {
-                                  setState(() {
-                                    _selectedCategory = '';
-                                    if (_searchTerm.isEmpty) {
-                                      updateData(
-                                          _searchTerm, _selectedCategory);
-                                    } else {
-                                      fetchData(_searchTerm);
-                                    }
-                                  });
-                                },
+                            ? Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      _selectedCategory, // Display selected category value
+                                      textAlign: TextAlign.end,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.clear),
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedCategory = '';
+                                        if (_searchTerm.isEmpty) {
+                                          updateData(
+                                              _searchTerm, _selectedCategory);
+                                        } else {
+                                          fetchData(_searchTerm);
+                                        }
+                                      });
+                                    },
+                                  ),
+                                ],
                               )
                             : null,
                       ),

@@ -383,14 +383,9 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
             child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            buildHeader(context),
             buildMenuItems(context),
           ],
         )),
-      );
-
-  Widget buildHeader(BuildContext context) => Container(
-        padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
       );
 
   Widget buildMenuItems(BuildContext context) => Container(
@@ -398,6 +393,30 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
         child: Wrap(
           runSpacing: 0, //verticalSpacing
           children: [
+            ListTile(
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Add your logo image here
+                  Image.asset(
+                    'assets/buddha_nature_logo.png',
+                    fit: BoxFit.cover,
+                    width: 60,
+                  ),
+                  SizedBox(
+                      height:
+                          10), // Adjust the spacing between logo and menu items
+                ],
+              ),
+              onTap: () => {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => MyHomePage(),
+                  ),
+                ),
+              },
+            ),
+
             ListTile(
               leading: _isChecked
                   ? Icon(Icons.library_books, color: _checkColor)

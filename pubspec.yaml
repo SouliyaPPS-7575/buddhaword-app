@@ -89,11 +89,12 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - assets/default_image.jpg
+    - assets/buddha_nature_logo.png
     - assets/ທໍາໃນເບື້ອງຕົ້ນ.jpg
     - assets/ທໍາໃນທ່າມກາງ.jpg
     - assets/ທໍາໃນທີສຸດ.jpg
     - assets/ທານ.jpg
-    - assets/default_image.jpg
     - assets/ກຳ.jpg
     - assets/ຄາຣະວາດຊັ້ນເລີດ.jpg
     - assets/ຈິດ ມະໂນ ວິນຍານ.jpg
