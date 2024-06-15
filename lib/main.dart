@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, use_key_in_widget_constructors, depend_on_referenced_packages
+// ignore_for_file: library_private_types_in_public_api, use_key_in_widget_constructors, depend_on_referenced_packages, use_build_context_synchronously
 
 import 'dart:async';
 import 'dart:convert';
@@ -69,6 +69,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _searchController = TextEditingController();
+  bool _isLoading = false;
 
   List<List<dynamic>> _data = [];
   List<String> _categories = [];
@@ -81,13 +82,60 @@ class _MyHomePageState extends State<MyHomePage> {
     fetchData(_searchTerm);
   }
 
+  Future<void> fetchDataFromAPI(String searchTerm) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    try {
+      final response = await http.get(Uri.parse(
+          'https://sheets.googleapis.com/v4/spreadsheets/1mKtgmZ_Is4e6P3P5lvOwIplqx7VQ3amicgienGN9zwA/values/Sheet1!1:1000000?key=AIzaSyDFjIl-SEHUsgK0sjMm7x0awpf8tTEPQjs'));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse = json.decode(response.body);
+        final List<dynamic> sheetValues =
+            jsonResponse['values'] as List<dynamic>;
+
+        final List<List<dynamic>> values =
+            sheetValues.skip(1).map((row) => List<dynamic>.from(row)).toList();
+
+        _data = values;
+        prefs.setString('cachedData', json.encode(_data));
+
+        // Update data with fetched values
+        updateData(searchTerm); // Update data here
+      } else {
+        if (kDebugMode) {
+          print('Failed to load data: ${response.statusCode}');
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching data: $e');
+      }
+    }
+  }
+
   Future<void> fetchData(String searchTerm) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? cachedData = prefs.getString('cachedData');
 
-    var connectivityResult = await (Connectivity().checkConnectivity());
+    bool hasInternet =
+        await Connectivity().checkConnectivity() != ConnectivityResult.none;
 
-    if (connectivityResult != ConnectivityResult.none) {
+    // Check if it's the 25th of the month
+    DateTime now = DateTime.now();
+    bool isUpdateDay = now.day == 25;
+
+    if (hasInternet) {
+      if (cachedData != null && cachedData.isNotEmpty) {
+        final List<dynamic> cachedValues = json.decode(cachedData);
+        _data = cachedValues.cast<List<dynamic>>();
+
+        // Update data with cached values
+        updateData(searchTerm); // Update data here
+      }
+    }
+
+    if (isUpdateDay || cachedData == null) {
       try {
         final response = await http.get(Uri.parse(
             'https://sheets.googleapis.com/v4/spreadsheets/1mKtgmZ_Is4e6P3P5lvOwIplqx7VQ3amicgienGN9zwA/values/Sheet1!1:1000000?key=AIzaSyDFjIl-SEHUsgK0sjMm7x0awpf8tTEPQjs'));
@@ -113,13 +161,18 @@ class _MyHomePageState extends State<MyHomePage> {
           }
         }
       } catch (e) {
-        if (kDebugMode) {
-          print('Error fetching data: $e');
+        // If no internet, load data from cache
+        if (cachedData != null && cachedData.isNotEmpty) {
+          final List<dynamic> cachedValues = json.decode(cachedData);
+          _data = cachedValues.cast<List<dynamic>>();
+
+          // Update data with cached values
+          updateData(searchTerm); // Update data here
         }
       }
     } else {
       // If no internet, load data from cache
-      if (cachedData != null && cachedData.isNotEmpty) {
+      if (cachedData.isNotEmpty) {
         final List<dynamic> cachedValues = json.decode(cachedData);
         _data = cachedValues.cast<List<dynamic>>();
 
@@ -165,6 +218,27 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: const Text('ທັມມະ'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () async {
+              setState(() {
+                _isLoading = true;
+              });
+              await fetchDataFromAPI(_searchTerm);
+              setState(() {
+                _isLoading = false;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Information has been successfully updated'),
+                  duration: Duration(seconds: 2),
+                  backgroundColor:
+                      Colors.green, // Set the background color to green
+                ),
+              );
+            },
+          ),
+          const SizedBox(width: 8),
           Consumer<ThemeProvider>(
             builder: (context, themeProvider, child) {
               return Switch(
@@ -179,186 +253,197 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       drawer: const NavigationDrawer(),
-      body: Padding(
-        padding: const EdgeInsets.all(1.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextField(
-              controller: _searchController,
-              style: const TextStyle(fontSize: 17.0),
-              decoration: InputDecoration(
-                hintText: 'ຄົ້ນຫາສຸດຕັນຕະສູນຍະຕາສູດ...',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: _searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          setState(() {
-                            _searchController.clear();
-                            _searchTerm = '';
-                            updateData(_searchTerm); // Update data directly
-                          });
-                        },
-                      )
-                    : null,
-              ),
-              onChanged: (value) {
-                setState(() {
-                  _searchTerm = value;
-                  updateData(
-                      _searchTerm); // Update data when search term changes
-                });
-              },
-            ),
-            const SizedBox(height: 2),
-            Expanded(
-              child: _searchTerm.isEmpty
-                  ? GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: crossAxisCount,
-                        mainAxisSpacing: 1.0,
-                        crossAxisSpacing: 1.0,
-                        childAspectRatio: aspectRatio,
-                      ),
-                      itemCount: _categories.length,
-                      itemBuilder: (context, index) {
-                        final category = _categories[index];
-                        final imageAsset = 'assets/$category.jpg';
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => CategoryListPage(
-                                  data: _data,
-                                  selectedCategory: category,
-                                  searchTerm: _searchTerm,
-                                ),
-                              ),
-                            );
-                          },
-                          child: Card(
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.all(1.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TextField(
+                    controller: _searchController,
+                    style: const TextStyle(fontSize: 17.0),
+                    decoration: InputDecoration(
+                      hintText: 'ຄົ້ນຫາສຸດຕັນຕະສູນຍະຕາສູດ...',
+                      prefixIcon: const Icon(Icons.search),
+                      suffixIcon: _searchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear),
+                              onPressed: () {
+                                setState(() {
+                                  _searchController.clear();
+                                  _searchTerm = '';
+                                  updateData(
+                                      _searchTerm); // Update data directly
+                                });
+                              },
+                            )
+                          : null,
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        _searchTerm = value;
+                        updateData(
+                            _searchTerm); // Update data when search term changes
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 2),
+                  Expanded(
+                    child: _searchTerm.isEmpty
+                        ? GridView.builder(
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: crossAxisCount,
+                              mainAxisSpacing: 1.0,
+                              crossAxisSpacing: 1.0,
+                              childAspectRatio: aspectRatio,
                             ),
-                            child: AspectRatio(
-                              aspectRatio: aspectRatio,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  Expanded(
-                                    child: ClipRRect(
-                                      borderRadius: const BorderRadius.vertical(
-                                        top: Radius.circular(2),
-                                      ),
-                                      child: AspectRatio(
-                                        aspectRatio: aspectRatio,
-                                        child: FutureBuilder<bool>(
-                                          future: _checkAssetExists(imageAsset),
-                                          builder: (context, snapshot) {
-                                            if (snapshot.connectionState ==
-                                                ConnectionState.waiting) {
-                                              // Loading state
-                                              return const Center(
-                                                  child:
-                                                      CircularProgressIndicator());
-                                            } else if (snapshot.hasData &&
-                                                snapshot.data!) {
-                                              // Asset exists, load it
-                                              return Image.asset(
-                                                imageAsset,
-                                                fit: BoxFit.cover,
-                                                width: double.infinity,
-                                                height: cardHeight,
-                                              );
-                                            } else {
-                                              // Asset doesn't exist, load default image
-                                              return Image.asset(
-                                                'assets/default_image.jpg',
-                                                fit: BoxFit.cover,
-                                                width: double.infinity,
-                                                height: cardHeight,
-                                              );
-                                            }
-                                          },
-                                        ),
+                            itemCount: _categories.length,
+                            itemBuilder: (context, index) {
+                              final category = _categories[index];
+                              final imageAsset = 'assets/$category.jpg';
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => CategoryListPage(
+                                        data: _data,
+                                        selectedCategory: category,
+                                        searchTerm: _searchTerm,
                                       ),
                                     ),
+                                  );
+                                },
+                                child: Card(
+                                  elevation: 2,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
-                                  const SizedBox(height: 1),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 2),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                  child: AspectRatio(
+                                    aspectRatio: aspectRatio,
+                                    child: Column(
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.center,
+                                          CrossAxisAlignment.stretch,
                                       children: [
                                         Expanded(
-                                          child: Container(
-                                            alignment: Alignment.center,
-                                            child: Text(
-                                              category,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                const BorderRadius.vertical(
+                                              top: Radius.circular(2),
                                             ),
+                                            child: AspectRatio(
+                                              aspectRatio: aspectRatio,
+                                              child: FutureBuilder<bool>(
+                                                future: _checkAssetExists(
+                                                    imageAsset),
+                                                builder: (context, snapshot) {
+                                                  if (snapshot
+                                                          .connectionState ==
+                                                      ConnectionState.waiting) {
+                                                    // Loading state
+                                                    return const Center(
+                                                        child:
+                                                            CircularProgressIndicator());
+                                                  } else if (snapshot.hasData &&
+                                                      snapshot.data!) {
+                                                    // Asset exists, load it
+                                                    return Image.asset(
+                                                      imageAsset,
+                                                      fit: BoxFit.cover,
+                                                      width: double.infinity,
+                                                      height: cardHeight,
+                                                    );
+                                                  } else {
+                                                    // Asset doesn't exist, load default image
+                                                    return Image.asset(
+                                                      'assets/default_image.jpg',
+                                                      fit: BoxFit.cover,
+                                                      width: double.infinity,
+                                                      height: cardHeight,
+                                                    );
+                                                  }
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 1),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 2),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Expanded(
+                                                child: Container(
+                                                  alignment: Alignment.center,
+                                                  child: Text(
+                                                    category,
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    )
-                  : ListView.builder(
-                      itemCount: _filteredData.length,
-                      itemBuilder: (context, index) {
-                        final rowData = _filteredData[index];
-                        final title = rowData[1].toString();
-                        final detailLink = rowData[3].toString();
-                        final category = rowData[4].toString();
+                                ),
+                              );
+                            },
+                          )
+                        : ListView.builder(
+                            itemCount: _filteredData.length,
+                            itemBuilder: (context, index) {
+                              final rowData = _filteredData[index];
+                              final title = rowData[1].toString();
+                              final detailLink = rowData[3].toString();
+                              final category = rowData[4].toString();
 
-                        return Card(
-                          child: ListTile(
-                            title: Text(
-                              title,
-                              style: const TextStyle(
-                                fontSize: 18, // Adjust the font size as needed
-                                fontWeight:
-                                    FontWeight.bold, // Make the title bold
-                              ),
-                            ),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => DetailPage(
-                                    title: title,
-                                    details: detailLink,
-                                    category: category,
+                              return Card(
+                                child: ListTile(
+                                  title: Text(
+                                    title,
+                                    style: const TextStyle(
+                                      fontSize:
+                                          18, // Adjust the font size as needed
+                                      fontWeight: FontWeight
+                                          .bold, // Make the title bold
+                                    ),
                                   ),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => DetailPage(
+                                          title: title,
+                                          details: detailLink,
+                                          category: category,
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 ),
                               );
                             },
                           ),
-                        );
-                      },
-                    ),
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
-      ),
     );
   }
 
