@@ -88,7 +88,7 @@ class _CategoryListPageState extends State<CategoryListPage> {
               controller: _searchController,
               style: const TextStyle(fontSize: 17.0),
               decoration: InputDecoration(
-                hintText: 'ຄົ້ນຫາສຸດຕັນຕະສູນຍະຕາສູດ...',
+                hintText: 'ຄົ້ນຫາພຣະສູດ...',
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(

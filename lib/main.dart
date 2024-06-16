@@ -219,7 +219,17 @@ class _MyHomePageState extends State<MyHomePage> {
         title: const Text('ທັມມະ'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: _isLoading
+                ? const SizedBox(
+                    width: 20.0, // Custom width
+                    height: 20.0, // Custom height
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                          Colors.white), // Change color here
+                      strokeWidth: 2.0, // Optional: change the stroke width
+                    ),
+                  )
+                : const Icon(Icons.update_outlined),
             onPressed: () async {
               setState(() {
                 _isLoading = true;
@@ -264,7 +274,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     controller: _searchController,
                     style: const TextStyle(fontSize: 17.0),
                     decoration: InputDecoration(
-                      hintText: 'ຄົ້ນຫາສຸດຕັນຕະສູນຍະຕາສູດ...',
+                      hintText: 'ຄົ້ນຫາພຣະສູດ...',
                       prefixIcon: const Icon(Icons.search),
                       suffixIcon: _searchController.text.isNotEmpty
                           ? IconButton(

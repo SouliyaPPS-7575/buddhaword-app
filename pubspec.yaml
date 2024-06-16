@@ -91,6 +91,7 @@ flutter:
   assets:
     - assets/default_image.jpg
     - assets/buddha_nature_logo.png
+    - assets/tathakod_logo.png
     - assets/ທໍາໃນເບື້ອງຕົ້ນ.jpg
     - assets/ທໍາໃນທ່າມກາງ.jpg
     - assets/ທໍາໃນທີສຸດ.jpg

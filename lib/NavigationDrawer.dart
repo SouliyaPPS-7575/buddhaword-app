@@ -1,11 +1,16 @@
-// ignore_for_file: unnecessary_const, non_constant_identifier_names, avoid_print, deprecated_member_use, prefer_const_constructors, unused_import, file_names
+// ignore_for_file: unnecessary_const, non_constant_identifier_names, avoid_print, deprecated_member_use, prefer_const_constructors, unused_import, file_names, depend_on_referenced_packages, use_build_context_synchronously
 
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
 
 import 'ContactInfoPage.dart';
 import 'FavoritePage.dart';
 import 'main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NavigationDrawer extends StatefulWidget {
   const NavigationDrawer({super.key});
@@ -17,6 +22,8 @@ class NavigationDrawer extends StatefulWidget {
 class _NavigationDrawerState extends State<NavigationDrawer> {
   late final bool _isChecked = false;
   late final Color _checkColor = const Color.fromARGB(255, 175, 93, 78);
+
+  List<List<dynamic>> _data = [];
 
   // Menu
   final String urlWebapp = "https://dhama-sutra.netlify.app";
@@ -377,6 +384,47 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
     }
   }
 
+  Future<void> fetchDataFromAPI() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    await Future.delayed(Duration(seconds: 1)); // Add delay here
+
+    try {
+      final response = await http.get(Uri.parse(
+          'https://sheets.googleapis.com/v4/spreadsheets/1mKtgmZ_Is4e6P3P5lvOwIplqx7VQ3amicgienGN9zwA/values/Sheet1!1:1000000?key=AIzaSyDFjIl-SEHUsgK0sjMm7x0awpf8tTEPQjs'));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse = json.decode(response.body);
+        final List<dynamic> sheetValues =
+            jsonResponse['values'] as List<dynamic>;
+
+        final List<List<dynamic>> values =
+            sheetValues.skip(1).map((row) => List<dynamic>.from(row)).toList();
+
+        _data = values;
+        prefs.setString('cachedData', json.encode(_data));
+      } else {
+        if (kDebugMode) {
+          print('Failed to load data: ${response.statusCode}');
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching data: $e');
+      }
+    }
+  }
+
+  void _handleTap() async {
+    await fetchDataFromAPI();
+
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => MyHomePage(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) => Drawer(
         child: SingleChildScrollView(
@@ -394,18 +442,21 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
           runSpacing: 0, //verticalSpacing
           children: [
             ListTile(
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Add your logo image here
+                  // Add your logo images here
                   Image.asset(
                     'assets/buddha_nature_logo.png',
                     fit: BoxFit.cover,
                     width: 60,
                   ),
-                  SizedBox(
-                      height:
-                          10), // Adjust the spacing between logo and menu items
+                  SizedBox(width: 20), // Adjust the spacing between the logos
+                  Image.asset(
+                    'assets/tathakod_logo.png',
+                    fit: BoxFit.cover,
+                    width: 50,
+                  ),
                 ],
               ),
               onTap: () => {
@@ -459,16 +510,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
               ),
               onTap: () => _openLinkBooks(),
             ),
-            // ListTile(
-            //   leading: _isChecked
-            //       ? Icon(Icons.open_in_browser_rounded, color: _checkColor)
-            //       : Icon(Icons.open_in_browser_outlined, color: _checkColor),
-            //   title: const Text(
-            //     'ພຣະສູດ Web',
-            //     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            //   ),
-            //   onTap: () => _openLinkWebapp(),
-            // ),
+
             ListTile(
               leading: _isChecked
                   ? Icon(Icons.filter_vintage, color: _checkColor)
@@ -534,6 +576,17 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                   ),
                 ),
               },
+            ),
+
+            ListTile(
+              leading: _isChecked
+                  ? Icon(Icons.refresh_outlined, color: _checkColor)
+                  : Icon(Icons.update_outlined, color: _checkColor),
+              title: const Text(
+                'ອັບເດດຂໍ້ມູນໃໝ່',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              onTap: _handleTap,
             ),
 
             ExpansionTile(
