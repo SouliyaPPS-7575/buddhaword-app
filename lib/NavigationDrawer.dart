@@ -546,7 +546,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                   ? Icon(Icons.video_library, color: _checkColor)
                   : Icon(Icons.video_collection_outlined, color: _checkColor),
               title: const Text(
-                'ອະນັດຕາ',
+                'ວີດີໂອ VDO',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               onTap: () => _openLinkArnuta(),
