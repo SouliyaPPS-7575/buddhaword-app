@@ -130,6 +130,7 @@ class _FavoritePageState extends State<FavoritePage> {
                         final item = _filteredFavorites[index];
                         // Assuming each item is a JSON string, parse it
                         final itemData = jsonDecode(item);
+                        final id = itemData['id'];
                         final title = itemData['title'];
                         final detailLink = itemData['details'];
                         final category = itemData['category'];
@@ -147,6 +148,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => DetailPage(
+                                    id: id,
                                     title: title,
                                     details: detailLink,
                                     category: category,

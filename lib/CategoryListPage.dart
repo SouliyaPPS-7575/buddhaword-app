@@ -114,6 +114,8 @@ class _CategoryListPageState extends State<CategoryListPage> {
               itemCount: _filteredData.length,
               itemBuilder: (context, index) {
                 final rowData = _filteredData[index];
+                final id = rowData[0]
+                    .toString(); // Assuming the first column contains the id
                 final title = rowData[1]
                     .toString(); // Assuming the first column contains the title
                 final detailLink = rowData[3]
@@ -135,6 +137,7 @@ class _CategoryListPageState extends State<CategoryListPage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => DetailPage(
+                              id: id,
                               title: title,
                               details: detailLink,
                               category: category),

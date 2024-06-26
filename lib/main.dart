@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'CategoryListPage.dart';
 import 'NavigationDrawer.dart';
@@ -419,6 +420,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             itemCount: _filteredData.length,
                             itemBuilder: (context, index) {
                               final rowData = _filteredData[index];
+                              final id = rowData[0].toString();
                               final title = rowData[1].toString();
                               final detailLink = rowData[3].toString();
                               final category = rowData[4].toString();
@@ -439,6 +441,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => DetailPage(
+                                          id: id,
                                           title: title,
                                           details: detailLink,
                                           category: category,
@@ -469,11 +472,13 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class DetailPage extends StatefulWidget {
+  final String id;
   final String title;
   final String details;
   final String category;
 
   const DetailPage({
+    required this.id,
     required this.title,
     required this.details,
     required this.category,
@@ -689,9 +694,29 @@ class _DetailPageState extends State<DetailPage> {
               color: Color.fromARGB(241, 179, 93, 78),
             ),
           ),
+          const SizedBox(width: 10),
+          FloatingActionButton(
+            heroTag: 'fab4',
+            onPressed: _shareDetailLink,
+            backgroundColor: const Color(0xFFF5F5F5),
+            child: const Icon(
+              Icons.share,
+              color: Color.fromARGB(241, 179, 93, 78),
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  void _shareDetailLink() {
+    String details = widget.details
+        .replaceAll(RegExp(r'<\/?b>'), ''); // Remove <b> and </b> tags
+
+    final shareText =
+        '${widget.title}\n\n $details\n\n ${widget.category}\n\n https://buddha-nature.web.app/#/details/${widget.id}';
+
+    Share.share(shareText, subject: widget.title);
   }
 
   Future<String> _fetchData(String url) async {
@@ -973,6 +998,7 @@ class _SearchPageState extends State<SearchPage> {
                 itemCount: _filteredData.length,
                 itemBuilder: (context, index) {
                   final rowData = _filteredData[index];
+                  final id = rowData[0].toString();
                   final title = rowData[1].toString();
                   final detailLink = rowData[3].toString();
                   final category = rowData[4].toString();
@@ -991,6 +1017,7 @@ class _SearchPageState extends State<SearchPage> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => DetailPage(
+                              id: id,
                               title: title,
                               details: detailLink,
                               category: category,
