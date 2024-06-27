@@ -10,8 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'CategoryListPage.dart';
 import 'NavigationDrawer.dart';
@@ -503,7 +503,7 @@ class _DetailPageState extends State<DetailPage> {
     // Load the favorite state based on both title and detailLink
     setState(() {
       _isFavorited = prefs.getBool(
-              '${widget.title}_${widget.details}_${widget.category}') ??
+              '${widget.id}_${widget.title}_${widget.details}_${widget.category}') ??
           false;
     });
   }
@@ -514,12 +514,14 @@ class _DetailPageState extends State<DetailPage> {
       _isFavorited = !_isFavorited;
       // Save the current state of _isFavorited for the title and detailLink
       prefs.setBool(
-          '${widget.title}_${widget.details}_${widget.category}', _isFavorited);
+          '${widget.id}_${widget.title}_${widget.details}_${widget.category}',
+          _isFavorited);
 
       // Load the current favorites list, add/remove the title and detailLink, and save it back
       List<String> currentFavorites = prefs.getStringList('favorites') ?? [];
       if (_isFavorited) {
         currentFavorites.add(json.encode({
+          'id': widget.id,
           'title': widget.title,
           'details': widget.details,
           'category': widget.category
@@ -527,7 +529,8 @@ class _DetailPageState extends State<DetailPage> {
       } else {
         currentFavorites.removeWhere((item) {
           Map<String, dynamic> current = json.decode(item);
-          return current['title'] == widget.title &&
+          return current['id'] == widget.id &&
+              current['title'] == widget.title &&
               current['details'] == widget.details &&
               current['category'] == widget.category;
         });
@@ -710,11 +713,8 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   void _shareDetailLink() {
-    String details = widget.details
-        .replaceAll(RegExp(r'<\/?b>'), ''); // Remove <b> and </b> tags
-
     final shareText =
-        '${widget.title}\n\n $details\n\n ${widget.category}\n\n https://buddha-nature.web.app/#/details/${widget.id}';
+        '${widget.title}\n https://buddha-nature.web.app/#/details/${widget.id}';
 
     Share.share(shareText, subject: widget.title);
   }

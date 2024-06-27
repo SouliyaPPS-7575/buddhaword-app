@@ -44,10 +44,12 @@ class _FavoritePageState extends State<FavoritePage> {
       _searchTerm = query;
       _filteredFavorites = _favorites.where((favorite) {
         final itemData = jsonDecode(favorite);
+        final id = itemData['id'].toLowerCase();
         final title = itemData['title'].toLowerCase();
         final detail = itemData['details'].toLowerCase(); // Get details
         final category = itemData['category'].toLowerCase(); // Get category
-        return title.contains(
+        return id.contains(query.toLowerCase()) ||
+            title.contains(
                 query.toLowerCase()) || // Check if title contains query
             detail.contains(
                 query.toLowerCase()) || // Check if detail contains query
