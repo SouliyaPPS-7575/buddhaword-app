@@ -136,10 +136,12 @@ class _CategoryListPageState extends State<CategoryListPage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => DetailPage(
-                              id: id,
-                              title: title,
-                              details: detailLink,
-                              category: category),
+                            id: id,
+                            title: title,
+                            details: detailLink,
+                            category: category,
+                            onFavoriteChanged: () => setState(() {}),
+                          ),
                         ),
                       );
                     },

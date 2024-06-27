@@ -59,6 +59,10 @@ class _FavoritePageState extends State<FavoritePage> {
     });
   }
 
+  void _onFavoriteChanged() {
+    _loadFavorites();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -154,6 +158,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                     title: title,
                                     details: detailLink,
                                     category: category,
+                                    onFavoriteChanged: _onFavoriteChanged,
                                   ),
                                 ),
                               );

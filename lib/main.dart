@@ -445,6 +445,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                           title: title,
                                           details: detailLink,
                                           category: category,
+                                          onFavoriteChanged: () {
+                                            fetchData(_searchTerm);
+                                          },
                                         ),
                                       ),
                                     );
@@ -476,12 +479,14 @@ class DetailPage extends StatefulWidget {
   final String title;
   final String details;
   final String category;
+  final VoidCallback onFavoriteChanged; // Add this line
 
   const DetailPage({
     required this.id,
     required this.title,
     required this.details,
     required this.category,
+    required this.onFavoriteChanged, // Add this line
   });
 
   @override
@@ -512,12 +517,10 @@ class _DetailPageState extends State<DetailPage> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _isFavorited = !_isFavorited;
-      // Save the current state of _isFavorited for the title and detailLink
       prefs.setBool(
           '${widget.id}_${widget.title}_${widget.details}_${widget.category}',
           _isFavorited);
 
-      // Load the current favorites list, add/remove the title and detailLink, and save it back
       List<String> currentFavorites = prefs.getStringList('favorites') ?? [];
       if (_isFavorited) {
         currentFavorites.add(json.encode({
@@ -536,6 +539,8 @@ class _DetailPageState extends State<DetailPage> {
         });
       }
       prefs.setStringList('favorites', currentFavorites);
+
+      widget.onFavoriteChanged(); // Notify the parent widget
     });
   }
 
@@ -1021,6 +1026,10 @@ class _SearchPageState extends State<SearchPage> {
                               title: title,
                               details: detailLink,
                               category: category,
+                              onFavoriteChanged: () {
+                                // Update data when favorite state changes
+                                fetchData(_searchTerm);
+                              },
                             ),
                           ),
                         );
