@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, depend_on_referenced_packages, file_names
+// ignore_for_file: library_private_types_in_public_api, depend_on_referenced_packages, file_names, use_build_context_synchronously
 
 import 'dart:convert';
 
@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../layouts/NavigationDrawer.dart';
 import '../themes/ThemeProvider.dart';
 import 'DetailPage.dart';
+import 'SearchPage.dart';
 
 class FavoritePage extends StatefulWidget {
   const FavoritePage({Key? key}) : super(key: key);
@@ -64,24 +65,104 @@ class _FavoritePageState extends State<FavoritePage> {
     _loadFavorites();
   }
 
+  Future<void> _deleteAllFavorites() async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("ລຶບລາຍການທີ່ຖືກໃຈທັງໝົດບໍ?"),
+          content: const Text("ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບລາຍການທີ່ຖືກໃຈທັງໝົດ?"),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("ຍົກເລີກ"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text("ລຶບ"),
+              onPressed: () async {
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.remove('favorites');
+
+                setState(() {
+                  _favorites.clear();
+                  _filteredFavorites.clear();
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ພຣະສູດທີຖືກໃຈ'),
-        actions: [
-          Consumer<ThemeProvider>(
-            builder: (context, themeProvider, child) {
-              return Switch(
-                value: themeProvider.isDarkMode,
-                onChanged: (isDarkMode) {
-                  themeProvider.toggleTheme(isDarkMode);
-                },
-                activeColor: Theme.of(context).colorScheme.secondary,
-              );
-            },
-          ),
-        ],
+        title: const Text(
+          'ພຣະສູດຖືກໃຈ',
+          style: TextStyle(fontSize: 18), // Adjust the font size as needed
+        ),
+        actions: _favorites
+                .isNotEmpty // Show delete button only if favorites is not empty
+            ? [
+                IconButton(
+                  icon: const Icon(Icons.search, color: Colors.white),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SearchPage(),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(width: 6), // Custom space
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: _deleteAllFavorites,
+                ),
+                const SizedBox(width: 6), // Custom space
+                Consumer<ThemeProvider>(
+                  builder: (context, themeProvider, child) {
+                    return Switch(
+                      value: themeProvider.isDarkMode,
+                      onChanged: (isDarkMode) {
+                        themeProvider.toggleTheme(isDarkMode);
+                      },
+                      activeColor: Theme.of(context).colorScheme.secondary,
+                    );
+                  },
+                ),
+              ]
+            : [
+                IconButton(
+                  icon: const Icon(Icons.search, color: Colors.white),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SearchPage(),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(width: 10), // Custom space
+                Consumer<ThemeProvider>(
+                  builder: (context, themeProvider, child) {
+                    return Switch(
+                      value: themeProvider.isDarkMode,
+                      onChanged: (isDarkMode) {
+                        themeProvider.toggleTheme(isDarkMode);
+                      },
+                      activeColor: Theme.of(context).colorScheme.secondary,
+                    );
+                  },
+                ),
+              ],
       ),
       drawer: const NavigationDrawer(),
       body: _favorites.isEmpty

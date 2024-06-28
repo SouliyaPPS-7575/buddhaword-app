@@ -88,7 +88,10 @@ class _DetailPageState extends State<DetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ສຸດຕັນຕະ'),
+        title: const Text(
+          'ພຣະສູດ',
+          style: TextStyle(fontSize: 18), // Adjust the font size as needed
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () {
@@ -103,6 +106,7 @@ class _DetailPageState extends State<DetailPage> {
             ),
             onPressed: _toggleFavorite,
           ),
+          const SizedBox(width: 4),
           IconButton(
             icon: const Icon(Icons.search, color: Colors.white),
             onPressed: () {
@@ -114,6 +118,7 @@ class _DetailPageState extends State<DetailPage> {
               );
             },
           ),
+          const SizedBox(width: 4),
           Builder(
             builder: (context) => IconButton(
               icon: const Icon(Icons.menu, color: Colors.white),
@@ -122,6 +127,7 @@ class _DetailPageState extends State<DetailPage> {
               },
             ),
           ),
+          const SizedBox(width: 4),
           Consumer<ThemeProvider>(
             builder: (context, themeProvider, child) {
               return Switch(
@@ -212,6 +218,7 @@ class _DetailPageState extends State<DetailPage> {
         children: [
           SizedBox(
             width: 100,
+            height: 48,
             child: FloatingActionButton(
               heroTag: 'fab1',
               onPressed: _increaseFontSize,
@@ -222,34 +229,45 @@ class _DetailPageState extends State<DetailPage> {
               ),
             ),
           ),
-          const SizedBox(width: 10),
-          FloatingActionButton(
-            heroTag: 'fab2',
-            onPressed: _decreaseFontSize,
-            backgroundColor: const Color(0xFFF5F5F5),
-            child: const Icon(
-              Icons.remove,
-              color: Color.fromARGB(241, 179, 93, 78),
+          SizedBox(
+            width: 50,
+            height: 48,
+            child: FloatingActionButton(
+              heroTag: 'fab2',
+              onPressed: _decreaseFontSize,
+              backgroundColor: const Color(0xFFF5F5F5),
+              child: const Icon(
+                Icons.remove,
+                color: Color.fromARGB(241, 179, 93, 78),
+              ),
             ),
           ),
           const SizedBox(width: 10),
-          FloatingActionButton(
-            heroTag: 'fab3',
-            onPressed: _copyContentToClipboard,
-            backgroundColor: const Color(0xFFF5F5F5),
-            child: const Icon(
-              Icons.content_copy,
-              color: Color.fromARGB(241, 179, 93, 78),
+          SizedBox(
+            width: 48, // Adjusted width for custom size
+            height: 48, // Adjusted height for custom size
+            child: FloatingActionButton(
+              heroTag: 'fab3',
+              onPressed: _copyContentToClipboard,
+              backgroundColor: const Color(0xFFF5F5F5),
+              child: const Icon(
+                Icons.content_copy,
+                color: Color.fromARGB(241, 179, 93, 78),
+              ),
             ),
           ),
-          const SizedBox(width: 10),
-          FloatingActionButton(
-            heroTag: 'fab4',
-            onPressed: _shareDetailLink,
-            backgroundColor: const Color(0xFFF5F5F5),
-            child: const Icon(
-              Icons.share,
-              color: Color.fromARGB(241, 179, 93, 78),
+          const SizedBox(width: 1),
+          SizedBox(
+            width: 48, // Adjusted width for custom size
+            height: 48, // Adjusted height for custom size
+            child: FloatingActionButton(
+              heroTag: 'fab4',
+              onPressed: _shareDetailLink,
+              backgroundColor: const Color(0xFFF5F5F5),
+              child: const Icon(
+                Icons.share,
+                color: Color.fromARGB(241, 179, 93, 78),
+              ),
             ),
           ),
         ],
