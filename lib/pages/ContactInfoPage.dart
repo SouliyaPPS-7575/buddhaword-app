@@ -1,12 +1,12 @@
 // ignore_for_file: deprecated_member_use, use_key_in_widget_constructors, file_names
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'NavigationDrawer.dart';
-import 'main.dart';
-import 'package:flutter/services.dart';
+import '../layouts/NavigationDrawer.dart';
+import '../themes/ThemeProvider.dart';
 
 class ContactInfoPage extends StatelessWidget {
   const ContactInfoPage({Key? key});

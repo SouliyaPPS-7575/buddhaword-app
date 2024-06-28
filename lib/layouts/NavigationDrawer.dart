@@ -4,13 +4,13 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
-
-import 'ContactInfoPage.dart';
-import 'FavoritePage.dart';
-import 'main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../main.dart';
+import '../pages/ContactInfoPage.dart';
+import '../pages/FavoritePage.dart';
 
 class NavigationDrawer extends StatefulWidget {
   const NavigationDrawer({super.key});

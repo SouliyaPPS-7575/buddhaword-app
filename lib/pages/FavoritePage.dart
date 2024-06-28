@@ -6,8 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'NavigationDrawer.dart';
-import 'main.dart';
+import '../layouts/NavigationDrawer.dart';
+import '../themes/ThemeProvider.dart';
+import 'DetailPage.dart';
 
 class FavoritePage extends StatefulWidget {
   const FavoritePage({Key? key}) : super(key: key);

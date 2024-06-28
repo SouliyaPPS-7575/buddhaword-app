@@ -1,8 +1,10 @@
 // ignore_for_file: library_private_types_in_public_api, file_names
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'NavigationDrawer.dart';
-import 'main.dart';
+
+import '../layouts/NavigationDrawer.dart';
+import '../themes/ThemeProvider.dart';
+import 'DetailPage.dart';
 
 class CategoryListPage extends StatefulWidget {
   final List<List<dynamic>> data;
