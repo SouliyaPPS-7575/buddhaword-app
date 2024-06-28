@@ -45,11 +45,38 @@ class _DetailPageState extends State<DetailPage> {
 
   Future<void> _loadFavoriteState() async {
     final prefs = await SharedPreferences.getInstance();
-    // Load the favorite state based on both title and detailLink
     setState(() {
-      _isFavorited = prefs.getBool(
-              '${widget.id}_${widget.title}_${widget.details}_${widget.category}') ??
-          false;
+      // Check if the current detail is in favorites
+      List<String>? currentFavorites = prefs.getStringList('favorites');
+      if (currentFavorites != null) {
+        _isFavorited = currentFavorites.any((item) {
+          Map<String, dynamic> current = json.decode(item);
+          return current['id'] == widget.id &&
+              current['title'] == widget.title &&
+              current['details'] == widget.details &&
+              current['category'] == widget.category;
+        });
+      } else {
+        _isFavorited = false;
+
+        // Initialize the favorites list
+        prefs.setStringList('favorites', []);
+
+        // Initialize the favorite state for the current detail
+
+        prefs.setBool(
+            '${widget.id}_${widget.title}_${widget.details}_${widget.category}',
+            false);
+
+        // Notify the parent widget
+        widget.onFavoriteChanged();
+
+        // Load the favorite state again
+        _loadFavoriteState();
+
+        // Return to avoid calling the setState method
+        return;
+      }
     });
   }
 
