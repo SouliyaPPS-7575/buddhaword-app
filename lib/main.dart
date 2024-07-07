@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'layouts/NavigationDrawer.dart';
+import 'pages/BookReadingScreenPage.dart';
 import 'pages/CategoryListPage.dart';
 import 'pages/DetailPage.dart';
 import 'themes/ThemeProvider.dart';
@@ -220,6 +221,25 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: const Text('ທັມມະ'),
         actions: [
+          _filteredData.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.auto_stories_outlined,
+                      color: Colors.white),
+                  onPressed: () {
+                    // Implement your action here, e.g., navigate to book reading screen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BookReadingScreenPage(
+                          filteredData: _filteredData,
+                          onFavoriteChanged: () => setState(() {}),
+                        ),
+                      ),
+                    );
+                  },
+                )
+              : const SizedBox(),
+          const SizedBox(width: 12),
           IconButton(
             icon: _isLoading
                 ? const SizedBox(

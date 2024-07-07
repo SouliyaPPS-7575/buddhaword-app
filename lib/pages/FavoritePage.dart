@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../layouts/NavigationDrawer.dart';
 import '../themes/ThemeProvider.dart';
+import 'BookReadingScreenPage.dart';
 import 'DetailPage.dart';
 import 'SearchPage.dart';
 
@@ -29,6 +30,7 @@ class _FavoritePageState extends State<FavoritePage> {
   void initState() {
     super.initState();
     _loadFavorites();
+
   }
 
   Future<void> _loadFavorites() async {
@@ -253,6 +255,32 @@ class _FavoritePageState extends State<FavoritePage> {
                 ],
               ),
             ),
+      floatingActionButton: _filteredFavorites.isNotEmpty
+          ? FloatingActionButton(
+              onPressed: () {
+                // Implement your action here, e.g., navigate to book reading screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BookReadingScreenPage(
+                      filteredData: _filteredFavorites.map((fav) {
+                        return [
+                          jsonDecode(fav)['id'],
+                          jsonDecode(fav)['title'],
+                          jsonDecode(fav)['author'],  // Assuming this should be 'author' instead of a duplicate 'title'
+                          jsonDecode(fav)['details'],
+                          jsonDecode(fav)['category'],
+                        ];
+                      }).toList(),
+                      onFavoriteChanged: () => setState(() {}),
+                    ),
+                  ),
+                );
+              },
+              tooltip: 'ອ່ານປຶ້ມ',
+              child: const Icon(Icons.auto_stories_outlined),
+            )
+          : null,
     );
   }
 }

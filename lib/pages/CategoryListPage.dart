@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../layouts/NavigationDrawer.dart';
 import '../themes/ThemeProvider.dart';
+import 'BookReadingScreenPage.dart';
 import 'DetailPage.dart';
 
 class CategoryListPage extends StatefulWidget {
@@ -154,6 +155,24 @@ class _CategoryListPageState extends State<CategoryListPage> {
           ),
         ],
       ),
+      floatingActionButton: _filteredData.isNotEmpty
+          ? FloatingActionButton(
+              onPressed: () {
+                // Implement your action here, e.g., navigate to book reading screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BookReadingScreenPage(
+                      filteredData: _filteredData,
+                      onFavoriteChanged: () => setState(() {}),
+                    ),
+                  ),
+                );
+              },
+              tooltip: 'ອ່ານປຶ້ມ',
+              child: const Icon(Icons.auto_stories_outlined),
+            )
+          : null,
     );
   }
 }
