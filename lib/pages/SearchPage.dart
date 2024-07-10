@@ -11,7 +11,6 @@ import '../layouts/NavigationDrawer.dart';
 import '../themes/ThemeProvider.dart';
 import 'DetailPage.dart';
 
-
 class SearchPage extends StatefulWidget {
   @override
   _SearchPageState createState() => _SearchPageState();
@@ -229,6 +228,7 @@ class _SearchPageState extends State<SearchPage> {
                   final title = rowData[1].toString();
                   final detailLink = rowData[3].toString();
                   final category = rowData[4].toString();
+                  final audio = rowData[5].toString();
 
                   return Card(
                     child: ListTile(
@@ -248,6 +248,7 @@ class _SearchPageState extends State<SearchPage> {
                               title: title,
                               details: detailLink,
                               category: category,
+                              audio: audio,
                               onFavoriteChanged: () {
                                 // Update data when favorite state changes
                                 fetchData(_searchTerm);

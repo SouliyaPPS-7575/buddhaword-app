@@ -125,6 +125,11 @@ flutter:
     - assets/ທາງສາຍກາງ.jpg
     - assets/ພຣະສູດທີ່ຕ້ອງຮູ້.jpg
     - assets/ວິໄນສົງ.jpg
+    - assets/ພິຈາລະນາທາງປັນຍາ/loading_mobile.png
+    - assets/ພິຈາລະນາທາງປັນຍາ/loading_tablet.png
+    - assets/ພິຈາລະນາທາງປັນຍາ/loading_desktop.png
+    - assets/ເຫັນທຳ/loading_mobile.jpg
+    - assets/ເຫັນທຳ/loading_desktop_tablet.jpg
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

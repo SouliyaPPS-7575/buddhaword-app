@@ -19,6 +19,8 @@ class DetailPage extends StatefulWidget {
   final String title;
   final String details;
   final String category;
+  final String audio;
+
   final VoidCallback onFavoriteChanged; // Add this line
 
   const DetailPage({
@@ -26,6 +28,7 @@ class DetailPage extends StatefulWidget {
     required this.title,
     required this.details,
     required this.category,
+    required this.audio,
     required this.onFavoriteChanged, // Add this line
   });
 
@@ -54,7 +57,8 @@ class _DetailPageState extends State<DetailPage> {
           return current['id'] == widget.id &&
               current['title'] == widget.title &&
               current['details'] == widget.details &&
-              current['category'] == widget.category;
+              current['category'] == widget.category &&
+              current['audio'] == widget.audio;
         });
       } else {
         _isFavorited = false;
@@ -94,7 +98,8 @@ class _DetailPageState extends State<DetailPage> {
           'id': widget.id,
           'title': widget.title,
           'details': widget.details,
-          'category': widget.category
+          'category': widget.category,
+          'audio': widget.audio
         }));
       } else {
         currentFavorites.removeWhere((item) {
@@ -102,7 +107,8 @@ class _DetailPageState extends State<DetailPage> {
           return current['id'] == widget.id &&
               current['title'] == widget.title &&
               current['details'] == widget.details &&
-              current['category'] == widget.category;
+              current['category'] == widget.category &&
+              current['audio'] == widget.audio;
         });
       }
       prefs.setStringList('favorites', currentFavorites);

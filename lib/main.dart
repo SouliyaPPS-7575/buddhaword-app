@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, use_key_in_widget_constructors, depend_on_referenced_packages, use_build_context_synchronously
+// ignore_for_file: library_private_types_in_public_api, use_key_in_widget_constructors, depend_on_referenced_packages, use_build_context_synchronously, unrelated_type_equality_checks
 
 import 'dart:async';
 import 'dart:convert';
@@ -16,6 +16,7 @@ import 'layouts/NavigationDrawer.dart';
 import 'pages/BookReadingScreenPage.dart';
 import 'pages/CategoryListPage.dart';
 import 'pages/DetailPage.dart';
+import 'pages/RandomImagePage.dart';
 import 'themes/ThemeProvider.dart';
 
 void main() {
@@ -72,7 +73,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _searchController = TextEditingController();
-  bool _isLoading = false;
 
   List<List<dynamic>> _data = [];
   List<String> _categories = [];
@@ -124,11 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
     bool hasInternet =
         await Connectivity().checkConnectivity() != ConnectivityResult.none;
 
-    // Check if it's the 25th of the month
-    DateTime now = DateTime.now();
-    bool isUpdateDay = now.day == 25;
-
-    if (hasInternet) {
+    if (!hasInternet) {
       if (cachedData != null && cachedData.isNotEmpty) {
         final List<dynamic> cachedValues = json.decode(cachedData);
         _data = cachedValues.cast<List<dynamic>>();
@@ -138,7 +134,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     }
 
-    if (isUpdateDay || cachedData == null) {
+    if (cachedData == null || cachedData.isEmpty || hasInternet) {
       try {
         final response = await http.get(Uri.parse(
             'https://sheets.googleapis.com/v4/spreadsheets/1mKtgmZ_Is4e6P3P5lvOwIplqx7VQ3amicgienGN9zwA/values/Sheet1!1:1000000?key=AIzaSyDFjIl-SEHUsgK0sjMm7x0awpf8tTEPQjs'));
@@ -241,7 +237,7 @@ class _MyHomePageState extends State<MyHomePage> {
               : const SizedBox(),
           const SizedBox(width: 12),
           IconButton(
-            icon: _isLoading
+            icon: _filteredData.isEmpty
                 ? const SizedBox(
                     width: 20.0, // Custom width
                     height: 20.0, // Custom height
@@ -253,13 +249,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   )
                 : const Icon(Icons.update_outlined),
             onPressed: () async {
-              setState(() {
-                _isLoading = true;
-              });
               await fetchDataFromAPI(_searchTerm);
-              setState(() {
-                _isLoading = false;
-              });
+
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Information has been successfully updated'),
@@ -285,8 +276,8 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       drawer: const NavigationDrawer(),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+      body: _filteredData.isEmpty
+          ? RandomImagePage()
           : Padding(
               padding: const EdgeInsets.all(1.0),
               child: Column(
@@ -445,6 +436,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               final title = rowData[1].toString();
                               final detailLink = rowData[3].toString();
                               final category = rowData[4].toString();
+                              final audio = rowData[5].toString();
 
                               return Card(
                                 child: ListTile(
@@ -466,6 +458,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                           title: title,
                                           details: detailLink,
                                           category: category,
+                                          audio: audio,
                                           onFavoriteChanged: () {
                                             fetchData(_searchTerm);
                                           },

@@ -68,13 +68,13 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
     }
   }
 
-  void _openLinkCalendar() async {
-    if (await canLaunch(urlCalendar)) {
-      await launch(urlCalendar);
-    } else {
-      throw 'Could not launch $urlCalendar';
-    }
-  }
+  // void _openLinkCalendar() async {
+  //   if (await canLaunch(urlCalendar)) {
+  //     await launch(urlCalendar);
+  //   } else {
+  //     throw 'Could not launch $urlCalendar';
+  //   }
+  // }
 
   void _openLinkArnuta() async {
     if (await canLaunch(urlArnuta)) {
@@ -531,16 +531,16 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
               ),
               onTap: () => _openLinkEnglish(),
             ),
-            ListTile(
-              leading: _isChecked
-                  ? Icon(Icons.calendar_month, color: _checkColor)
-                  : Icon(Icons.calendar_month_outlined, color: _checkColor),
-              title: const Text(
-                'ປະຕິທິນທັມ',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              onTap: () => _openLinkCalendar(),
-            ),
+            // ListTile(
+            //   leading: _isChecked
+            //       ? Icon(Icons.calendar_month, color: _checkColor)
+            //       : Icon(Icons.calendar_month_outlined, color: _checkColor),
+            //   title: const Text(
+            //     'ປະຕິທິນທັມ',
+            //     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            //   ),
+            //   onTap: () => _openLinkCalendar(),
+            // ),
             ListTile(
               leading: _isChecked
                   ? Icon(Icons.video_library, color: _checkColor)

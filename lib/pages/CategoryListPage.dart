@@ -123,6 +123,7 @@ class _CategoryListPageState extends State<CategoryListPage> {
                 final detailLink = rowData[3]
                     .toString(); // Assuming the second column contains the detail link
                 final category = rowData[4].toString();
+                final audio = rowData[5].toString();
 
                 return Card(
                   child: ListTile(
@@ -143,6 +144,7 @@ class _CategoryListPageState extends State<CategoryListPage> {
                             title: title,
                             details: detailLink,
                             category: category,
+                            audio: audio,
                             onFavoriteChanged: () => setState(() {}),
                           ),
                         ),

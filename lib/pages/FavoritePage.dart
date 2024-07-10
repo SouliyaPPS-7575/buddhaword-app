@@ -30,7 +30,6 @@ class _FavoritePageState extends State<FavoritePage> {
   void initState() {
     super.initState();
     _loadFavorites();
-
   }
 
   Future<void> _loadFavorites() async {
@@ -224,6 +223,8 @@ class _FavoritePageState extends State<FavoritePage> {
                         final title = itemData['title'];
                         final detailLink = itemData['details'];
                         final category = itemData['category'];
+                        final audio = itemData['audio'];
+
                         return Card(
                           child: ListTile(
                             title: Text(
@@ -242,6 +243,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                     title: title,
                                     details: detailLink,
                                     category: category,
+                                    audio: audio,
                                     onFavoriteChanged: _onFavoriteChanged,
                                   ),
                                 ),
@@ -267,9 +269,10 @@ class _FavoritePageState extends State<FavoritePage> {
                         return [
                           jsonDecode(fav)['id'],
                           jsonDecode(fav)['title'],
-                          jsonDecode(fav)['author'],  // Assuming this should be 'author' instead of a duplicate 'title'
+                          jsonDecode(fav)['image'],
                           jsonDecode(fav)['details'],
                           jsonDecode(fav)['category'],
+                          jsonDecode(fav)['audio'],
                         ];
                       }).toList(),
                       onFavoriteChanged: () => setState(() {}),

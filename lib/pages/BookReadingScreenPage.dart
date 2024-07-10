@@ -69,6 +69,10 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
     return widget.filteredData[_currentPageIndex][4].toString();
   }
 
+  String getCurrentAudio() {
+    return widget.filteredData[_currentPageIndex][5].toString();
+  }
+
   Future<void> _loadFavoriteState() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -80,7 +84,8 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
           return current['id'] == getCurrentID() &&
               current['title'] == getCurrentTitle() &&
               current['details'] == getCurrentDetail() &&
-              current['category'] == getCurrentCategory();
+              current['category'] == getCurrentCategory() &&
+              current['audio'] == getCurrentAudio();
         });
       } else {
         _isFavorited = false;
@@ -120,7 +125,8 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
           'id': getCurrentID(),
           'title': getCurrentTitle(),
           'details': getCurrentDetail(),
-          'category': getCurrentCategory()
+          'category': getCurrentCategory(),
+          'audio': getCurrentAudio(),
         }));
       } else {
         currentFavorites.removeWhere((item) {
@@ -128,7 +134,8 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
           return current['id'] == getCurrentID() &&
               current['title'] == getCurrentTitle() &&
               current['details'] == getCurrentDetail() &&
-              current['category'] == getCurrentCategory();
+              current['category'] == getCurrentCategory() &&
+              current['audio'] == getCurrentAudio();
         });
       }
       prefs.setStringList('favorites', currentFavorites);
