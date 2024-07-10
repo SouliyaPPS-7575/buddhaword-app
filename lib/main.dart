@@ -59,7 +59,9 @@ class MyApp extends StatelessWidget {
                   xApiKey:
                       'ZmRmNjE3ZDQtZmQwYS00OTgxLWIzZjAtNGE5Mzk4YWU1ZTYx', // Your x-api-key
                   appInfo: appInfo,
-                  child: MyHomePage()));
+                  child: const MyHomePage(
+                    title: '',
+                  )));
         },
       ),
     );
@@ -67,6 +69,10 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
+  final String title;
+
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
+
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -79,10 +85,16 @@ class _MyHomePageState extends State<MyHomePage> {
   List<List<dynamic>> _filteredData = [];
   String _searchTerm = '';
 
+  String get title => widget.title;
+
   @override
   void initState() {
     super.initState();
-    fetchData(_searchTerm);
+    if (title == 'ພຣະສູດ') {
+      fetchData(_searchTerm);
+    } else {
+      fetchDataFromAPI(_searchTerm);
+    }
   }
 
   Future<void> fetchDataFromAPI(String searchTerm) async {
@@ -134,7 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     }
 
-    if (cachedData == null || cachedData.isEmpty || hasInternet) {
+    if (cachedData == null || cachedData.isEmpty) {
       try {
         final response = await http.get(Uri.parse(
             'https://sheets.googleapis.com/v4/spreadsheets/1mKtgmZ_Is4e6P3P5lvOwIplqx7VQ3amicgienGN9zwA/values/Sheet1!1:1000000?key=AIzaSyDFjIl-SEHUsgK0sjMm7x0awpf8tTEPQjs'));

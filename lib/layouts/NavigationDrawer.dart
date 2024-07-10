@@ -420,7 +420,9 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
 
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (context) => MyHomePage(),
+        builder: (context) => MyHomePage(
+          title: '',
+        ),
       ),
     );
   }
@@ -462,7 +464,9 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
               onTap: () => {
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
-                    builder: (context) => MyHomePage(),
+                    builder: (context) => MyHomePage(
+                      title: '',
+                    ),
                   ),
                 ),
               },
@@ -479,7 +483,9 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
               onTap: () => {
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
-                    builder: (context) => MyHomePage(),
+                    builder: (context) => MyHomePage(
+                      title: 'ພຣະສູດ',
+                    ),
                   ),
                 ),
               },
