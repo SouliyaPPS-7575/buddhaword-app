@@ -25,17 +25,14 @@ class RandomImagePage extends StatelessWidget {
 
             // Lists of image paths for each device type
             List<String> desktopImages = [
-              'assets/ພິຈາລະນາທາງປັນຍາ/loading_desktop.png',
               'assets/ເຫັນທຳ/loading_desktop_tablet.jpg',
             ];
 
             List<String> tabletImages = [
-              'assets/ພິຈາລະນາທາງປັນຍາ/loading_tablet.png',
               'assets/ເຫັນທຳ/loading_mobile.jpg',
             ];
 
             List<String> mobileImages = [
-              'assets/ພິຈາລະນາທາງປັນຍາ/loading_mobile.png',
               'assets/ເຫັນທຳ/loading_mobile.jpg',
             ];
 
