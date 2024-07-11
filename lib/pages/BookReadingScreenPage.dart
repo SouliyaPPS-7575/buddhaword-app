@@ -1,8 +1,11 @@
-// ignore_for_file: file_names, avoid_web_libraries_in_flutter, unnecessary_null_comparison, depend_on_referenced_packages
+// ignore_for_file: file_names, avoid_web_libraries_in_flutter, unnecessary_null_comparison, depend_on_referenced_packages, unrelated_type_equality_checks
 
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:audioplayers/audioplayers.dart';
+import 'package:connectivity/connectivity.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -32,13 +35,26 @@ class BookReadingScreenPage extends StatefulWidget {
 }
 
 class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
+  final audioPlayer = AudioPlayer();
+  bool isPlaying = false;
+  Duration duration = Duration.zero;
+  Duration position = Duration.zero;
+
   double _fontSize = 18.0;
+  double get fontSize => _fontSize;
 
   late PageController _pageController;
   int _currentPageIndex = 0;
 
   // check if the item is favorited on local storage data or not
   bool _isFavorited = false;
+
+  late StreamSubscription<PlayerState> _playerStateSubscription;
+  late StreamSubscription<Duration> _durationSubscription;
+  late StreamSubscription<Duration> _positionSubscription;
+
+  bool hasInternet =
+      Connectivity().checkConnectivity() != ConnectivityResult.none;
 
   @override
   void initState() {
@@ -51,6 +67,25 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
     _pageController.addListener(() {
       _onPageChanged(_pageController.page!.toInt());
     });
+
+    _loadFontSizeFromSharedPreferences();
+
+    if (hasInternet) {
+      _initializePlayer();
+    }
+  }
+
+  @override
+  void dispose() {
+    if (hasInternet) {
+      audioPlayer.dispose();
+
+      _playerStateSubscription.cancel();
+      _durationSubscription.cancel();
+      _positionSubscription.cancel();
+    }
+
+    super.dispose();
   }
 
   String getCurrentID() {
@@ -71,6 +106,62 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
 
   String getCurrentAudio() {
     return widget.filteredData[_currentPageIndex][5].toString();
+  }
+
+  Future<void> _initializePlayer() async {
+    try {
+      await audioPlayer.setSourceUrl(getCurrentAudio());
+
+      _playerStateSubscription =
+          audioPlayer.onPlayerStateChanged.listen((playerState) {
+        setState(() {
+          isPlaying = playerState == PlayerState.playing;
+        });
+      });
+
+      _durationSubscription =
+          audioPlayer.onDurationChanged.listen((newDuration) {
+        setState(() {
+          duration = newDuration;
+        });
+      });
+
+      _positionSubscription =
+          audioPlayer.onPositionChanged.listen((newPosition) {
+        setState(() {
+          position = newPosition;
+        });
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error initializing audio player: $e');
+      }
+    }
+  }
+
+  Future<void> _playPauseAudio() async {
+    if (isPlaying) {
+      await audioPlayer.pause();
+    } else {
+      String? url = getCurrentAudio();
+      await audioPlayer.play(UrlSource(url));
+    }
+    setState(() {
+      isPlaying = !isPlaying;
+    });
+  }
+
+  String formatTime(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final hours = twoDigits(duration.inHours);
+    final minutes = twoDigits(duration.inMinutes.remainder(60));
+    final seconds = twoDigits(duration.inSeconds.remainder(60));
+
+    return [
+      if (duration.inHours > 0) hours,
+      minutes,
+      seconds,
+    ].join(':');
   }
 
   Future<void> _loadFavoriteState() async {
@@ -265,10 +356,64 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
                   const SizedBox(height: 10),
                   const Divider(color: Colors.black, thickness: 1, height: 1),
                   const SizedBox(height: 10),
+                  Column(
+                    children: [
+                      if (getCurrentAudio() !=
+                              'https://drive.google.com/uc?export=download&id=' &&
+                          hasInternet)
+                        Center(
+                          child: CircleAvatar(
+                            radius: 25,
+                            child: IconButton(
+                              icon: Icon(
+                                  isPlaying ? Icons.pause : Icons.play_arrow),
+                              iconSize: 30,
+                              onPressed: _playPauseAudio,
+                            ),
+                          ),
+                        ),
+                      if (isPlaying &&
+                          position > Duration.zero &&
+                          hasInternet &&
+                          getCurrentAudio() !=
+                              'https://drive.google.com/uc?export=download&id=')
+                        Slider(
+                          min: 0.0,
+                          max: duration.inSeconds.toDouble(),
+                          value: position.inSeconds.toDouble(),
+                          onChanged: (value) async {
+                            final position = Duration(seconds: value.toInt());
+                            await audioPlayer.seek(position);
+
+                            await audioPlayer.resume();
+
+                            setState(() {
+                              this.position = position;
+                            });
+                          },
+                        ),
+                      if (isPlaying &&
+                          position > Duration.zero &&
+                          hasInternet &&
+                          getCurrentAudio() !=
+                              'https://drive.google.com/uc?export=download&id=')
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(formatTime(position)),
+                              Text(formatTime(duration - position)),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
                   FutureBuilder<String>(
                     future: _fetchData(detailLink),
                     builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
+                      if (!snapshot.hasData && !snapshot.hasError) {
                         return const Center(
                           child: CircularProgressIndicator(),
                         );
@@ -395,15 +540,33 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
     );
   }
 
+  Future<void> _loadFontSizeFromSharedPreferences() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final double fontSize = prefs.getDouble('fontSize') ?? 18.0;
+
+    setState(() {
+      _fontSize = fontSize;
+    });
+  }
+
+  Future<void> _saveFontSizeToSharedPreferences(double fontSize) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('fontSize', fontSize);
+  }
+
   void _increaseFontSize() {
     setState(() {
       _fontSize += 2.0;
     });
+
+    _saveFontSizeToSharedPreferences(_fontSize);
   }
 
   void _decreaseFontSize() {
     setState(() {
       _fontSize = _fontSize > 2.0 ? _fontSize - 2.0 : _fontSize;
     });
+
+    _saveFontSizeToSharedPreferences(_fontSize);
   }
 }

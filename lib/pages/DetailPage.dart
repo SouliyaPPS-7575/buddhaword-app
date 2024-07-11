@@ -1,8 +1,10 @@
-// ignore_for_file: depend_on_referenced_packages, file_names, use_key_in_widget_constructors, library_private_types_in_public_api
+// ignore_for_file: depend_on_referenced_packages, file_names, use_key_in_widget_constructors, library_private_types_in_public_api, unrelated_type_equality_checks
 
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:audioplayers/audioplayers.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,7 +12,6 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:audioplayers/audioplayers.dart';
 
 import '../layouts/NavigationDrawer.dart';
 import '../themes/ThemeProvider.dart';
@@ -53,23 +54,30 @@ class _DetailPageState extends State<DetailPage> {
   late StreamSubscription<Duration> _durationSubscription;
   late StreamSubscription<Duration> _positionSubscription;
 
+  bool hasInternet =
+      Connectivity().checkConnectivity() != ConnectivityResult.none;
+
   @override
   void initState() {
     super.initState();
 
     _loadFavoriteState();
     _loadFontSizeFromSharedPreferences();
-    _initializePlayer();
+
+    if (hasInternet) {
+      _initializePlayer();
+    }
   }
 
   @override
   void dispose() {
-    audioPlayer.dispose();
+    if (hasInternet) {
+      audioPlayer.dispose();
 
-    _playerStateSubscription.cancel();
-    _durationSubscription.cancel();
-    _positionSubscription.cancel();
-
+      _playerStateSubscription.cancel();
+      _durationSubscription.cancel();
+      _positionSubscription.cancel();
+    }
     super.dispose();
   }
 
@@ -290,7 +298,9 @@ class _DetailPageState extends State<DetailPage> {
               const SizedBox(height: 10),
               Column(
                 children: [
-                  if (widget.audio != '/')
+                  if (widget.audio !=
+                          'https://drive.google.com/uc?export=download&id=' &&
+                      hasInternet)
                     Center(
                       child: CircleAvatar(
                         radius: 25,
