@@ -3,12 +3,14 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 import '../layouts/NavigationDrawer.dart';
 import '../themes/ThemeProvider.dart';
@@ -37,16 +39,94 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
+  final audioPlayer = AudioPlayer();
+  bool isPlaying = false;
+  Duration duration = Duration.zero;
+  Duration position = Duration.zero;
+
   double _fontSize = 18.0;
   double get fontSize => _fontSize;
 
   bool _isFavorited = false; // Add this line
 
+  late StreamSubscription<PlayerState> _playerStateSubscription;
+  late StreamSubscription<Duration> _durationSubscription;
+  late StreamSubscription<Duration> _positionSubscription;
+
   @override
   void initState() {
     super.initState();
+
     _loadFavoriteState();
     _loadFontSizeFromSharedPreferences();
+    _initializePlayer();
+  }
+
+  @override
+  void dispose() {
+    audioPlayer.dispose();
+
+    _playerStateSubscription.cancel();
+    _durationSubscription.cancel();
+    _positionSubscription.cancel();
+
+    super.dispose();
+  }
+
+  Future<void> _initializePlayer() async {
+    try {
+      await audioPlayer.setSourceUrl(widget.audio);
+
+      _playerStateSubscription =
+          audioPlayer.onPlayerStateChanged.listen((playerState) {
+        setState(() {
+          isPlaying = playerState == PlayerState.playing;
+        });
+      });
+
+      _durationSubscription =
+          audioPlayer.onDurationChanged.listen((newDuration) {
+        setState(() {
+          duration = newDuration;
+        });
+      });
+
+      _positionSubscription =
+          audioPlayer.onPositionChanged.listen((newPosition) {
+        setState(() {
+          position = newPosition;
+        });
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error initializing audio player: $e');
+      }
+    }
+  }
+
+  Future<void> _playPauseAudio() async {
+    if (isPlaying) {
+      await audioPlayer.pause();
+    } else {
+      String? url = widget.audio;
+      await audioPlayer.play(UrlSource(url));
+    }
+    setState(() {
+      isPlaying = !isPlaying;
+    });
+  }
+
+  String formatTime(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final hours = twoDigits(duration.inHours);
+    final minutes = twoDigits(duration.inMinutes.remainder(60));
+    final seconds = twoDigits(duration.inSeconds.remainder(60));
+
+    return [
+      if (duration.inHours > 0) hours,
+      minutes,
+      seconds,
+    ].join(':');
   }
 
   Future<void> _loadFavoriteState() async {
@@ -72,7 +152,7 @@ class _DetailPageState extends State<DetailPage> {
         // Initialize the favorite state for the current detail
 
         prefs.setBool(
-            '${widget.id}_${widget.title}_${widget.details}_${widget.category}',
+            '${widget.id}_${widget.title}_${widget.details}_${widget.category}_${widget.audio}',
             false);
 
         // Notify the parent widget
@@ -92,7 +172,7 @@ class _DetailPageState extends State<DetailPage> {
     setState(() {
       _isFavorited = !_isFavorited;
       prefs.setBool(
-          '${widget.id}_${widget.title}_${widget.details}_${widget.category}',
+          '${widget.id}_${widget.title}_${widget.details}_${widget.category}_${widget.audio}',
           _isFavorited);
 
       List<String> currentFavorites = prefs.getStringList('favorites') ?? [];
@@ -208,10 +288,54 @@ class _DetailPageState extends State<DetailPage> {
               const SizedBox(height: 10),
               const Divider(color: Colors.black, thickness: 1, height: 1),
               const SizedBox(height: 10),
+              Column(
+                children: [
+                  if (widget.audio != '/')
+                    Center(
+                      child: CircleAvatar(
+                        radius: 25,
+                        child: IconButton(
+                          icon:
+                              Icon(isPlaying ? Icons.pause : Icons.play_arrow),
+                          iconSize: 30,
+                          onPressed: _playPauseAudio,
+                        ),
+                      ),
+                    ),
+                  if (isPlaying || position > Duration.zero)
+                    Slider(
+                      min: 0.0,
+                      max: duration.inSeconds.toDouble(),
+                      value: position.inSeconds.toDouble(),
+                      onChanged: (value) async {
+                        final position = Duration(seconds: value.toInt());
+                        await audioPlayer.seek(position);
+
+                        await audioPlayer.resume();
+
+                        setState(() {
+                          this.position = position;
+                        });
+                      },
+                    ),
+                  if (isPlaying || position > Duration.zero)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(formatTime(position)),
+                          Text(formatTime(duration - position)),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 10),
               FutureBuilder<String>(
                 future: _fetchData(widget.details),
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
+                  if (!snapshot.hasData && !snapshot.hasError) {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
