@@ -38,12 +38,15 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
   double _fontSize = 18.0;
+  double get fontSize => _fontSize;
+
   bool _isFavorited = false; // Add this line
 
   @override
   void initState() {
     super.initState();
     _loadFavoriteState();
+    _loadFontSizeFromSharedPreferences();
   }
 
   Future<void> _loadFavoriteState() async {
@@ -337,16 +340,34 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
+  Future<void> _loadFontSizeFromSharedPreferences() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final double fontSize = prefs.getDouble('fontSize') ?? 18.0;
+
+    setState(() {
+      _fontSize = fontSize;
+    });
+  }
+
+  Future<void> _saveFontSizeToSharedPreferences(double fontSize) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('fontSize', fontSize);
+  }
+
   void _increaseFontSize() {
     setState(() {
       _fontSize += 2.0;
     });
+
+    _saveFontSizeToSharedPreferences(_fontSize);
   }
 
   void _decreaseFontSize() {
     setState(() {
       _fontSize = _fontSize > 2.0 ? _fontSize - 2.0 : _fontSize;
     });
+
+    _saveFontSizeToSharedPreferences(_fontSize);
   }
 }
 
