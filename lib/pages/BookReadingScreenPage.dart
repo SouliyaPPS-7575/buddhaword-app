@@ -70,22 +70,10 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
 
     _loadFontSizeFromSharedPreferences();
 
-    if (hasInternet) {
+    if (hasInternet &&
+        widget.filteredData[_currentPageIndex][5].toString() != '/') {
       _initializePlayer();
     }
-  }
-
-  @override
-  void dispose() {
-    if (hasInternet) {
-      audioPlayer.dispose();
-
-      _playerStateSubscription.cancel();
-      _durationSubscription.cancel();
-      _positionSubscription.cancel();
-    }
-
-    super.dispose();
   }
 
   String getCurrentID() {
@@ -108,7 +96,7 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
     return widget.filteredData[_currentPageIndex][5].toString();
   }
 
-  Future<void> _initializePlayer() async {
+void _initializePlayer() async {
     try {
       await audioPlayer.setSourceUrl(getCurrentAudio());
 
@@ -137,6 +125,20 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
         print('Error initializing audio player: $e');
       }
     }
+  }
+  
+  @override
+  void dispose() {
+    if (hasInternet) {
+      audioPlayer.dispose();
+
+      // Cancel subscriptions here to avoid LateInitializationError
+      _playerStateSubscription.cancel();
+      _durationSubscription.cancel();
+      _positionSubscription.cancel();
+    }
+
+    super.dispose();
   }
 
   Future<void> _playPauseAudio() async {
@@ -358,9 +360,7 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
                   const SizedBox(height: 10),
                   Column(
                     children: [
-                      if (getCurrentAudio() !=
-                              'https://drive.google.com/uc?export=download&id=' &&
-                          hasInternet)
+                      if (getCurrentAudio() != '/' && hasInternet)
                         Center(
                           child: CircleAvatar(
                             radius: 25,
@@ -375,8 +375,7 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
                       if (isPlaying &&
                           position > Duration.zero &&
                           hasInternet &&
-                          getCurrentAudio() !=
-                              'https://drive.google.com/uc?export=download&id=')
+                          getCurrentAudio() != '/')
                         Slider(
                           min: 0.0,
                           max: duration.inSeconds.toDouble(),
@@ -395,8 +394,7 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
                       if (isPlaying &&
                           position > Duration.zero &&
                           hasInternet &&
-                          getCurrentAudio() !=
-                              'https://drive.google.com/uc?export=download&id=')
+                          getCurrentAudio() != '/')
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Row(

@@ -64,24 +64,12 @@ class _DetailPageState extends State<DetailPage> {
     _loadFavoriteState();
     _loadFontSizeFromSharedPreferences();
 
-    if (hasInternet) {
+    if (hasInternet && widget.audio != '/') {
       _initializePlayer();
     }
   }
 
-  @override
-  void dispose() {
-    if (hasInternet) {
-      audioPlayer.dispose();
-
-      _playerStateSubscription.cancel();
-      _durationSubscription.cancel();
-      _positionSubscription.cancel();
-    }
-    super.dispose();
-  }
-
-  Future<void> _initializePlayer() async {
+  void _initializePlayer() async {
     try {
       await audioPlayer.setSourceUrl(widget.audio);
 
@@ -110,6 +98,20 @@ class _DetailPageState extends State<DetailPage> {
         print('Error initializing audio player: $e');
       }
     }
+  }
+
+  @override
+  void dispose() {
+    if (hasInternet) {
+      audioPlayer.dispose();
+
+      // Cancel subscriptions here to avoid LateInitializationError
+      _playerStateSubscription.cancel();
+      _durationSubscription.cancel();
+      _positionSubscription.cancel();
+    }
+
+    super.dispose();
   }
 
   Future<void> _playPauseAudio() async {
@@ -298,9 +300,7 @@ class _DetailPageState extends State<DetailPage> {
               const SizedBox(height: 10),
               Column(
                 children: [
-                  if (widget.audio !=
-                          'https://drive.google.com/uc?export=download&id=' &&
-                      hasInternet)
+                  if (widget.audio != '/' && hasInternet)
                     Center(
                       child: CircleAvatar(
                         radius: 25,
