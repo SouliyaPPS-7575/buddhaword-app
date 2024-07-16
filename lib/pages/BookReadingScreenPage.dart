@@ -49,9 +49,9 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
   // check if the item is favorited on local storage data or not
   bool _isFavorited = false;
 
-  late StreamSubscription<PlayerState> _playerStateSubscription;
-  late StreamSubscription<Duration> _durationSubscription;
-  late StreamSubscription<Duration> _positionSubscription;
+  StreamSubscription<PlayerState>? _playerStateSubscription;
+  StreamSubscription<Duration?>? _durationSubscription;
+  StreamSubscription<Duration>? _positionSubscription;
 
   bool hasInternet =
       Connectivity().checkConnectivity() != ConnectivityResult.none;
@@ -59,21 +59,27 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
   @override
   void initState() {
     super.initState();
-
-    _loadFavoriteState();
-
     _currentPageIndex = widget.initialPageIndex;
     _pageController = PageController(initialPage: widget.initialPageIndex);
     _pageController.addListener(() {
       _onPageChanged(_pageController.page!.toInt());
     });
 
-    _loadFontSizeFromSharedPreferences();
+    _initialize().then((_) async {
+      if (hasInternet && getCurrentAudio() != '/') {
+        _initializePlayer();
+      }
+    });
+  }
 
-    if (hasInternet &&
-        widget.filteredData[_currentPageIndex][5].toString() != '/') {
-      _initializePlayer();
-    }
+  Future<void> _initialize() async {
+    await _loadFavoriteState();
+    await _loadFontSizeFromSharedPreferences();
+  }
+
+  void _disposeAudioPlayer() {
+    // clear state playing audio
+    audioPlayer.stop();
   }
 
   String getCurrentID() {
@@ -96,47 +102,54 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
     return widget.filteredData[_currentPageIndex][5].toString();
   }
 
-void _initializePlayer() async {
+  void _initializePlayer() async {
     try {
-      await audioPlayer.setSourceUrl(getCurrentAudio());
+      String audioUrl = getCurrentAudio();
+      if (audioUrl != '/') {
+        await audioPlayer.setSourceUrl(audioUrl);
 
-      _playerStateSubscription =
-          audioPlayer.onPlayerStateChanged.listen((playerState) {
-        setState(() {
-          isPlaying = playerState == PlayerState.playing;
+        _playerStateSubscription =
+            audioPlayer.onPlayerStateChanged.listen((playerState) {
+          if (mounted) {
+            setState(() {
+              isPlaying = playerState == PlayerState.playing;
+            });
+          }
         });
-      });
 
-      _durationSubscription =
-          audioPlayer.onDurationChanged.listen((newDuration) {
-        setState(() {
-          duration = newDuration;
+        _durationSubscription =
+            audioPlayer.onDurationChanged.listen((newDuration) {
+          if (mounted) {
+            setState(() {
+              duration = newDuration;
+            });
+          }
         });
-      });
 
-      _positionSubscription =
-          audioPlayer.onPositionChanged.listen((newPosition) {
-        setState(() {
-          position = newPosition;
+        _positionSubscription =
+            audioPlayer.onPositionChanged.listen((newPosition) {
+          if (mounted) {
+            setState(() {
+              position = newPosition;
+            });
+          }
         });
-      });
+      }
     } catch (e) {
       if (kDebugMode) {
         print('Error initializing audio player: $e');
       }
     }
   }
-  
+
   @override
   void dispose() {
-    if (hasInternet) {
-      audioPlayer.dispose();
+    _disposeAudioPlayer();
 
-      // Cancel subscriptions here to avoid LateInitializationError
-      _playerStateSubscription.cancel();
-      _durationSubscription.cancel();
-      _positionSubscription.cancel();
-    }
+    // Cancel subscriptions here to avoid LateInitializationError
+    _playerStateSubscription?.cancel();
+    _durationSubscription?.cancel();
+    _positionSubscription?.cancel();
 
     super.dispose();
   }
@@ -146,11 +159,19 @@ void _initializePlayer() async {
       await audioPlayer.pause();
     } else {
       String? url = getCurrentAudio();
-      await audioPlayer.play(UrlSource(url));
+      if (url != null && url.isNotEmpty) {
+        try {
+          await audioPlayer.play(UrlSource(url));
+          setState(() {
+            isPlaying = true;
+          });
+        } catch (e) {
+          if (kDebugMode) {
+            print('Error playing audio: $e');
+          }
+        }
+      }
     }
-    setState(() {
-      isPlaying = !isPlaying;
-    });
   }
 
   String formatTime(Duration duration) {
@@ -164,6 +185,15 @@ void _initializePlayer() async {
       minutes,
       seconds,
     ].join(':');
+  }
+
+  void _onPageChanged(int index) {
+    setState(() {
+      _currentPageIndex = index;
+    });
+    _loadFavoriteState();
+
+    _disposeAudioPlayer(); // Dispose the current audio player
   }
 
   Future<void> _loadFavoriteState() async {
@@ -237,13 +267,6 @@ void _initializePlayer() async {
     });
   }
 
-  void _onPageChanged(int index) {
-    setState(() {
-      _currentPageIndex = index;
-    });
-    _loadFavoriteState();
-  }
-
   Future<String> _fetchData(String url) async {
     try {
       final response = await http.get(Uri.parse(url));
@@ -274,6 +297,8 @@ void _initializePlayer() async {
               // If the current route is the initial route, handle the back action differently
               Navigator.of(context).maybePop();
             }
+
+            _disposeAudioPlayer();
           },
         ),
         actions: [
@@ -288,6 +313,8 @@ void _initializePlayer() async {
           IconButton(
             icon: const Icon(Icons.search, color: Colors.white),
             onPressed: () {
+              _disposeAudioPlayer();
+
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -523,7 +550,7 @@ void _initializePlayer() async {
     final currentRoute =
         'https://buddha-nature.web.app/#/details/${widget.filteredData[_currentPageIndex][0]}';
 
-    final shareText = '$currentTitle\n $currentRoute';
+    final shareText = '$currentTitle\n\n $currentRoute';
 
     Share.share(shareText, subject: currentTitle);
   }

@@ -599,7 +599,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
               leading: Icon(Icons.hearing,
                   color: const Color.fromARGB(241, 179, 93, 78)),
               title: Text(
-                'ສຽງທັມ',
+                'ໝວດສຽງ',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               children: [

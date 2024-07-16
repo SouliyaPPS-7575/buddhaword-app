@@ -113,109 +113,115 @@ class _SearchPageState extends State<SearchPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
-              constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context)
-                      .size
-                      .width), // Constrain width of the row
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 1,
-                    child: TextField(
-                      controller: _searchController,
-                      focusNode: _focusNode,
-                      style: const TextStyle(fontSize: 17.0),
-                      decoration: InputDecoration(
-                        hintText: 'ຄົ້ນຫາ...',
-                        prefixIcon: const Icon(Icons.search),
-                        suffixIcon: _searchController.text.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(Icons.clear),
-                                onPressed: () {
-                                  setState(() {
-                                    _searchController.clear();
-                                    _searchTerm = '';
-                                    fetchData(_searchTerm);
-                                  });
-                                },
-                              )
-                            : null,
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          _searchTerm = value;
-                          fetchData(_searchTerm);
-                        });
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 2),
-                  Expanded(
-                    flex: 1,
-                    child: DropdownButtonFormField<String>(
-                      value: _selectedCategory.isNotEmpty
-                          ? _selectedCategory
-                          : null,
-                      decoration: InputDecoration(
-                        hintText: 'ໝວດທັມ',
-                        suffixIcon: _selectedCategory.isNotEmpty
-                            ? Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      _selectedCategory, // Display selected category value
-                                      textAlign: TextAlign.end,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey[600],
-                                      ),
-                                    ),
-                                  ),
-                                  IconButton(
+              padding: const EdgeInsets.all(8.0),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return Row(
+                    children: [
+                      Flexible(
+                        flex: 1,
+                        child: TextField(
+                          controller: _searchController,
+                          focusNode: _focusNode,
+                          style: const TextStyle(fontSize: 15.0),
+                          decoration: InputDecoration(
+                            hintText: 'ຄົ້ນຫາ',
+                            prefixIcon: const Icon(Icons.search),
+                            suffixIcon: _searchController.text.isNotEmpty
+                                ? IconButton(
                                     icon: const Icon(Icons.clear),
                                     onPressed: () {
                                       setState(() {
-                                        _selectedCategory = '';
-                                        if (_searchTerm.isEmpty) {
-                                          updateData(
-                                              _searchTerm, _selectedCategory);
-                                        } else {
-                                          fetchData(_searchTerm);
-                                        }
+                                        _searchController.clear();
+                                        _searchTerm = '';
+                                        fetchData(_searchTerm);
                                       });
                                     },
-                                  ),
-                                ],
-                              )
-                            : null,
+                                  )
+                                : null,
+                          ),
+                          onChanged: (value) {
+                            setState(() {
+                              _searchTerm = value;
+                              fetchData(_searchTerm);
+                            });
+                          },
+                        ),
                       ),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          _selectedCategory = newValue ?? '';
-                          if (_searchTerm.isEmpty) {
-                            updateData(_searchTerm, _selectedCategory);
-                          } else {
-                            fetchData(_searchTerm);
-                          }
-                        });
-                      },
-                      items: _data.isEmpty
-                          ? null
-                          : _data
-                              .map((row) =>
-                                  row.length > 4 ? row[4].toString() : '')
-                              .toSet()
-                              .toList()
-                              .map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                    ),
-                  ),
-                ],
+                      const SizedBox(width: 2),
+                      Flexible(
+                        flex: 1,
+                        child: Stack(
+                          children: [
+                            DropdownButtonFormField<String>(
+                              value: _selectedCategory.isNotEmpty
+                                  ? _selectedCategory
+                                  : null,
+                              decoration: const InputDecoration(
+                                hintText: 'ໝວດທັມ',
+                                contentPadding: EdgeInsets.only(
+                                    right:
+                                        20.0), // Adjust padding to make space for the clear button
+                              ),
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  _selectedCategory = newValue ?? '';
+                                  if (_searchTerm.isEmpty) {
+                                    updateData(_searchTerm, _selectedCategory);
+                                  } else {
+                                    fetchData(_searchTerm);
+                                  }
+                                });
+                              },
+                              items: _data.isEmpty
+                                  ? []
+                                  : _data
+                                      .map((row) => row.length > 4
+                                          ? row[4].toString()
+                                          : '')
+                                      .toSet()
+                                      .toList()
+                                      .map<DropdownMenuItem<String>>(
+                                          (String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Text(
+                                          value,
+                                          style:
+                                              const TextStyle(fontSize: 15.0),
+                                        ),
+                                      );
+                                    }).toList(),
+                            ),
+                            if (_selectedCategory.isNotEmpty)
+                              Positioned(
+                                right: 5,
+                                top: 0,
+                                child: IconButton(
+                                  icon: const Icon(
+                                    Icons.clear,
+                                    color:
+                                        Colors.brown, // Change the color here
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _selectedCategory = '';
+                                      if (_searchTerm.isEmpty) {
+                                        updateData(
+                                            _searchTerm, _selectedCategory);
+                                      } else {
+                                        fetchData(_searchTerm);
+                                      }
+                                    });
+                                  },
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
             const SizedBox(height: 2),

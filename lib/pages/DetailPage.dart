@@ -50,9 +50,9 @@ class _DetailPageState extends State<DetailPage> {
 
   bool _isFavorited = false; // Add this line
 
-  late StreamSubscription<PlayerState> _playerStateSubscription;
-  late StreamSubscription<Duration> _durationSubscription;
-  late StreamSubscription<Duration> _positionSubscription;
+  StreamSubscription<PlayerState>? _playerStateSubscription;
+  StreamSubscription<Duration?>? _durationSubscription;
+  StreamSubscription<Duration>? _positionSubscription;
 
   bool hasInternet =
       Connectivity().checkConnectivity() != ConnectivityResult.none;
@@ -102,16 +102,24 @@ class _DetailPageState extends State<DetailPage> {
 
   @override
   void dispose() {
-    if (hasInternet) {
-      audioPlayer.dispose();
-
-      // Cancel subscriptions here to avoid LateInitializationError
-      _playerStateSubscription.cancel();
-      _durationSubscription.cancel();
-      _positionSubscription.cancel();
-    }
-
     super.dispose();
+
+    audioPlayer.dispose();
+
+    // Cancel subscriptions here to avoid LateInitializationError
+    _playerStateSubscription?.cancel();
+    _durationSubscription?.cancel();
+    _positionSubscription?.cancel();
+  }
+
+  void _disposeAudioPlayer() {
+    // clear state playing audio
+    audioPlayer.stop();
+
+    // Cancel subscriptions here to avoid LateInitializationError
+    _playerStateSubscription?.cancel();
+    _durationSubscription?.cancel();
+    _positionSubscription?.cancel();
   }
 
   Future<void> _playPauseAudio() async {
@@ -221,6 +229,8 @@ class _DetailPageState extends State<DetailPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () {
+            _disposeAudioPlayer();
+
             Navigator.of(context).pop();
           },
         ),
@@ -236,6 +246,8 @@ class _DetailPageState extends State<DetailPage> {
           IconButton(
             icon: const Icon(Icons.search, color: Colors.white),
             onPressed: () {
+              _disposeAudioPlayer();
+
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -447,7 +459,7 @@ class _DetailPageState extends State<DetailPage> {
 
   void _shareDetailLink() {
     final shareText =
-        '${widget.title}\n https://buddha-nature.web.app/#/details/${widget.id}';
+        '${widget.title}\n\n https://buddha-nature.web.app/#/details/${widget.id}';
 
     Share.share(shareText, subject: widget.title);
   }

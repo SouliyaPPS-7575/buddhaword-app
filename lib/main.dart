@@ -87,6 +87,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   String get title => widget.title;
 
+  bool hasInternet =
+      Connectivity().checkConnectivity() != ConnectivityResult.none;
+
   @override
   void initState() {
     super.initState();
@@ -100,6 +103,21 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> fetchDataFromAPI(String searchTerm) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
+    String? cachedData = prefs.getString('cachedData');
+
+    bool hasInternet =
+        await Connectivity().checkConnectivity() != ConnectivityResult.none;
+
+    if (!hasInternet) {
+      if (cachedData != null && cachedData.isNotEmpty) {
+        final List<dynamic> cachedValues = json.decode(cachedData);
+        _data = cachedValues.cast<List<dynamic>>();
+
+        // Update data with cached values
+        updateData(searchTerm); // Update data here
+      }
+    }
+    
     try {
       final response = await http.get(Uri.parse(
           'https://sheets.googleapis.com/v4/spreadsheets/1mKtgmZ_Is4e6P3P5lvOwIplqx7VQ3amicgienGN9zwA/values/Sheet1!1:1000000?key=AIzaSyDFjIl-SEHUsgK0sjMm7x0awpf8tTEPQjs'));
@@ -249,7 +267,7 @@ class _MyHomePageState extends State<MyHomePage> {
               : const SizedBox(),
           const SizedBox(width: 12),
           IconButton(
-            icon: _filteredData.isEmpty
+            icon: _data.isEmpty
                 ? const SizedBox(
                     width: 20.0, // Custom width
                     height: 20.0, // Custom height
@@ -288,7 +306,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       drawer: const NavigationDrawer(),
-      body: _filteredData.isEmpty
+      body: _data.isEmpty
           ? RandomImagePage()
           : Padding(
               padding: const EdgeInsets.all(1.0),
