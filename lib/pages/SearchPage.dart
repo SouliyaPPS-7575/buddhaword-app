@@ -118,14 +118,14 @@ class _SearchPageState extends State<SearchPage> {
                 builder: (context, constraints) {
                   return Row(
                     children: [
-                      Flexible(
+                      Expanded(
                         flex: 1,
                         child: TextField(
                           controller: _searchController,
                           focusNode: _focusNode,
-                          style: const TextStyle(fontSize: 15.0),
+                          style: const TextStyle(fontSize: 17.0),
                           decoration: InputDecoration(
-                            hintText: 'ຄົ້ນຫາ',
+                            hintText: 'ຄົ້ນຫາ...',
                             prefixIcon: const Icon(Icons.search),
                             suffixIcon: _searchController.text.isNotEmpty
                                 ? IconButton(
@@ -149,74 +149,70 @@ class _SearchPageState extends State<SearchPage> {
                         ),
                       ),
                       const SizedBox(width: 2),
-                      Flexible(
+                      Expanded(
                         flex: 1,
-                        child: Stack(
-                          children: [
-                            DropdownButtonFormField<String>(
-                              value: _selectedCategory.isNotEmpty
-                                  ? _selectedCategory
-                                  : null,
-                              decoration: const InputDecoration(
-                                hintText: 'ໝວດທັມ',
-                                contentPadding: EdgeInsets.only(
-                                    right:
-                                        20.0), // Adjust padding to make space for the clear button
-                              ),
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  _selectedCategory = newValue ?? '';
-                                  if (_searchTerm.isEmpty) {
-                                    updateData(_searchTerm, _selectedCategory);
-                                  } else {
-                                    fetchData(_searchTerm);
-                                  }
-                                });
-                              },
-                              items: _data.isEmpty
-                                  ? []
-                                  : _data
-                                      .map((row) => row.length > 4
-                                          ? row[4].toString()
-                                          : '')
-                                      .toSet()
-                                      .toList()
-                                      .map<DropdownMenuItem<String>>(
-                                          (String value) {
-                                      return DropdownMenuItem<String>(
-                                        value: value,
+                        child: DropdownButtonFormField<String>(
+                          value: _selectedCategory.isNotEmpty
+                              ? _selectedCategory
+                              : null,
+                          decoration: InputDecoration(
+                            hintText: 'ໝວດທັມ',
+                            suffixIcon: _selectedCategory.isNotEmpty
+                                ? Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Expanded(
                                         child: Text(
-                                          value,
-                                          style:
-                                              const TextStyle(fontSize: 15.0),
+                                          _selectedCategory, // Display selected category value
+                                          textAlign: TextAlign.end,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey[600],
+                                          ),
                                         ),
-                                      );
-                                    }).toList(),
-                            ),
-                            if (_selectedCategory.isNotEmpty)
-                              Positioned(
-                                right: 5,
-                                top: 0,
-                                child: IconButton(
-                                  icon: const Icon(
-                                    Icons.clear,
-                                    color:
-                                        Colors.brown, // Change the color here
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _selectedCategory = '';
-                                      if (_searchTerm.isEmpty) {
-                                        updateData(
-                                            _searchTerm, _selectedCategory);
-                                      } else {
-                                        fetchData(_searchTerm);
-                                      }
-                                    });
-                                  },
-                                ),
-                              ),
-                          ],
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.clear),
+                                        onPressed: () {
+                                          setState(() {
+                                            _selectedCategory = '';
+                                            if (_searchTerm.isEmpty) {
+                                              updateData(_searchTerm,
+                                                  _selectedCategory);
+                                            } else {
+                                              fetchData(_searchTerm);
+                                            }
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  )
+                                : null,
+                          ),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              _selectedCategory = newValue ?? '';
+                              if (_searchTerm.isEmpty) {
+                                updateData(_searchTerm, _selectedCategory);
+                              } else {
+                                fetchData(_searchTerm);
+                              }
+                            });
+                          },
+                          items: _data.isEmpty
+                              ? null
+                              : _data
+                                  .map((row) =>
+                                      row.length > 4 ? row[4].toString() : '')
+                                  .toSet()
+                                  .toList()
+                                  .map<DropdownMenuItem<String>>(
+                                      (String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                }).toList(),
                         ),
                       ),
                     ],
