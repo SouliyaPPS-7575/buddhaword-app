@@ -435,40 +435,66 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
                     ],
                   ),
                   const SizedBox(height: 10),
-                  FutureBuilder<String>(
+                   FutureBuilder<String>(
                     future: _fetchData(detailLink),
                     builder: (context, snapshot) {
-                      if (!snapshot.hasData && !snapshot.hasError) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      } else if (snapshot.hasData) {
-                        return SingleChildScrollView(
-                          physics: const ClampingScrollPhysics(),
-                          child: SelectableText.rich(
-                            TextSpan(
-                              children: parseContent(detailLink),
-                            ),
-                            toolbarOptions: const ToolbarOptions(
-                              copy: true,
-                              cut: true,
-                              paste: true,
-                              selectAll: true,
-                            ),
-                            showCursor: true,
-                            textAlign: TextAlign.start,
-                            style: TextStyle(
-                              fontSize: _fontSize,
-                              height: 1.8,
-                            ),
-                          ),
+                      if (snapshot.hasData && snapshot.data != null) {
+                        return LayoutBuilder(
+                          builder: (context, constraints) {
+                            final bool isMobile = constraints.maxWidth < 600;
+                            final double paddingValue = isMobile
+                                ? 6.0 // Smaller padding for mobile devices
+                                : constraints.maxWidth *
+                                    0.1; // 10% of the width as padding for larger screens
+
+                            return SingleChildScrollView(
+                              physics: const ClampingScrollPhysics(),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: paddingValue, vertical: 16.0),
+                                child: Align(
+                                  alignment: Alignment
+                                      .center, // Center align text for larger screens
+                                  child: ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      minWidth: isMobile
+                                          ? constraints.maxWidth
+                                          : constraints.maxWidth * 0.8,
+                                      maxWidth: constraints.maxWidth,
+                                    ),
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: isMobile ? 0 : paddingValue,
+                                      ), // Add horizontal padding to center the text
+                                      child: SelectableText.rich(
+                                        TextSpan(
+                                          children: parseContent(detailLink),
+                                        ),
+                                        toolbarOptions: const ToolbarOptions(
+                                          copy: true,
+                                          cut: true,
+                                          paste: true,
+                                          selectAll: true,
+                                        ),
+                                        showCursor: true,
+                                        style: TextStyle(
+                                          fontSize: _fontSize,
+                                          height: 1.8,
+                                          textBaseline: TextBaseline.alphabetic,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
                         );
                       } else if (snapshot.hasError) {
-                        return Center(
-                          child: Text('Error: ${snapshot.error}'),
-                        );
+                        return Text('Error: ${snapshot.error}');
+                      } else {
+                        return const Center(child: CircularProgressIndicator());
                       }
-                      return Container();
                     },
                   ),
                   const SizedBox(height: 150),

@@ -144,7 +144,7 @@ flutter:
   fonts:
     - family: NotoSerifLao
       fonts:
-        - asset: assets/fonts/DefagoNotoSansLao.ttf
+        - asset: assets/fonts/NotoSerifLao-VariableFont_wdth,wght.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro
