@@ -490,6 +490,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                 ),
               },
             ),
+            
             ListTile(
               leading: _isChecked
                   ? Icon(Icons.favorite, color: _checkColor)
@@ -506,6 +507,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                 ),
               },
             ),
+
             ListTile(
               leading: _isChecked
                   ? Icon(Icons.book, color: _checkColor)
@@ -527,26 +529,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
               ),
               onTap: () => _openLinkDhamma(),
             ),
-            ListTile(
-              leading: _isChecked
-                  ? Icon(Icons.language, color: _checkColor)
-                  : Icon(Icons.language_outlined, color: _checkColor),
-              title: const Text(
-                'Buddhaword English',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              onTap: () => _openLinkEnglish(),
-            ),
-            // ListTile(
-            //   leading: _isChecked
-            //       ? Icon(Icons.calendar_month, color: _checkColor)
-            //       : Icon(Icons.calendar_month_outlined, color: _checkColor),
-            //   title: const Text(
-            //     'ປະຕິທິນທັມ',
-            //     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            //   ),
-            //   onTap: () => _openLinkCalendar(),
-            // ),
+
             ListTile(
               leading: _isChecked
                   ? Icon(Icons.video_library, color: _checkColor)
@@ -557,6 +540,29 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
               ),
               onTap: () => _openLinkArnuta(),
             ),
+
+            ListTile(
+              leading: _isChecked
+                  ? Icon(Icons.language, color: _checkColor)
+                  : Icon(Icons.language_outlined, color: _checkColor),
+              title: const Text(
+                'Buddhaword English',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              onTap: () => _openLinkEnglish(),
+            ),
+
+            // ListTile(
+            //   leading: _isChecked
+            //       ? Icon(Icons.calendar_month, color: _checkColor)
+            //       : Icon(Icons.calendar_month_outlined, color: _checkColor),
+            //   title: const Text(
+            //     'ປະຕິທິນທັມ',
+            //     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            //   ),
+            //   onTap: () => _openLinkCalendar(),
+            // ),
+
             ListTile(
               leading: _isChecked
                   ? Icon(Icons.message, color: _checkColor)

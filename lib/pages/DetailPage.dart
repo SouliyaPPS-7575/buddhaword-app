@@ -362,7 +362,7 @@ class _DetailPageState extends State<DetailPage> {
                       builder: (context, constraints) {
                         final bool isMobile = constraints.maxWidth < 600;
                         final double paddingValue = isMobile
-                            ? 6.0 // Smaller padding for mobile devices
+                            ? 0.0 // Smaller padding for mobile devices
                             : constraints.maxWidth *
                                 0.1; // 10% of the width as padding for larger screens
 
