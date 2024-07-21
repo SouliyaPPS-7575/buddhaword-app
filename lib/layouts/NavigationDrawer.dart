@@ -9,8 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../main.dart';
-import '../pages/ContactInfoPage.dart';
-import '../pages/FavoritePage.dart';
+import '../pages/Sutra/ContactInfoPage.dart';
+import '../pages/Sutra/FavoritePage.dart';
 
 class NavigationDrawer extends StatefulWidget {
   const NavigationDrawer({super.key});

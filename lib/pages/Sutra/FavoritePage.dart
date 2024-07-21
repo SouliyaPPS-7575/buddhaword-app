@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../layouts/NavigationDrawer.dart';
-import '../themes/ThemeProvider.dart';
+import '../../layouts/NavigationDrawer.dart';
+import '../../themes/ThemeProvider.dart';
 import 'BookReadingScreenPage.dart';
 import 'DetailPage.dart';
 import 'SearchPage.dart';

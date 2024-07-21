@@ -13,8 +13,8 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../layouts/NavigationDrawer.dart';
-import '../themes/ThemeProvider.dart';
+import '../../layouts/NavigationDrawer.dart';
+import '../../themes/ThemeProvider.dart';
 import 'DetailPage.dart';
 import 'SearchPage.dart';
 
@@ -576,7 +576,7 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
     final currentRoute =
         'https://buddha-nature.web.app/#/details/${widget.filteredData[_currentPageIndex][0]}';
 
-    final shareText = '$currentTitle\n\n $currentRoute';
+    final shareText = '$currentTitle\n $currentRoute';
 
     Share.share(shareText, subject: currentTitle);
   }

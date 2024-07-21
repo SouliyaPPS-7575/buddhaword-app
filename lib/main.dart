@@ -13,10 +13,10 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'layouts/NavigationDrawer.dart';
-import 'pages/BookReadingScreenPage.dart';
-import 'pages/CategoryListPage.dart';
-import 'pages/DetailPage.dart';
-import 'pages/RandomImagePage.dart';
+import 'pages/Sutra/BookReadingScreenPage.dart';
+import 'pages/Sutra/CategoryListPage.dart';
+import 'pages/Sutra/DetailPage.dart';
+import 'pages/Sutra/RandomImagePage.dart';
 import 'themes/ThemeProvider.dart';
 
 void main() {

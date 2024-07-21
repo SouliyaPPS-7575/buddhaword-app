@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../layouts/NavigationDrawer.dart';
-import '../themes/ThemeProvider.dart';
+import '../../layouts/NavigationDrawer.dart';
+import '../../themes/ThemeProvider.dart';
 import 'BookReadingScreenPage.dart';
 import 'DetailPage.dart';
 

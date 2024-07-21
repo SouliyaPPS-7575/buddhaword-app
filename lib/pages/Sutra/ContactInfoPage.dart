@@ -5,8 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../layouts/NavigationDrawer.dart';
-import '../themes/ThemeProvider.dart';
+import '../../layouts/NavigationDrawer.dart';
+import '../../themes/ThemeProvider.dart';
 
 class ContactInfoPage extends StatelessWidget {
   const ContactInfoPage({Key? key});

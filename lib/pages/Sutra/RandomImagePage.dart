@@ -1,4 +1,4 @@
-// ignore_for_file: file_names
+// ignore_for_file: file_names, prefer_const_constructors
 
 import 'dart:math';
 
@@ -54,11 +54,37 @@ class RandomImagePage extends StatelessWidget {
             double imageWidth = screenWidth;
             double imageHeight = screenHeight;
 
-            return Image.asset(
-              imagePath,
-              width: imageWidth,
-              height: imageHeight,
-              fit: BoxFit.cover, // Ensures the image covers the entire screen
+            return Stack(
+              children: [
+                Image.asset(
+                  imagePath,
+                  width: imageWidth,
+                  height: imageHeight,
+                  fit: BoxFit
+                      .cover, // Ensures the image covers the entire screen
+                ),
+                Positioned(
+                  bottom: 50, // Position the button at the bottom center
+                  left: screenWidth / 2 - 135,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Handle skip offline mode button press
+                      Navigator.pushReplacementNamed(context, '/');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.brown,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Skip Offline Mode (ໃຊ້ໂໝດອ໋ອບໄລນ໌)',
+                        style: TextStyle(fontSize: 15),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             );
           },
         ),

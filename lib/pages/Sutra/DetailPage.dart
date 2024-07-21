@@ -13,8 +13,8 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../layouts/NavigationDrawer.dart';
-import '../themes/ThemeProvider.dart';
+import '../../layouts/NavigationDrawer.dart';
+import '../../themes/ThemeProvider.dart';
 import 'SearchPage.dart';
 
 class DetailPage extends StatefulWidget {
@@ -485,7 +485,7 @@ class _DetailPageState extends State<DetailPage> {
 
   void _shareDetailLink() {
     final shareText =
-        '${widget.title}\n\n https://buddha-nature.web.app/#/details/${widget.id}';
+        '${widget.title}\n https://buddha-nature.web.app/#/details/${widget.id}';
 
     Share.share(shareText, subject: widget.title);
   }
