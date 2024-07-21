@@ -4,6 +4,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../main.dart';
+
 class RandomImagePage extends StatelessWidget {
   // Generate a random key for each instance to ensure it rebuilds
   final Key randomKey = ValueKey(Random().nextInt(10000));
@@ -68,8 +70,13 @@ class RandomImagePage extends StatelessWidget {
                   left: screenWidth / 2 - 135,
                   child: ElevatedButton(
                     onPressed: () {
-                      // Handle skip offline mode button press
-                      Navigator.pushReplacementNamed(context, '/');
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (context) => MyHomePage(
+                            title: 'ພຣະສູດ',
+                          ),
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.brown,
