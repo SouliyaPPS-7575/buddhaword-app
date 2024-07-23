@@ -333,7 +333,7 @@ class _SearchPageState extends State<SearchPage> {
                     child: ListTile(
                       title: Padding(
                         padding: const EdgeInsets.only(
-                            top: 1.8), // Add top margin here
+                            top: 1.5), // Add top margin here
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
