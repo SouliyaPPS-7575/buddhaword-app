@@ -333,25 +333,59 @@ class _SearchPageState extends State<SearchPage> {
                     child: ListTile(
                       title: Padding(
                         padding: const EdgeInsets.only(
-                            top: 2.3), // Add top margin here
+                            top: 1.8), // Add top margin here
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             if (audio != '/')
-                              CircleAvatar(
-                                radius: 20,
-                                child: IconButton(
-                                  icon: Icon(
-                                    _currentlyPlayingIndex == index &&
-                                            _isPlaying
-                                        ? Icons.pause
-                                        : Icons.play_arrow,
+                             CircleAvatar(
+                                radius:
+                                    22, // Smaller radius for a smaller button
+                                backgroundColor: Colors
+                                    .transparent, // Transparent background for CircleAvatar
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.brown.shade600,
+                                        Colors.brown.shade500,
+                                        Colors.brown.shade400,
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.brown
+                                            .withOpacity(0.5), // Shadow color
+                                        spreadRadius: 2,
+                                        blurRadius: 4,
+                                        offset: Offset(2, 2), // Shadow position
+                                      ),
+                                      BoxShadow(
+                                        color: Colors.white.withOpacity(
+                                            0.8), // Inner shadow for 3D effect
+                                        spreadRadius: 2,
+                                        blurRadius: 4,
+                                        offset: Offset(-2, -2),
+                                      ),
+                                    ],
                                   ),
-                                  iconSize: 25,
-                                  onPressed: () async {
-                                    await _playPauseAudio(index, audio);
-                                  },
+                                  child: IconButton(
+                                    icon: Icon(
+                                      _currentlyPlayingIndex == index &&
+                                              _isPlaying
+                                          ? Icons.pause
+                                          : Icons.play_arrow,
+                                      color: Colors.white, // Icon color
+                                    ),
+                                    iconSize: 20, // Smaller icon size
+                                    onPressed: () async {
+                                      await _playPauseAudio(index, audio);
+                                    },
+                                  ),
                                 ),
                               ),
                             SizedBox(

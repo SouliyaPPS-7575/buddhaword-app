@@ -1,4 +1,4 @@
-// ignore_for_file: depend_on_referenced_packages, file_names, use_key_in_widget_constructors, library_private_types_in_public_api, unrelated_type_equality_checks
+// ignore_for_file: depend_on_referenced_packages, file_names, use_key_in_widget_constructors, library_private_types_in_public_api, unrelated_type_equality_checks, prefer_const_constructors
 
 import 'dart:async';
 import 'dart:convert';
@@ -223,8 +223,8 @@ class _DetailPageState extends State<DetailPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'ພຣະສູດ & ສຽງ',
-          style: TextStyle(fontSize: 18), // Adjust the font size as needed
+          'ພຣະສູດ',
+          style: TextStyle(fontSize: 16), // Adjust the font size as needed
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -315,12 +315,45 @@ class _DetailPageState extends State<DetailPage> {
                   if (widget.audio != '/' && hasInternet)
                     Center(
                       child: CircleAvatar(
-                        radius: 25,
-                        child: IconButton(
-                          icon:
-                              Icon(isPlaying ? Icons.pause : Icons.play_arrow),
-                          iconSize: 30,
-                          onPressed: _playPauseAudio,
+                        radius: 22, // Smaller radius for a smaller button
+                        backgroundColor: Colors
+                            .transparent, // Transparent background for CircleAvatar
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.brown.shade600,
+                                Colors.brown.shade500,
+                                Colors.brown.shade400,
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.brown
+                                    .withOpacity(0.5), // Shadow color
+                                spreadRadius: 2,
+                                blurRadius: 4,
+                                offset: Offset(2, 2), // Shadow position
+                              ),
+                              BoxShadow(
+                                color: Colors.white.withOpacity(
+                                    0.8), // Inner shadow for 3D effect
+                                spreadRadius: 2,
+                                blurRadius: 4,
+                                offset: Offset(-2, -2),
+                              ),
+                            ],
+                          ),
+                          child: IconButton(
+                            icon: Icon(
+                                isPlaying ? Icons.pause : Icons.play_arrow),
+                            color: Colors.white, // Icon color
+                            iconSize: 25,
+                            onPressed: _playPauseAudio,
+                          ),
                         ),
                       ),
                     ),
