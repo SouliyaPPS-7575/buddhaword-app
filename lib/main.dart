@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, use_key_in_widget_constructors, depend_on_referenced_packages, use_build_context_synchronously, unrelated_type_equality_checks
+// ignore_for_file: library_private_types_in_public_api, use_key_in_widget_constructors, depend_on_referenced_packages, use_build_context_synchronously, unrelated_type_equality_checks, prefer_const_constructors, unnecessary_null_comparison
 
 import 'dart:async';
 import 'dart:convert';
@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:just_audio/just_audio.dart';
 
 import 'layouts/NavigationDrawer.dart';
 import 'pages/Sutra/BookReadingScreenPage.dart';
@@ -90,10 +91,22 @@ class _MyHomePageState extends State<MyHomePage> {
   bool hasInternet =
       Connectivity().checkConnectivity() != ConnectivityResult.none;
 
+  int? _currentlyPlayingIndex;
+  bool _isPlaying = false;
+  Duration _duration = Duration.zero;
+  Duration _position = Duration.zero;
+  String? _currentUrl;
+
+  final AudioPlayer _player = AudioPlayer();
+
+  StreamSubscription<PlayerState>? _playerStateSubscription;
+  StreamSubscription<Duration?>? _durationSubscription;
+  StreamSubscription<Duration>? _positionSubscription;
+
   @override
   void initState() {
     super.initState();
-    if (title == 'ພຣະສູດ') {
+    if (title == 'ພຣະສູດ & ສຽງ') {
       fetchData(_searchTerm);
     } else {
       fetchDataFromAPI(_searchTerm);
@@ -117,7 +130,7 @@ class _MyHomePageState extends State<MyHomePage> {
         updateData(searchTerm); // Update data here
       }
     }
-    
+
     try {
       final response = await http.get(Uri.parse(
           'https://sheets.googleapis.com/v4/spreadsheets/1mKtgmZ_Is4e6P3P5lvOwIplqx7VQ3amicgienGN9zwA/values/Sheet1!1:1000000?key=AIzaSyDFjIl-SEHUsgK0sjMm7x0awpf8tTEPQjs'));
@@ -230,9 +243,90 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Future<void> _setupAudio(int index, String audio) async {
+    try {
+      if (audio != null && audio != '/' && audio != _currentUrl) {
+        await _player.setUrl(audio);
+        _currentUrl = audio;
+
+        _playerStateSubscription?.cancel();
+        _durationSubscription?.cancel();
+        _positionSubscription?.cancel();
+
+        _playerStateSubscription =
+            _player.playerStateStream.listen((playerState) {
+          setState(() {
+            _isPlaying = playerState.playing;
+            if (playerState.processingState == ProcessingState.completed) {
+              // Automatically play the next audio when current audio finishes
+              if (index < _filteredData.length - 1) {
+                final nextAudio = _filteredData[index + 1][5].toString();
+                _playPauseAudio(index + 1, nextAudio);
+              }
+            }
+          });
+        });
+
+        _durationSubscription = _player.durationStream.listen((duration) {
+          setState(() {
+            _duration = duration ?? Duration.zero;
+          });
+        });
+
+        _positionSubscription = _player.positionStream.listen((position) {
+          setState(() {
+            _position = position;
+          });
+        });
+
+        setState(() {
+          _currentlyPlayingIndex = index;
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error initializing player: $e');
+      }
+    }
+  }
+
+  Future<void> _disposeAudioPlayer() async {
+    await _playerStateSubscription?.cancel();
+    await _durationSubscription?.cancel();
+    await _positionSubscription?.cancel();
+    await _player.pause();
+    _player.dispose();
+  }
+
+  Future<void> _playPauseAudio(int index, String audioUrl) async {
+    if (_currentlyPlayingIndex == index) {
+      if (_player.playing) {
+        await _player.pause();
+      } else {
+        await _player.play();
+      }
+    } else {
+      await _setupAudio(index, audioUrl); // Setup the new audio
+      await _player.play(); // Play the audio immediately after setup
+    }
+  }
+
+  void _seek(Duration position) {
+    _player.seek(position);
+  }
+
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+    return '$twoDigitMinutes:$twoDigitSeconds';
+  }
+
   @override
   void dispose() {
     _searchController.dispose();
+    _disposeAudioPlayer();
+
     super.dispose();
   }
 
@@ -392,9 +486,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 future: _checkAssetExists(
                                                     imageAsset),
                                                 builder: (context, snapshot) {
-                                                  if (snapshot
-                                                          .connectionState ==
-                                                      ConnectionState.waiting) {
+                                                  if (_filteredData.isEmpty) {
                                                     // Loading state
                                                     return const Center(
                                                         child:
@@ -469,16 +561,148 @@ class _MyHomePageState extends State<MyHomePage> {
                               final audio = rowData[5].toString();
 
                               return Card(
+                                elevation: 4,
+                                margin: EdgeInsets.symmetric(
+                                    vertical: 6, horizontal: 14),
                                 child: ListTile(
-                                  title: Text(
-                                    title,
-                                    style: const TextStyle(
-                                      fontSize:
-                                          18, // Adjust the font size as needed
-                                      fontWeight: FontWeight
-                                          .bold, // Make the title bold
+                                  title: Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 2.3), // Add top margin here
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        if (audio != '/')
+                                          CircleAvatar(
+                                            radius: 20,
+                                            child: IconButton(
+                                              icon: Icon(
+                                                _currentlyPlayingIndex ==
+                                                            index &&
+                                                        _isPlaying
+                                                    ? Icons.pause
+                                                    : Icons.play_arrow,
+                                              ),
+                                              iconSize: 25,
+                                              onPressed: () async {
+                                                await _playPauseAudio(
+                                                    index, audio);
+                                              },
+                                            ),
+                                          ),
+                                        SizedBox(
+                                            width:
+                                                10), // Space between the button and title
+                                        Expanded(
+                                          child: Text(
+                                            title,
+                                            style: const TextStyle(
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
+                                  subtitle: audio != '/'
+                                      ? Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            if (_currentlyPlayingIndex == index)
+                                              Column(
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      IconButton(
+                                                        icon: Icon(Icons
+                                                            .skip_previous),
+                                                        onPressed: () {
+                                                          if (index > 0) {
+                                                            final previousAudio =
+                                                                _filteredData[
+                                                                        index -
+                                                                            1][5]
+                                                                    .toString();
+                                                            _playPauseAudio(
+                                                                index - 1,
+                                                                previousAudio);
+                                                          }
+                                                        },
+                                                      ),
+                                                      Expanded(
+                                                        child: Slider(
+                                                          min: 0.0,
+                                                          max: _duration
+                                                              .inMilliseconds
+                                                              .toDouble(),
+                                                          value: _position
+                                                              .inMilliseconds
+                                                              .toDouble()
+                                                              .clamp(
+                                                                  0.0,
+                                                                  _duration
+                                                                      .inMilliseconds
+                                                                      .toDouble()),
+                                                          onChanged: (value) {
+                                                            _seek(Duration(
+                                                                milliseconds: value
+                                                                    .toInt()
+                                                                    .clamp(
+                                                                        0,
+                                                                        _duration
+                                                                            .inMilliseconds)));
+                                                          },
+                                                        ),
+                                                      ),
+                                                      IconButton(
+                                                        icon: Icon(
+                                                            Icons.skip_next),
+                                                        onPressed: () {
+                                                          if (index <
+                                                              _filteredData
+                                                                      .length -
+                                                                  1) {
+                                                            final nextAudio =
+                                                                _filteredData[
+                                                                        index +
+                                                                            1][5]
+                                                                    .toString();
+                                                            _playPauseAudio(
+                                                                index + 1,
+                                                                nextAudio);
+                                                          }
+                                                        },
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                            .symmetric(
+                                                        horizontal: 14.0),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(_formatDuration(
+                                                            _position)),
+                                                        Text(_formatDuration(
+                                                            _duration -
+                                                                _position)),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                          ],
+                                        )
+                                      : null,
                                   onTap: () {
                                     Navigator.push(
                                       context,

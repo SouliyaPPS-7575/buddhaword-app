@@ -477,20 +477,20 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                   ? Icon(Icons.library_books, color: _checkColor)
                   : Icon(Icons.library_books_outlined, color: _checkColor),
               title: const Text(
-                'ພຣະສູດ',
+                'ພຣະສູດ & ສຽງ',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               onTap: () => {
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
                     builder: (context) => MyHomePage(
-                      title: 'ພຣະສູດ',
+                      title: 'ພຣະສູດ & ສຽງ',
                     ),
                   ),
                 ),
               },
             ),
-            
+
             ListTile(
               leading: _isChecked
                   ? Icon(Icons.favorite, color: _checkColor)

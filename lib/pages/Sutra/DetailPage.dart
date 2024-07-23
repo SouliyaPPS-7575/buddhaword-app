@@ -223,7 +223,7 @@ class _DetailPageState extends State<DetailPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'ພຣະສູດ',
+          'ພຣະສູດ & ສຽງ',
           style: TextStyle(fontSize: 18), // Adjust the font size as needed
         ),
         leading: IconButton(

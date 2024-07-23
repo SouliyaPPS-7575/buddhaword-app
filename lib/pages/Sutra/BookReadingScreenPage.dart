@@ -285,7 +285,7 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'ພຣະສູດ',
+          'ພຣະສູດ & ສຽງ',
           style: TextStyle(fontSize: 17), // Adjust the font size as needed
         ),
         leading: IconButton(

@@ -73,7 +73,7 @@ class RandomImagePage extends StatelessWidget {
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
                           builder: (context) => MyHomePage(
-                            title: 'ພຣະສູດ',
+                            title: 'ພຣະສູດ & ສຽງ',
                           ),
                         ),
                       );
