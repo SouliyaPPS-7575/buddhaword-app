@@ -323,29 +323,13 @@ class _DetailPageState extends State<DetailPage> {
                             gradient: LinearGradient(
                               colors: [
                                 Colors.brown.shade600,
-                                Colors.brown.shade500,
-                                Colors.brown.shade400,
+                                Colors.brown.shade600,
+                                Colors.brown.shade600,
                               ],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
                             shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.brown
-                                    .withOpacity(0.5), // Shadow color
-                                spreadRadius: 2,
-                                blurRadius: 4,
-                                offset: Offset(2, 2), // Shadow position
-                              ),
-                              BoxShadow(
-                                color: Colors.white.withOpacity(
-                                    0.8), // Inner shadow for 3D effect
-                                spreadRadius: 2,
-                                blurRadius: 4,
-                                offset: Offset(-2, -2),
-                              ),
-                            ],
                           ),
                           child: IconButton(
                             icon: Icon(
