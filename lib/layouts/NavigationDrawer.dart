@@ -478,7 +478,11 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                   : Icon(Icons.library_books_outlined, color: _checkColor),
               title: const Text(
                 'ພຣະສູດ & ສຽງ',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
               ),
               onTap: () => {
                 Navigator.of(context).pushReplacement(
@@ -497,7 +501,11 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                   : Icon(Icons.favorite, color: _checkColor),
               title: const Text(
                 'ພຣະສູດທີຖືກໃຈ',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
               ),
               onTap: () => {
                 Navigator.of(context).pushReplacement(
@@ -514,7 +522,11 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                   : Icon(Icons.book_outlined, color: _checkColor),
               title: const Text(
                 'ປື້ມ & ເເຜນຜັງ',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
               ),
               onTap: () => _openLinkBooks(),
             ),
@@ -525,7 +537,11 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                   : Icon(Icons.sunny, color: _checkColor),
               title: const Text(
                 'ພຣະທັມ',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
               ),
               onTap: () => _openLinkDhamma(),
             ),
@@ -536,7 +552,10 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                   : Icon(Icons.video_collection_outlined, color: _checkColor),
               title: const Text(
                 'ວີດີໂອ VDO',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5),
               ),
               onTap: () => _openLinkArnuta(),
             ),
@@ -547,7 +566,10 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                   : Icon(Icons.language_outlined, color: _checkColor),
               title: const Text(
                 'Buddhaword English',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5),
               ),
               onTap: () => _openLinkEnglish(),
             ),
@@ -558,7 +580,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
             //       : Icon(Icons.calendar_month_outlined, color: _checkColor),
             //   title: const Text(
             //     'ປະຕິທິນທັມ',
-            //     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            //     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: 0.5),
             //   ),
             //   onTap: () => _openLinkCalendar(),
             // ),
@@ -569,7 +591,10 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                   : Icon(Icons.message_outlined, color: _checkColor),
               title: const Text(
                 'ສົນທະນາທັມ',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5),
               ),
               onTap: () => _openLinkChat(),
             ),
@@ -579,7 +604,10 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                   : Icon(Icons.contact_page_outlined, color: _checkColor),
               title: const Text(
                 'ຂໍ້ມູນຕິດຕໍ່',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5),
               ),
               onTap: () => {
                 Navigator.of(context).pushReplacement(
@@ -596,7 +624,10 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                   : Icon(Icons.update_outlined, color: _checkColor),
               title: const Text(
                 'ອັບເດດຂໍ້ມູນໃໝ່',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5),
               ),
               onTap: _handleTap,
             ),
@@ -606,19 +637,22 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                   color: const Color.fromARGB(241, 179, 93, 78)),
               title: Text(
                 'ໝວດສຽງ',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5),
               ),
               children: [
                 ExpansionTile(
                   title: Text(
                     'ທັມໃນເບື້ອງຕົ້ນ',
-                    style: TextStyle(fontSize: 18),
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                   ),
                   children: [
                     ListTile(
                       title: Text(
                         'ຄະຣາວາດຊັ້ນເລີດ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openSoundKarawatSunlert(),
                     ),
@@ -630,7 +664,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ListTile(
                       title: Text(
                         'ສາທະຍາຍທັມ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openLinkSathayaiytham(),
                     ),
@@ -642,7 +676,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ListTile(
                       title: Text(
                         'ທານ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openLinkTarn(),
                     ),
@@ -654,7 +688,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ListTile(
                       title: Text(
                         'ປະຖົມທັມ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openPathomtham(),
                     ),
@@ -666,7 +700,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ListTile(
                       title: Text(
                         'ຄູ່ມືໂສດາບັນ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openSodabun(),
                     ),
@@ -678,7 +712,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ListTile(
                       title: Text(
                         'ພຸດທະວະຈະນະ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openBuddhawajana(),
                     ),
@@ -692,13 +726,13 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                 ExpansionTile(
                   title: Text(
                     'ທັມໃນທ່າມກາງ',
-                    style: TextStyle(fontSize: 18),
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                   ),
                   children: [
                     ListTile(
                       title: Text(
                         'ກໍາ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openurlKaekam(),
                     ),
@@ -710,7 +744,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ListTile(
                       title: Text(
                         'ສະຕິປັຕຖານ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openurlStiputarn_4(),
                     ),
@@ -722,7 +756,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ListTile(
                       title: Text(
                         'ອານາປານະສະຕິ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openurlRnapa(),
                     ),
@@ -734,7 +768,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ListTile(
                       title: Text(
                         'ຂໍ້ປະຕິບັດວິ​ທີ​ທີ່​ງ່າຍ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openurlKorpatibutngaiy(),
                     ),
@@ -746,7 +780,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ListTile(
                       title: Text(
                         'ອິນຊີສັງວອນ​',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openurlInseesungvone(),
                     ),
@@ -758,7 +792,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ListTile(
                       title: Text(
                         'ຕາມຮອຍທັມ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openurlTarmhoytham(),
                     ),
@@ -770,7 +804,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ListTile(
                       title: Text(
                         'ກ້າວຍ່າງຢ່າງພຸດທະ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openurlKaoyangyabuddha(),
                     ),
@@ -782,7 +816,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ListTile(
                       title: Text(
                         'ຕາຖາຄົດ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openurlTatarkod(),
                     ),
@@ -794,7 +828,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ListTile(
                       title: Text(
                         'ປະຕິບັດສະມາທະ&ວິປັດຊະນາ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openurlSmataviputsna(),
                     ),
@@ -806,7 +840,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ListTile(
                       title: Text(
                         'ພົບພູມ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openurlpobpoum(),
                     ),
@@ -818,7 +852,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ListTile(
                       title: Text(
                         'ເດຍລະສານວິຊາ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openurldaylasarnvisa(),
                     ),
@@ -830,7 +864,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ListTile(
                       title: Text(
                         'ສະກະທາຄາມີ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openurlskatakarmi(),
                     ),
@@ -844,13 +878,13 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                 ExpansionTile(
                   title: Text(
                     'ທັມໃນທີສຸດ',
-                    style: TextStyle(fontSize: 18),
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                   ),
                   children: [
                     ListTile(
                       title: Text(
                         'ຈິດ ມະໂນ ວິນຍານ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openurljitmanovinyarn(),
                     ),
@@ -862,7 +896,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ListTile(
                       title: Text(
                         'ສັຕ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openurlzut(),
                     ),
@@ -874,7 +908,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ListTile(
                       title: Text(
                         'ອະນາຄາມີ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openurlRnakarmi(),
                     ),
@@ -886,7 +920,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ListTile(
                       title: Text(
                         'ສັງໂຢດ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openurlSangyort(),
                     ),
@@ -898,7 +932,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ListTile(
                       title: Text(
                         'ອະຣິຍະສັດຈາກພຣະໂອດ ພາກຕົ້ນ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openurlpartton(),
                     ),
@@ -910,7 +944,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ListTile(
                       title: Text(
                         'ອະຣິຍະສັດຈາກພຣະໂອດ ພາກປາຍ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openurlpartpaiy(),
                     ),
@@ -922,7 +956,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ListTile(
                       title: Text(
                         'ພຸດທະປະຫວັດຈາກພຣະໂອດ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openurlphutapawat(),
                     ),
@@ -934,7 +968,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ListTile(
                       title: Text(
                         'ປະຕິຈະສະມຸບາດຈາກພຣະໂອດ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openurlpatijasmobard(),
                     ),
@@ -946,7 +980,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ListTile(
                       title: Text(
                         'ລວມພຸດທະວະຈະນະບັນລະຍາຍ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openurlluambunyaiy(),
                     ),
@@ -958,7 +992,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ListTile(
                       title: Text(
                         'ລວມພຸດທະວະຈະນະໝວດອື່ນໆ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openurletc(),
                     ),
@@ -970,7 +1004,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     ListTile(
                       title: Text(
                         'ລາຍການ FAQ ພຸດທະວະຈະນະຈາກພຣະໂອດ',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                       ),
                       onTap: () => _openurlFAQ(),
                     ),

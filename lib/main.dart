@@ -350,7 +350,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ທັມມະ'),
+        title: const Text(
+          'ທັມມະ',
+          style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
+        ),
         actions: [
           _filteredData.isNotEmpty
               ? IconButton(
@@ -541,10 +544,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                                   child: Text(
                                                     category,
                                                     style: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        letterSpacing: 0.5),
                                                     maxLines: 1,
                                                     overflow:
                                                         TextOverflow.ellipsis,
@@ -597,9 +600,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                             child: Text(
                                               title,
                                               style: const TextStyle(
-                                                fontSize: 17,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                                  fontSize: 17,
+                                                  fontWeight: FontWeight.bold,
+                                                  letterSpacing: 0.5),
                                             ),
                                           ),
                                           SizedBox(

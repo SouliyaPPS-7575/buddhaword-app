@@ -12,6 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../layouts/NavigationDrawer.dart';
 import '../../themes/ThemeProvider.dart';
+import 'BookReadingScreenPage.dart';
 import 'DetailPage.dart';
 
 class SearchPage extends StatefulWidget {
@@ -183,7 +184,10 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ຄົ້ນຫາ'),
+        title: const Text(
+          'ຄົ້ນຫາ',
+          style: TextStyle(letterSpacing: 0.5),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () {
@@ -229,7 +233,8 @@ class _SearchPageState extends State<SearchPage> {
                         child: TextField(
                           controller: _searchController,
                           focusNode: _focusNode,
-                          style: const TextStyle(fontSize: 17.0),
+                          style: const TextStyle(
+                              fontSize: 17.0, letterSpacing: 0.5),
                           decoration: InputDecoration(
                             hintText: 'ຄົ້ນຫາ...',
                             prefixIcon: const Icon(Icons.search),
@@ -272,9 +277,9 @@ class _SearchPageState extends State<SearchPage> {
                                           _selectedCategory, // Display selected category value
                                           textAlign: TextAlign.end,
                                           style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.grey[600],
-                                          ),
+                                              fontSize: 14,
+                                              color: Colors.grey[600],
+                                              letterSpacing: 0.5),
                                         ),
                                       ),
                                       IconButton(
@@ -362,9 +367,9 @@ class _SearchPageState extends State<SearchPage> {
                                 child: Text(
                                   title,
                                   style: const TextStyle(
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 0.5),
                                 ),
                               ),
                               SizedBox(
@@ -540,6 +545,24 @@ class _SearchPageState extends State<SearchPage> {
           ],
         ),
       ),
+      floatingActionButton: _filteredData.isNotEmpty
+          ? FloatingActionButton(
+              onPressed: () {
+                // Implement your action here, e.g., navigate to book reading screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BookReadingScreenPage(
+                      filteredData: _filteredData,
+                      onFavoriteChanged: () => setState(() {}),
+                    ),
+                  ),
+                );
+              },
+              tooltip: 'ອ່ານປຶ້ມ',
+              child: const Icon(Icons.auto_stories_outlined),
+            )
+          : null,
     );
   }
 }

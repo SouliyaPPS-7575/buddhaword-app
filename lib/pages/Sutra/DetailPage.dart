@@ -233,7 +233,10 @@ class _DetailPageState extends State<DetailPage> {
       appBar: AppBar(
         title: const Text(
           'ພຣະສູດ',
-          style: TextStyle(fontSize: 16), // Adjust the font size as needed
+          style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5), // Adjust the font size as needed
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -311,9 +314,9 @@ class _DetailPageState extends State<DetailPage> {
                   ),
                   showCursor: true,
                   style: const TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
-                  ),
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5),
                 ),
               ),
               const SizedBox(height: 10),
@@ -643,7 +646,7 @@ List<TextSpan> parseContent(String content) {
     } else {
       children.add(TextSpan(
         text: chunk,
-        style: const TextStyle(fontWeight: FontWeight.bold),
+        style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
       ));
     }
   }

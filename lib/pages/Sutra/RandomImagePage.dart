@@ -86,7 +86,7 @@ class RandomImagePage extends StatelessWidget {
                     child: Center(
                       child: Text(
                         'Skip Offline Mode (ໃຊ້ໂໝດອ໋ອບໄລນ໌)',
-                        style: TextStyle(fontSize: 15),
+                        style: TextStyle(fontSize: 15, letterSpacing: 0.5),
                       ),
                     ),
                   ),

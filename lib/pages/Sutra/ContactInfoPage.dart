@@ -15,7 +15,10 @@ class ContactInfoPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ຂໍ້​ມູນ​ຕິດ​ຕໍ່'),
+        title: const Text(
+          'ຂໍ້​ມູນ​ຕິດ​ຕໍ່',
+          style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () {
@@ -62,16 +65,16 @@ class ContactInfoPage extends StatelessWidget {
               const Text(
                 'ແອັບນີ້ແມ່ນແອັບຄຳສອນພຣະພຸດທະເຈົ້າ, ສ້າງຂື້ນເພື່ອເຜີຍແຜ່ໃຫ້ພວກເຮົາທັງຫຼາຍໄດ້ສຶກສາ ແລະ ປະຕິບັດຕາມ, ດັ່ງທີ່ພຣະຕະຖາຄົດກ່າວວ່າ "ທຳມະຍິ່ງເປີດເຜີຍຍິ່ງຮຸ່ງເຮືອງ" ເມື່ອໄດ້ສຶກສາ ແລະ ປະຕິບັດຕາມ ຈົນເຫັນທຳມະຊາດຕາມຄວາມເປັນຈິງ ກໍຈະຫຼຸດພົ້ນຈາກຄວາມທຸກທັງປວງ. "ທຳກໍດີ ວິໄນກໍດີ ທີ່ເຮົາສະແດງແລ້ວ ບັນຍັດໄວ້ດີແລ້ວ ທຳ ແລະ ວິໄນນັ້ນ ຈະເປັນສາດສະດາແທນຕໍ່ໄປ"',
                 style: TextStyle(
-                  fontSize: 20, // Adjusted font size
-                ),
+                    fontSize: 20, // Adjusted font size
+                    letterSpacing: 0.5),
               ),
               const SizedBox(height: 20),
               const Text(
                 'ຕິດ​ຕໍ່​ພວກ​ເຮົາ',
                 style: TextStyle(
-                  fontSize: 30, // Increased font size
-                  fontWeight: FontWeight.bold,
-                ),
+                    fontSize: 30, // Increased font size
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5),
               ),
               const SizedBox(height: 20),
               Row(
@@ -96,7 +99,7 @@ class ContactInfoPage extends StatelessWidget {
                     },
                     child: const Text(
                       '+8562078287509',
-                      style: TextStyle(fontSize: 20),
+                      style: TextStyle(fontSize: 20, letterSpacing: 0.5),
                     ),
                   ),
                 ],
@@ -124,7 +127,7 @@ class ContactInfoPage extends StatelessWidget {
                     },
                     child: const Text(
                       '+8562077801610',
-                      style: TextStyle(fontSize: 20),
+                      style: TextStyle(fontSize: 20, letterSpacing: 0.5),
                     ),
                   ),
                 ],
@@ -152,7 +155,7 @@ class ContactInfoPage extends StatelessWidget {
                     },
                     child: const Text(
                       'souliyappsdev@gmail.com',
-                      style: TextStyle(fontSize: 20),
+                      style: TextStyle(fontSize: 20, letterSpacing: 0.5),
                     ),
                   ),
                 ],
@@ -180,7 +183,7 @@ class ContactInfoPage extends StatelessWidget {
                     },
                     child: const Text(
                       'Katiya921@gmail.com',
-                      style: TextStyle(fontSize: 20),
+                      style: TextStyle(fontSize: 20, letterSpacing: 0.5),
                     ),
                   ),
                 ],
@@ -189,9 +192,9 @@ class ContactInfoPage extends StatelessWidget {
               const Text(
                 'Follow Us',
                 style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5),
               ),
               const SizedBox(height: 10),
               Row(
@@ -210,8 +213,9 @@ class ContactInfoPage extends StatelessWidget {
                           'Facebook',
                           style: TextStyle(
                               fontSize: 20,
-                              color: Colors
-                                  .blue), // Increased font size and changed color
+                              color: Colors.blue,
+                              letterSpacing:
+                                  0.5), // Increased font size and changed color
                         ),
                       ],
                     ),

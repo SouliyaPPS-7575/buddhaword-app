@@ -164,7 +164,11 @@ class _CategoryListPageState extends State<CategoryListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.selectedCategory),
+        title: Text(
+          widget.selectedCategory,
+          style: TextStyle(
+              fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () {
@@ -203,7 +207,7 @@ class _CategoryListPageState extends State<CategoryListPage> {
             padding: const EdgeInsets.all(2.0),
             child: TextField(
               controller: _searchController,
-              style: const TextStyle(fontSize: 17.0),
+              style: const TextStyle(fontSize: 17.0, letterSpacing: 0.5),
               decoration: InputDecoration(
                 hintText: 'ຄົ້ນຫາພຣະສູດ...',
                 prefixIcon: const Icon(Icons.search),
@@ -262,9 +266,9 @@ class _CategoryListPageState extends State<CategoryListPage> {
                               child: Text(
                                 title,
                                 style: const TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 0.5),
                               ),
                             ),
                             SizedBox(

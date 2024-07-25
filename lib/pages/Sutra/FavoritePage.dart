@@ -89,7 +89,10 @@ class _FavoritePageState extends State<FavoritePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("ລຶບລາຍການທີ່ຖືກໃຈທັງໝົດບໍ?"),
+          title: const Text(
+            "ລຶບລາຍການທີ່ຖືກໃຈທັງໝົດບໍ?",
+            style: TextStyle(letterSpacing: 0.5),
+          ),
           content: const Text("ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບລາຍການທີ່ຖືກໃຈທັງໝົດ?"),
           actions: <Widget>[
             TextButton(
@@ -219,7 +222,10 @@ class _FavoritePageState extends State<FavoritePage> {
       appBar: AppBar(
         title: const Text(
           'ພຣະສູດຖືກໃຈ',
-          style: TextStyle(fontSize: 18), // Adjust the font size as needed
+          style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5), // Adjust the font size as needed
         ),
         actions: _favorites
                 .isNotEmpty // Show delete button only if favorites is not empty
@@ -298,7 +304,8 @@ class _FavoritePageState extends State<FavoritePage> {
                           flex: 2,
                           child: TextField(
                             controller: _searchController,
-                            style: const TextStyle(fontSize: 17.0),
+                            style: const TextStyle(
+                                fontSize: 17.0, letterSpacing: 0.5),
                             decoration: InputDecoration(
                               hintText: 'ຄົ້ນຫາ...',
                               prefixIcon: const Icon(Icons.search),
@@ -364,9 +371,9 @@ class _FavoritePageState extends State<FavoritePage> {
                                       child: Text(
                                         title,
                                         style: const TextStyle(
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 0.5),
                                       ),
                                     ),
                                     SizedBox(

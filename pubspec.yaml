@@ -60,7 +60,6 @@ dependencies:
   app_upgrade_flutter_sdk: ^2.0.2
   upgrader: ^6.5.0
   share_plus: ^6.3.4
-  audioplayers: ^4.1.0
   just_audio: ^0.9.37
 
 flutter_icons:
