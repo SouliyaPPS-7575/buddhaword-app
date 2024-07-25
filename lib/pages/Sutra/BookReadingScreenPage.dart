@@ -1,9 +1,9 @@
-// ignore_for_file: file_names, avoid_web_libraries_in_flutter, unnecessary_null_comparison, depend_on_referenced_packages, unrelated_type_equality_checks
+// ignore_for_file: file_names, avoid_web_libraries_in_flutter, unnecessary_null_comparison, depend_on_referenced_packages, unrelated_type_equality_checks, prefer_const_constructors, deprecated_member_use
 
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:audioplayers/audioplayers.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +12,7 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../layouts/NavigationDrawer.dart';
 import '../../themes/ThemeProvider.dart';
@@ -35,11 +36,6 @@ class BookReadingScreenPage extends StatefulWidget {
 }
 
 class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
-  final audioPlayer = AudioPlayer();
-  bool isPlaying = false;
-  Duration duration = Duration.zero;
-  Duration position = Duration.zero;
-
   double _fontSize = 18.0;
   double get fontSize => _fontSize;
 
@@ -48,6 +44,15 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
 
   // check if the item is favorited on local storage data or not
   bool _isFavorited = false;
+
+  final AudioPlayer _player = AudioPlayer();
+  bool _isPlaying = false;
+  Duration _duration = Duration.zero;
+  Duration _position = Duration.zero;
+  // Add the repeat functionality
+  bool _isRepeating = false;
+  int? _currentlyPlayingIndex;
+  String? _currentUrl;
 
   StreamSubscription<PlayerState>? _playerStateSubscription;
   StreamSubscription<Duration?>? _durationSubscription;
@@ -59,27 +64,23 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
   @override
   void initState() {
     super.initState();
+
+    _initialize().then((_) {
+      _initAudioPlayer();
+    });
+
     _currentPageIndex = widget.initialPageIndex;
     _pageController = PageController(initialPage: widget.initialPageIndex);
     _pageController.addListener(() {
       _onPageChanged(_pageController.page!.toInt());
     });
 
-    _initialize().then((_) async {
-      if (hasInternet && getCurrentAudio() != '/') {
-        _initializePlayer();
-      }
-    });
+    _checkInternetConnectivity();
   }
 
   Future<void> _initialize() async {
     await _loadFavoriteState();
     await _loadFontSizeFromSharedPreferences();
-  }
-
-  void _disposeAudioPlayer() {
-    // clear state playing audio
-    audioPlayer.stop();
   }
 
   String getCurrentID() {
@@ -102,42 +103,90 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
     return widget.filteredData[_currentPageIndex][5].toString();
   }
 
-  void _initializePlayer() async {
+  Future<void> _checkInternetConnectivity() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    setState(() {
+      hasInternet = connectivityResult != ConnectivityResult.none;
+    });
+    if (hasInternet && getCurrentAudio() != '/') {
+      _initAudioPlayer();
+    }
+  }
+
+  Future<void> _initAudioPlayer() async {
     try {
-      String audioUrl = getCurrentAudio();
-      if (audioUrl != '/') {
-        await audioPlayer.setSourceUrl(audioUrl);
+      String url = getCurrentAudio();
+      if (url != null && url != '/') {
+        await _player.setUrl(url);
 
         _playerStateSubscription =
-            audioPlayer.onPlayerStateChanged.listen((playerState) {
-          if (mounted) {
-            setState(() {
-              isPlaying = playerState == PlayerState.playing;
-            });
-          }
+            _player.playerStateStream.listen((playerState) {
+          setState(() {
+            _isPlaying = playerState.playing;
+          });
         });
 
-        _durationSubscription =
-            audioPlayer.onDurationChanged.listen((newDuration) {
-          if (mounted) {
-            setState(() {
-              duration = newDuration;
-            });
-          }
+        _durationSubscription = _player.durationStream.listen((duration) {
+          setState(() {
+            _duration = duration ?? Duration.zero;
+          });
         });
 
-        _positionSubscription =
-            audioPlayer.onPositionChanged.listen((newPosition) {
-          if (mounted) {
-            setState(() {
-              position = newPosition;
-            });
-          }
+        _positionSubscription = _player.positionStream.listen((position) {
+          setState(() {
+            _position = position;
+          });
         });
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Error initializing audio player: $e');
+        print('Error initializing player: $e');
+      }
+    }
+  }
+
+  Future<void> _setupAudio(int index, String audio) async {
+    try {
+      if (audio != null && audio != '/' && audio != _currentUrl) {
+        await _player.setUrl(audio);
+        _currentUrl = audio;
+
+        _playerStateSubscription?.cancel();
+        _durationSubscription?.cancel();
+        _positionSubscription?.cancel();
+
+        _playerStateSubscription =
+            _player.playerStateStream.listen((playerState) {
+          setState(() {
+            _isPlaying = playerState.playing;
+            if (playerState.processingState == ProcessingState.completed) {
+              if (index < getCurrentAudio().length - 1) {
+                final nextAudio = widget.filteredData[index + 1][5].toString();
+                _playPauseAudio(index + 1, nextAudio);
+              }
+            }
+          });
+        });
+
+        _durationSubscription = _player.durationStream.listen((duration) {
+          setState(() {
+            _duration = duration ?? Duration.zero;
+          });
+        });
+
+        _positionSubscription = _player.positionStream.listen((position) {
+          setState(() {
+            _position = position;
+          });
+        });
+
+        setState(() {
+          _currentlyPlayingIndex = index;
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error setting up audio: $e');
       }
     }
   }
@@ -145,46 +194,45 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
   @override
   void dispose() {
     _disposeAudioPlayer();
-
-    // Cancel subscriptions here to avoid LateInitializationError
-    _playerStateSubscription?.cancel();
-    _durationSubscription?.cancel();
-    _positionSubscription?.cancel();
-
     super.dispose();
   }
 
-  Future<void> _playPauseAudio() async {
-    if (isPlaying) {
-      await audioPlayer.pause();
+  void _disposeAudioPlayer() {
+    _playerStateSubscription?.cancel();
+    _durationSubscription?.cancel();
+    _positionSubscription?.cancel();
+    _player.pause();
+  }
+
+  void _playPause() {
+    if (_isPlaying) {
+      _player.pause();
     } else {
-      String? url = getCurrentAudio();
-      if (url != null && url.isNotEmpty) {
-        try {
-          await audioPlayer.play(UrlSource(url));
-          setState(() {
-            isPlaying = true;
-          });
-        } catch (e) {
-          if (kDebugMode) {
-            print('Error playing audio: $e');
-          }
-        }
-      }
+      _player.play(); // Start playing the audio
     }
   }
 
-  String formatTime(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    final hours = twoDigits(duration.inHours);
-    final minutes = twoDigits(duration.inMinutes.remainder(60));
-    final seconds = twoDigits(duration.inSeconds.remainder(60));
+  void _seek(Duration position) {
+    _player.seek(position);
+  }
 
-    return [
-      if (duration.inHours > 0) hours,
-      minutes,
-      seconds,
-    ].join(':');
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+    return '$twoDigitMinutes:$twoDigitSeconds';
+  }
+
+  Future<void> _playPauseAudio(int index, String audioUrl) async {
+    if (_currentlyPlayingIndex == index) {
+      if (_player.playing) {
+        await _player.pause();
+      } else {
+        await _player.play();
+      }
+    } else {
+      await _setupAudio(index, audioUrl);
+    }
   }
 
   void _onPageChanged(int index) {
@@ -193,7 +241,24 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
     });
     _loadFavoriteState();
 
+    _updateAudioPlayer();
+
+    if (hasInternet && getCurrentAudio() != '/') {
+      _setupAudio(index, getCurrentAudio());
+    }
+  }
+
+  Future<void> _updateAudioPlayer() async {
     _disposeAudioPlayer(); // Dispose the current audio player
+    await _initAudioPlayer(); // Re-initialize audio player on page change
+  }
+
+  void _downloadAudio(String urlAudio) async {
+    if (await canLaunch(urlAudio)) {
+      await launch(urlAudio);
+    } else {
+      throw 'Could not launch $urlAudio';
+    }
   }
 
   Future<void> _loadFavoriteState() async {
@@ -285,8 +350,8 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'ພຣະສູດ & ສຽງ',
-          style: TextStyle(fontSize: 17), // Adjust the font size as needed
+          'ພຣະສູດ',
+          style: TextStyle(fontSize: 16), // Adjust the font size as needed
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -388,54 +453,225 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
                   Column(
                     children: [
                       if (getCurrentAudio() != '/' && hasInternet)
-                        Center(
-                          child: CircleAvatar(
-                            radius: 25,
-                            child: IconButton(
-                              icon: Icon(
-                                  isPlaying ? Icons.pause : Icons.play_arrow),
-                              iconSize: 30,
-                              onPressed: _playPauseAudio,
-                            ),
-                          ),
-                        ),
-                      if (isPlaying &&
-                          position > Duration.zero &&
-                          hasInternet &&
-                          getCurrentAudio() != '/')
-                        Slider(
-                          min: 0.0,
-                          max: duration.inSeconds.toDouble(),
-                          value: position.inSeconds.toDouble(),
-                          onChanged: (value) async {
-                            final position = Duration(seconds: value.toInt());
-                            await audioPlayer.seek(position);
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final bool isMobile = constraints.maxWidth < 600;
+                            final double paddingValue = isMobile
+                                ? 8.0 // Smaller padding for mobile devices
+                                : constraints.maxWidth *
+                                    0.1; // 10% of the width as padding for larger screens
 
-                            await audioPlayer.resume();
-
-                            setState(() {
-                              this.position = position;
-                            });
+                            return Center(
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  minWidth: isMobile
+                                      ? constraints.maxWidth
+                                      : constraints.maxWidth * 0.8,
+                                  maxWidth: constraints.maxWidth,
+                                ),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: isMobile ? 0 : paddingValue,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          IconButton(
+                                            icon: Icon(_isRepeating
+                                                ? Icons.repeat_one
+                                                : Icons.repeat),
+                                            color: Colors.brown, // Icon color
+                                            iconSize: 25,
+                                            onPressed: () {
+                                              setState(() {
+                                                _isRepeating = !_isRepeating;
+                                                _player.setLoopMode(_isRepeating
+                                                    ? LoopMode.one
+                                                    : LoopMode.off);
+                                              });
+                                            },
+                                          ),
+                                          SizedBox(width: 10),
+                                          CircleAvatar(
+                                            radius:
+                                                22, // Smaller radius for a smaller button
+                                            backgroundColor: Colors
+                                                .transparent, // Transparent background for CircleAvatar
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  colors: [
+                                                    Colors.brown.shade600,
+                                                    Colors.brown.shade600,
+                                                    Colors.brown.shade600,
+                                                  ],
+                                                  begin: Alignment.topLeft,
+                                                  end: Alignment.bottomRight,
+                                                ),
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: IconButton(
+                                                icon: Icon(_isPlaying
+                                                    ? Icons.pause
+                                                    : Icons.play_arrow),
+                                                color: Colors.white,
+                                                iconSize: 25,
+                                                onPressed: _playPause,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(width: 10),
+                                          IconButton(
+                                            icon: Icon(Icons.download),
+                                            color: Colors.brown, // Icon color
+                                            iconSize: 25,
+                                            onPressed: () {
+                                              _downloadAudio(getCurrentAudio());
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                      Column(
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              if (_isPlaying &&
+                                                  _position > Duration.zero &&
+                                                  getCurrentAudio() != '/' &&
+                                                  hasInternet)
+                                                IconButton(
+                                                  icon:
+                                                      Icon(Icons.skip_previous),
+                                                  onPressed: () {
+                                                    if (index > 0) {
+                                                      final previousAudio = widget
+                                                          .filteredData[
+                                                              _currentPageIndex -
+                                                                  1][5]
+                                                          .toString();
+                                                      _playPauseAudio(index - 1,
+                                                              previousAudio)
+                                                          .then(
+                                                        (value) => {
+                                                          // back Pageview
+                                                          _pageController.previousPage(
+                                                              duration:
+                                                                  const Duration(
+                                                                      milliseconds:
+                                                                          500),
+                                                              curve: Curves
+                                                                  .easeInOut),
+                                                        },
+                                                      );
+                                                    }
+                                                  },
+                                                ),
+                                              SizedBox(width: 5),
+                                              if (_isPlaying &&
+                                                  _position > Duration.zero &&
+                                                  getCurrentAudio() != '/' &&
+                                                  hasInternet)
+                                                Expanded(
+                                                  child: Slider(
+                                                    min: 0.0,
+                                                    max: _duration
+                                                        .inMilliseconds
+                                                        .toDouble(),
+                                                    value: _position
+                                                        .inMilliseconds
+                                                        .toDouble()
+                                                        .clamp(
+                                                            0.0,
+                                                            _duration
+                                                                .inMilliseconds
+                                                                .toDouble()),
+                                                    onChanged: (value) {
+                                                      _seek(Duration(
+                                                          milliseconds: value
+                                                              .toInt()
+                                                              .clamp(
+                                                                  0,
+                                                                  _duration
+                                                                      .inMilliseconds)));
+                                                    },
+                                                  ),
+                                                ),
+                                              if (_isPlaying &&
+                                                  _position > Duration.zero &&
+                                                  getCurrentAudio() != '/' &&
+                                                  hasInternet)
+                                                IconButton(
+                                                  icon: Icon(Icons.skip_next),
+                                                  onPressed: () {
+                                                    if (index <
+                                                        detailLink.length - 1) {
+                                                      final nextAudio = widget
+                                                          .filteredData[
+                                                              _currentPageIndex +
+                                                                  1][5]
+                                                          .toString();
+                                                      _playPauseAudio(index + 1,
+                                                              nextAudio)
+                                                          .then(
+                                                        (value) => {
+                                                          // next pageview
+                                                          _pageController
+                                                              .nextPage(
+                                                            duration:
+                                                                const Duration(
+                                                                    milliseconds:
+                                                                        500),
+                                                            curve: Curves
+                                                                .easeInOut,
+                                                          ),
+                                                        },
+                                                      );
+                                                    }
+                                                  },
+                                                ),
+                                            ],
+                                          ),
+                                          if (_isPlaying &&
+                                              _position > Duration.zero &&
+                                              getCurrentAudio() != '/' &&
+                                              hasInternet)
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 16.0),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(_formatDuration(
+                                                      _position)),
+                                                  Text(_formatDuration(
+                                                      _duration - _position)),
+                                                ],
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
                           },
-                        ),
-                      if (isPlaying &&
-                          position > Duration.zero &&
-                          hasInternet &&
-                          getCurrentAudio() != '/')
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(formatTime(position)),
-                              Text(formatTime(duration - position)),
-                            ],
-                          ),
                         ),
                     ],
                   ),
                   const SizedBox(height: 10),
-                   FutureBuilder<String>(
+                  FutureBuilder<String>(
                     future: _fetchData(detailLink),
                     builder: (context, snapshot) {
                       if (snapshot.hasData && snapshot.data != null) {

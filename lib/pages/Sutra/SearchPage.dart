@@ -1,4 +1,4 @@
-// ignore_for_file: depend_on_referenced_packages, file_names, use_key_in_widget_constructors, library_private_types_in_public_api, prefer_const_constructors
+// ignore_for_file: depend_on_referenced_packages, file_names, use_key_in_widget_constructors, library_private_types_in_public_api, prefer_const_constructors, deprecated_member_use
 
 import 'dart:async';
 import 'dart:convert';
@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../layouts/NavigationDrawer.dart';
 import '../../themes/ThemeProvider.dart';
@@ -32,6 +33,8 @@ class _SearchPageState extends State<SearchPage> {
   Duration _duration = Duration.zero;
   Duration _position = Duration.zero;
   String? _currentUrl;
+  // Add the repeat functionality
+  bool _isRepeating = false;
 
   final AudioPlayer _player = AudioPlayer();
 
@@ -136,6 +139,14 @@ class _SearchPageState extends State<SearchPage> {
     _disposeAudioPlayer();
 
     super.dispose();
+  }
+
+  void _downloadAudio(String urlAudio) async {
+    if (await canLaunch(urlAudio)) {
+      await launch(urlAudio);
+    } else {
+      throw 'Could not launch $urlAudio';
+    }
   }
 
   Future<void> fetchData(String searchTerm) async {
@@ -454,6 +465,32 @@ class _SearchPageState extends State<SearchPage> {
                                                   _playPauseAudio(
                                                       index + 1, nextAudio);
                                                 }
+                                              },
+                                            ),
+                                            SizedBox(width: 0),
+                                            IconButton(
+                                              icon: Icon(_isRepeating
+                                                  ? Icons.repeat_one
+                                                  : Icons.repeat),
+                                              color: Colors.brown, // Icon color
+                                              iconSize: 25,
+                                              onPressed: () {
+                                                setState(() {
+                                                  _isRepeating = !_isRepeating;
+                                                  _player.setLoopMode(
+                                                      _isRepeating
+                                                          ? LoopMode.one
+                                                          : LoopMode.off);
+                                                });
+                                              },
+                                            ),
+                                            SizedBox(width: 0),
+                                            IconButton(
+                                              icon: Icon(Icons.download),
+                                              color: Colors.brown, // Icon color
+                                              iconSize: 25,
+                                              onPressed: () {
+                                                _downloadAudio(audio);
                                               },
                                             ),
                                           ],

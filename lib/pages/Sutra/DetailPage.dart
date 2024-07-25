@@ -1,9 +1,9 @@
-// ignore_for_file: depend_on_referenced_packages, file_names, use_key_in_widget_constructors, library_private_types_in_public_api, unrelated_type_equality_checks, prefer_const_constructors
+// ignore_for_file: depend_on_referenced_packages, file_names, use_key_in_widget_constructors, library_private_types_in_public_api, unrelated_type_equality_checks, prefer_const_constructors, avoid_web_libraries_in_flutter, unused_local_variable, deprecated_member_use
 
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:audioplayers/audioplayers.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +12,7 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../layouts/NavigationDrawer.dart';
 import '../../themes/ThemeProvider.dart';
@@ -40,15 +41,17 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
-  final audioPlayer = AudioPlayer();
-  bool isPlaying = false;
-  Duration duration = Duration.zero;
-  Duration position = Duration.zero;
-
   double _fontSize = 18.0;
   double get fontSize => _fontSize;
 
   bool _isFavorited = false; // Add this line
+
+  final AudioPlayer _player = AudioPlayer();
+  bool _isPlaying = false;
+  Duration _duration = Duration.zero;
+  Duration _position = Duration.zero;
+  // Add the repeat functionality
+  bool _isRepeating = false;
 
   StreamSubscription<PlayerState>? _playerStateSubscription;
   StreamSubscription<Duration?>? _durationSubscription;
@@ -71,26 +74,24 @@ class _DetailPageState extends State<DetailPage> {
 
   void _initializePlayer() async {
     try {
-      await audioPlayer.setSourceUrl(widget.audio);
+      await _player.setUrl(widget.audio);
 
       _playerStateSubscription =
-          audioPlayer.onPlayerStateChanged.listen((playerState) {
+          _player.playerStateStream.listen((playerState) {
         setState(() {
-          isPlaying = playerState == PlayerState.playing;
+          _isPlaying = playerState.playing;
         });
       });
 
-      _durationSubscription =
-          audioPlayer.onDurationChanged.listen((newDuration) {
+      _durationSubscription = _player.durationStream.listen((duration) {
         setState(() {
-          duration = newDuration;
+          _duration = duration ?? Duration.zero;
         });
       });
 
-      _positionSubscription =
-          audioPlayer.onPositionChanged.listen((newPosition) {
+      _positionSubscription = _player.positionStream.listen((position) {
         setState(() {
-          position = newPosition;
+          _position = position;
         });
       });
     } catch (e) {
@@ -102,19 +103,18 @@ class _DetailPageState extends State<DetailPage> {
 
   @override
   void dispose() {
-    super.dispose();
+    _player.dispose();
 
-    audioPlayer.dispose();
-
-    // Cancel subscriptions here to avoid LateInitializationError
     _playerStateSubscription?.cancel();
     _durationSubscription?.cancel();
     _positionSubscription?.cancel();
+
+    super.dispose();
   }
 
   void _disposeAudioPlayer() {
     // clear state playing audio
-    audioPlayer.stop();
+    _player.stop();
 
     // Cancel subscriptions here to avoid LateInitializationError
     _playerStateSubscription?.cancel();
@@ -123,15 +123,16 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Future<void> _playPauseAudio() async {
-    if (isPlaying) {
-      await audioPlayer.pause();
+    if (_isPlaying) {
+      await _player.pause();
     } else {
-      String? url = widget.audio;
-      await audioPlayer.play(UrlSource(url));
+      await _player.play();
     }
-    setState(() {
-      isPlaying = !isPlaying;
-    });
+    if (mounted) {
+      setState(() {
+        _isPlaying = !_isPlaying;
+      });
+    }
   }
 
   String formatTime(Duration duration) {
@@ -145,6 +146,14 @@ class _DetailPageState extends State<DetailPage> {
       minutes,
       seconds,
     ].join(':');
+  }
+
+  void _downloadAudio(String urlAudio) async {
+    if (await canLaunch(urlAudio)) {
+      await launch(urlAudio);
+    } else {
+      throw 'Could not launch $urlAudio';
+    }
   }
 
   Future<void> _loadFavoriteState() async {
@@ -310,66 +319,127 @@ class _DetailPageState extends State<DetailPage> {
               const SizedBox(height: 10),
               const Divider(color: Colors.black, thickness: 1, height: 1),
               const SizedBox(height: 10),
-              Column(
-                children: [
-                  if (widget.audio != '/' && hasInternet)
-                    Center(
-                      child: CircleAvatar(
-                        radius: 22, // Smaller radius for a smaller button
-                        backgroundColor: Colors
-                            .transparent, // Transparent background for CircleAvatar
+              // Add buttons to control audio playback
+
+              if (widget.audio != '/' && hasInternet)
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final bool isMobile = constraints.maxWidth < 600;
+                    final double paddingValue = isMobile
+                        ? 8.0 // Smaller padding for mobile devices
+                        : constraints.maxWidth *
+                            0.1; // 10% of the width as padding for larger screens
+
+                    return Center(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minWidth: isMobile
+                              ? constraints.maxWidth
+                              : constraints.maxWidth * 0.8,
+                          maxWidth: constraints.maxWidth,
+                        ),
                         child: Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.brown.shade600,
-                                Colors.brown.shade600,
-                                Colors.brown.shade600,
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            shape: BoxShape.circle,
-                          ),
-                          child: IconButton(
-                            icon: Icon(
-                                isPlaying ? Icons.pause : Icons.play_arrow),
-                            color: Colors.white, // Icon color
-                            iconSize: 25,
-                            onPressed: _playPauseAudio,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isMobile ? 0 : paddingValue,
+                          ), // Add horizontal padding to center the text
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(_isRepeating
+                                        ? Icons.repeat_one
+                                        : Icons.repeat),
+                                    color: Colors.brown, // Icon color
+                                    iconSize: 25,
+                                    onPressed: () {
+                                      setState(() {
+                                        _isRepeating = !_isRepeating;
+                                        _player.setLoopMode(_isRepeating
+                                            ? LoopMode.one
+                                            : LoopMode.off);
+                                      });
+                                    },
+                                  ),
+                                  SizedBox(width: 10),
+                                  CircleAvatar(
+                                    radius:
+                                        22, // Smaller radius for a smaller button
+                                    backgroundColor: Colors
+                                        .transparent, // Transparent background for CircleAvatar
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Colors.brown.shade600,
+                                            Colors.brown.shade600,
+                                            Colors.brown.shade600,
+                                          ],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        ),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: IconButton(
+                                        icon: Icon(_isPlaying
+                                            ? Icons.pause
+                                            : Icons.play_arrow),
+                                        color: Colors.white, // Icon color
+                                        iconSize: 25,
+                                        onPressed: _playPauseAudio,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  IconButton(
+                                    icon: Icon(Icons.download),
+                                    color: Colors.brown, // Icon color
+                                    iconSize: 25,
+                                    onPressed: () {
+                                      _downloadAudio(widget.audio);
+                                    },
+                                  ),
+                                ],
+                              ),
+                              if (_isPlaying || _position > Duration.zero)
+                                Slider(
+                                  min: 0.0,
+                                  max: _duration.inSeconds.toDouble(),
+                                  value: _position.inSeconds.toDouble(),
+                                  onChanged: (value) async {
+                                    final position =
+                                        Duration(seconds: value.toInt());
+                                    await _player.seek(position);
+
+                                    setState(() {
+                                      _position = position;
+                                    });
+                                  },
+                                ),
+                              if (_isPlaying || _position > Duration.zero)
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(formatTime(_position)),
+                                      Text(formatTime(_duration - _position)),
+                                    ],
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
                       ),
-                    ),
-                  if (isPlaying || position > Duration.zero)
-                    Slider(
-                      min: 0.0,
-                      max: duration.inSeconds.toDouble(),
-                      value: position.inSeconds.toDouble(),
-                      onChanged: (value) async {
-                        final position = Duration(seconds: value.toInt());
-                        await audioPlayer.seek(position);
+                    );
+                  },
+                ),
 
-                        await audioPlayer.resume();
-
-                        setState(() {
-                          this.position = position;
-                        });
-                      },
-                    ),
-                  if (isPlaying || position > Duration.zero)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(formatTime(position)),
-                          Text(formatTime(duration - position)),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
               const SizedBox(height: 10),
               FutureBuilder<String>(
                 future: _fetchData(widget.details),
