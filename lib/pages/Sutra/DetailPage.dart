@@ -487,6 +487,7 @@ class _DetailPageState extends State<DetailPage> {
                                       fontSize: _fontSize,
                                       height: 1.8,
                                       textBaseline: TextBaseline.alphabetic,
+                                      letterSpacing: 0.5,
                                     ),
                                   ),
                                 ),
