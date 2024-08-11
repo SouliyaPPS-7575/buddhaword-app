@@ -1281,13 +1281,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.9.5"
-  webviewx_plus:
-    dependency: "direct main"
-    description:
-      name: webviewx_plus
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.3.2"
   win32:
     dependency: transitive
     description:

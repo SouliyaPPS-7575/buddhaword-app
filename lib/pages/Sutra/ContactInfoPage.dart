@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use, use_key_in_widget_constructors, file_names
+// ignore_for_file: deprecated_member_use, use_key_in_widget_constructors, file_names, prefer_const_constructors
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -62,11 +62,15 @@ class ContactInfoPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center, // Changed alignment
             children: [
               const SizedBox(height: 20),
-              const Text(
-                'ແອັບນີ້ແມ່ນແອັບຄຳສອນພຣະພຸດທະເຈົ້າ, ສ້າງຂື້ນເພື່ອເຜີຍແຜ່ໃຫ້ພວກເຮົາທັງຫຼາຍໄດ້ສຶກສາ ແລະ ປະຕິບັດຕາມ, ດັ່ງທີ່ພຣະຕະຖາຄົດກ່າວວ່າ "ທຳມະຍິ່ງເປີດເຜີຍຍິ່ງຮຸ່ງເຮືອງ" ເມື່ອໄດ້ສຶກສາ ແລະ ປະຕິບັດຕາມ ຈົນເຫັນທຳມະຊາດຕາມຄວາມເປັນຈິງ ກໍຈະຫຼຸດພົ້ນຈາກຄວາມທຸກທັງປວງ. "ທຳກໍດີ ວິໄນກໍດີ ທີ່ເຮົາສະແດງແລ້ວ ບັນຍັດໄວ້ດີແລ້ວ ທຳ ແລະ ວິໄນນັ້ນ ຈະເປັນສາດສະດາແທນຕໍ່ໄປ"',
-                style: TextStyle(
+              Center(
+                child: const Text(
+                  'ແອັບນີ້ແມ່ນແອັບຄຳສອນພຣະພຸດທະເຈົ້າ, ສ້າງຂື້ນເພື່ອເຜີຍແຜ່ໃຫ້ພວກເຮົາທັງຫຼາຍໄດ້ສຶກສາ ແລະ ປະຕິບັດຕາມ, ດັ່ງທີ່ພຣະຕະຖາຄົດກ່າວວ່າ "ທຳມະຍິ່ງເປີດເຜີຍຍິ່ງຮຸ່ງເຮືອງ" ເມື່ອໄດ້ສຶກສາ ແລະ ປະຕິບັດຕາມ ຈົນເຫັນທຳມະຊາດຕາມຄວາມເປັນຈິງ ກໍຈະຫຼຸດພົ້ນຈາກຄວາມທຸກທັງປວງ. "ທຳກໍດີ ວິໄນກໍດີ ທີ່ເຮົາສະແດງແລ້ວ ບັນຍັດໄວ້ດີແລ້ວ ທຳ ແລະ ວິໄນນັ້ນ ຈະເປັນສາດສະດາແທນຕໍ່ໄປ"',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
                     fontSize: 20, // Adjusted font size
-                    letterSpacing: 0.5),
+                    letterSpacing: 0.5,
+                  ),
+                ),
               ),
               const SizedBox(height: 20),
               const Text(

@@ -349,7 +349,7 @@ class _VideoPageState extends State<VideoPage> {
     bool hasInternet =
         await Connectivity().checkConnectivity() != ConnectivityResult.none;
 
-    if (!hasInternet) {
+    if (!hasInternet || title == '') {
       if (cachedData != null && cachedData.isNotEmpty) {
         final List<dynamic> cachedValues = json.decode(cachedData);
         _data = cachedValues.cast<List<dynamic>>();
@@ -360,7 +360,7 @@ class _VideoPageState extends State<VideoPage> {
     }
 
     try {
-      if (hasInternet) {
+      if (hasInternet && title != '') {
         final response = await http.get(Uri.parse(
             'https://sheets.googleapis.com/v4/spreadsheets/1mKtgmZ_Is4e6P3P5lvOwIplqx7VQ3amicgienGN9zwA/values/video!1:1000000?key=AIzaSyDFjIl-SEHUsgK0sjMm7x0awpf8tTEPQjs'));
 

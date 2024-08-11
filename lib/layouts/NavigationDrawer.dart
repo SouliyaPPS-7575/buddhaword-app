@@ -9,6 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../main.dart';
+import '../pages/Books/BooksPage.dart';
+import '../pages/Home/HomePage.dart';
 import '../pages/Sutra/ContactInfoPage.dart';
 import '../pages/Sutra/FavoritePage.dart';
 import '../pages/Video/VideoPage.dart';
@@ -47,13 +49,13 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
   //   }
   // }
 
-  void _openLinkBooks() async {
-    if (await canLaunch(urlBooks)) {
-      await launch(urlBooks);
-    } else {
-      throw 'Could not launch $urlBooks';
-    }
-  }
+  // void _openLinkBooks() async {
+  //   if (await canLaunch(urlBooks)) {
+  //     await launch(urlBooks);
+  //   } else {
+  //     throw 'Could not launch $urlBooks';
+  //   }
+  // }
 
   void _openLinkDhamma() async {
     if (await canLaunch(urlDhamma)) {
@@ -483,17 +485,24 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
               },
             ),
             ListTile(
-                leading: _isChecked
-                    ? Icon(Icons.home_outlined, color: _checkColor)
-                    : Icon(Icons.home_rounded, color: _checkColor),
-                title: const Text(
-                  'ເມນູ',
-                  style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5),
+              leading: _isChecked
+                  ? Icon(Icons.home_outlined, color: _checkColor)
+                  : Icon(Icons.home_rounded, color: _checkColor),
+              title: const Text(
+                'ເມນູ',
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5),
+              ),
+              onTap: () => {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => HomePage(),
+                  ),
                 ),
-                onTap: () => {}),
+              },
+            ),
             ListTile(
               leading: _isChecked
                   ? Icon(Icons.library_books, color: _checkColor)
@@ -549,7 +558,13 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                   letterSpacing: 0.5,
                 ),
               ),
-              onTap: () => _openLinkBooks(),
+              onTap: () => {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => BooksPage(),
+                  ),
+                ),
+              },
             ),
 
             ListTile(
@@ -568,25 +583,26 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
             ),
 
             ListTile(
-                leading: _isChecked
-                    ? Icon(Icons.video_library, color: _checkColor)
-                    : Icon(Icons.video_collection_outlined, color: _checkColor),
-                title: const Text(
-                  'ວີດີໂອ VDO',
-                  style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5),
+              leading: _isChecked
+                  ? Icon(Icons.video_library, color: _checkColor)
+                  : Icon(Icons.video_collection_outlined, color: _checkColor),
+              title: const Text(
+                'ວີດີໂອ VDO',
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5),
+              ),
+              onTap: () => {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => VideoPage(
+                      title: 'ວີດີໂອ VDO',
+                    ),
+                  ),
                 ),
-                onTap: () => {
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (context) => VideoPage(
-                            title: 'ວີດີໂອ VDO',
-                          ),
-                        ),
-                      ),
-                    }),
+              },
+            ),
 
             ListTile(
               leading: _isChecked

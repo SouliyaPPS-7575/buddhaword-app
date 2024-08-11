@@ -15,6 +15,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'layouts/NavigationDrawer.dart';
+import 'pages/Home/HomePage.dart';
 import 'pages/Sutra/BookReadingScreenPage.dart';
 import 'pages/Sutra/CategoryListPage.dart';
 import 'pages/Sutra/DetailPage.dart';
@@ -43,27 +44,37 @@ class MyApp extends StatelessWidget {
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {
           return MaterialApp(
-              debugShowCheckedModeBanner: false,
-              title: 'ທັມມະ',
-              theme: ThemeData(
-                primarySwatch: Colors.brown,
-                fontFamily: 'NotoSerifLao',
-              ),
-              darkTheme: ThemeData(
-                brightness: Brightness.dark,
-                primarySwatch: Colors.brown,
-                fontFamily: 'NotoSerifLao',
-              ),
-              themeMode:
-                  themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-              // home: MyHomePage(),
-              home: AppUpgradeAlert(
-                  xApiKey:
-                      'ZmRmNjE3ZDQtZmQwYS00OTgxLWIzZjAtNGE5Mzk4YWU1ZTYx', // Your x-api-key
-                  appInfo: appInfo,
-                  child: const MyHomePage(
-                    title: '',
-                  )));
+            debugShowCheckedModeBanner: false,
+            title: 'ທັມມະ',
+            theme: ThemeData(
+              primarySwatch: Colors.brown,
+              fontFamily: 'NotoSerifLao',
+            ),
+            darkTheme: ThemeData(
+              brightness: Brightness.dark,
+              primarySwatch: Colors.brown,
+              fontFamily: 'NotoSerifLao',
+            ),
+            themeMode:
+                themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+            home: FutureBuilder(
+              future: Connectivity().checkConnectivity(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: RandomImagePage());
+                } else if (snapshot.hasData &&
+                    snapshot.data != ConnectivityResult.none) {
+                  return AppUpgradeAlert(
+                    xApiKey: 'ZmRmNjE3ZDQtZmQwYS00OTgxLWIzZjAtNGE5Mzk4YWU1ZTYx',
+                    appInfo: appInfo,
+                    child: HomePage(),
+                  );
+                } else {
+                  return MyHomePage(title: '');
+                }
+              },
+            ),
+          );
         },
       ),
     );

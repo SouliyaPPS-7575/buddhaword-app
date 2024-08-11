@@ -63,7 +63,6 @@ dependencies:
   just_audio: ^0.9.37
   cached_network_image: ^3.2.3
   youtube_player_iframe: ^3.1.0
-  webviewx_plus: ^0.3.2
   flutter_inappwebview: ^5.8.0
 
 flutter_icons:
@@ -131,6 +130,7 @@ flutter:
     - assets/ວິໄນສົງ.jpg
     - assets/ເຫັນທຳ/loading_mobile.jpg
     - assets/ເຫັນທຳ/loading_desktop_tablet.jpg
+    - assets/wooden_background.jpg
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

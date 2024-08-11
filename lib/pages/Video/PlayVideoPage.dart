@@ -46,7 +46,6 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
 
   String _videoTitle = '';
 
-  // WebViewXController? _webviewController;
   InAppWebViewController? _webviewController;
 
   bool hasInternet = false;
@@ -85,25 +84,6 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
       });
     }
   }
-
-  // void _loadVideoInWebViewX(String videoLink, double height) {
-  //   if (_webviewController == null) {
-  //     // The WebViewXController is not initialized
-  //     return;
-  //   }
-
-  //   if (videoLink.contains('youtube.com') || videoLink.contains('youtu.be')) {
-  //     final videoYoutubeLink = convertYoutubeLink(videoLink);
-  //     final videoId = YoutubePlayerController.convertUrlToId(videoYoutubeLink);
-  //     if (videoId != null) {
-  //       final youtubeEmbedUrl = 'https://www.youtube.com/embed/$videoId';
-  //       _webviewController?.loadContent(youtubeEmbedUrl);
-  //     }
-  //   } else if (videoLink.contains('facebook.com')) {
-  //     final facebookEmbedUrl = getFacebookEmbedUrl(videoLink, height);
-  //     _webviewController?.loadContent(facebookEmbedUrl);
-  //   }
-  // }
 
   void _loadVideoInInAppWebView(String videoLink, double height) {
     if (_webviewController == null) {
@@ -549,7 +529,7 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
                             URLRequest(url: Uri.parse(videoLink)),
                         initialOptions: InAppWebViewGroupOptions(
                           crossPlatform: InAppWebViewOptions(
-                            mediaPlaybackRequiresUserGesture: false,
+                            mediaPlaybackRequiresUserGesture: true,
                             useOnLoadResource:
                                 true, // Ensure all resources are loaded
                           ),
