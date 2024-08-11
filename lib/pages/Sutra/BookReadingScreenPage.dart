@@ -429,7 +429,7 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
               constraints: BoxConstraints(
                 minHeight: MediaQuery.of(context).size.height,
               ),
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -445,7 +445,7 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
                       ),
                       showCursor: true,
                       style: const TextStyle(
-                          fontSize: 25,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 0.5),
                     ),

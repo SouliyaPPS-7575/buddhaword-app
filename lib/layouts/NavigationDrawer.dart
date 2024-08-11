@@ -11,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../main.dart';
 import '../pages/Sutra/ContactInfoPage.dart';
 import '../pages/Sutra/FavoritePage.dart';
+import '../pages/Video/VideoPage.dart';
 
 class NavigationDrawer extends StatefulWidget {
   const NavigationDrawer({super.key});
@@ -32,6 +33,8 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
   final String urlDhamma =
       "https://buddhaword.vercel.app/4d1689680be74b6f96071c8dda16db9e";
   final String urlEnglish = "https://buddhaword-english.blogspot.com";
+  final String urlNews =
+      "https://www.facebook.com/profile.php?id=100077638042542";
   final String urlCalendar = "https://bit.ly/LaosCalendar";
   final String urlArnuta = "https://arnuta.blogspot.com/";
   final String urlChat = "https://chat.whatsapp.com/CZ7j5fhSatK37v76zmmVCK";
@@ -68,6 +71,14 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
     }
   }
 
+  void _openLinkNews() async {
+    if (await canLaunch(urlNews)) {
+      await launch(urlNews);
+    } else {
+      throw 'Could not launch $urlNews';
+    }
+  }
+
   // void _openLinkCalendar() async {
   //   if (await canLaunch(urlCalendar)) {
   //     await launch(urlCalendar);
@@ -76,13 +87,13 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
   //   }
   // }
 
-  void _openLinkArnuta() async {
-    if (await canLaunch(urlArnuta)) {
-      await launch(urlArnuta);
-    } else {
-      throw 'Could not launch $urlArnuta';
-    }
-  }
+  // void _openLinkArnuta() async {
+  //   if (await canLaunch(urlArnuta)) {
+  //     await launch(urlArnuta);
+  //   } else {
+  //     throw 'Could not launch $urlArnuta';
+  //   }
+  // }
 
   void _openLinkChat() async {
     if (await canLaunch(urlChat)) {
@@ -471,7 +482,18 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                 ),
               },
             ),
-
+            ListTile(
+                leading: _isChecked
+                    ? Icon(Icons.home_outlined, color: _checkColor)
+                    : Icon(Icons.home_rounded, color: _checkColor),
+                title: const Text(
+                  'ເມນູ',
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5),
+                ),
+                onTap: () => {}),
             ListTile(
               leading: _isChecked
                   ? Icon(Icons.library_books, color: _checkColor)
@@ -494,7 +516,6 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                 ),
               },
             ),
-
             ListTile(
               leading: _isChecked
                   ? Icon(Icons.favorite, color: _checkColor)
@@ -547,18 +568,25 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
             ),
 
             ListTile(
-              leading: _isChecked
-                  ? Icon(Icons.video_library, color: _checkColor)
-                  : Icon(Icons.video_collection_outlined, color: _checkColor),
-              title: const Text(
-                'ວີດີໂອ VDO',
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5),
-              ),
-              onTap: () => _openLinkArnuta(),
-            ),
+                leading: _isChecked
+                    ? Icon(Icons.video_library, color: _checkColor)
+                    : Icon(Icons.video_collection_outlined, color: _checkColor),
+                title: const Text(
+                  'ວີດີໂອ VDO',
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5),
+                ),
+                onTap: () => {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (context) => VideoPage(
+                            title: 'ວີດີໂອ VDO',
+                          ),
+                        ),
+                      ),
+                    }),
 
             ListTile(
               leading: _isChecked
@@ -573,7 +601,19 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
               ),
               onTap: () => _openLinkEnglish(),
             ),
-
+            ListTile(
+              leading: _isChecked
+                  ? Icon(Icons.newspaper_outlined, color: _checkColor)
+                  : Icon(Icons.newspaper_rounded, color: _checkColor),
+              title: const Text(
+                'ຂ່າວສານ',
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5),
+              ),
+              onTap: () => _openLinkNews(),
+            ),
             // ListTile(
             //   leading: _isChecked
             //       ? Icon(Icons.calendar_month, color: _checkColor)
