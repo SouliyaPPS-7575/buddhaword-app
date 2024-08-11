@@ -51,8 +51,6 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
 
   bool hasInternet = false;
 
-  bool _isFullScreen = false;
-
   @override
   void initState() {
     super.initState();
@@ -545,11 +543,7 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
                     // Video Player
                     Container(
                       width: double.infinity,
-                      height: _isFullScreen
-                          ? isTabletOrDesktop
-                              ? videoPlayerHeight + 60
-                              : videoPlayerHeight + 230
-                          : videoPlayerHeight,
+                      height: videoPlayerHeight,
                       child: InAppWebView(
                         initialUrlRequest:
                             URLRequest(url: Uri.parse(videoLink)),
