@@ -55,8 +55,18 @@ class _VideoPageState extends State<VideoPage> {
   Future<void> _initialize() async {
     try {
       await Future.delayed(Duration(seconds: 1));
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? cachedData = prefs.getString('videoLocalData');
 
-      await fetchDataFromAPI(_searchTerm);
+      if (title != '' ||
+          title.isNotEmpty ||
+          cachedData == null ||
+          cachedData.isEmpty ||
+          cachedData == '{}') {
+        await fetchDataFromAPI(_searchTerm);
+      } else {
+        await fetchDataOffline(_searchTerm);
+      }
     } catch (e) {
       if (kDebugMode) {
         print('Initialization error: $e');
@@ -344,23 +354,11 @@ class _VideoPageState extends State<VideoPage> {
   Future<void> fetchDataFromAPI(String searchTerm) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    String? cachedData = prefs.getString('videoLocalData');
-
     bool hasInternet =
         await Connectivity().checkConnectivity() != ConnectivityResult.none;
 
-    if (!hasInternet || title == '') {
-      if (cachedData != null && cachedData.isNotEmpty) {
-        final List<dynamic> cachedValues = json.decode(cachedData);
-        _data = cachedValues.cast<List<dynamic>>();
-
-        // Update data with cached values
-        updateData(searchTerm); // Update data here
-      }
-    }
-
     try {
-      if (hasInternet && title != '') {
+      if (hasInternet) {
         final response = await http.get(Uri.parse(
             'https://sheets.googleapis.com/v4/spreadsheets/1mKtgmZ_Is4e6P3P5lvOwIplqx7VQ3amicgienGN9zwA/values/video!1:1000000?key=AIzaSyDFjIl-SEHUsgK0sjMm7x0awpf8tTEPQjs'));
 
@@ -399,11 +397,13 @@ class _VideoPageState extends State<VideoPage> {
     bool hasInternet =
         await Connectivity().checkConnectivity() != ConnectivityResult.none;
 
-    if (!hasInternet) {
+    if (!hasInternet || title == '' || title.isEmpty) {
       if (cachedData != null && cachedData.isNotEmpty) {
         final List<dynamic> cachedValues = json.decode(cachedData);
         _data = cachedValues.cast<List<dynamic>>();
-
+        setState(() {
+          _data = cachedValues.cast<List<dynamic>>();
+        });
         // Update data with cached values
         updateData(searchTerm); // Update data here
       }

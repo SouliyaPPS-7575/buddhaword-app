@@ -587,7 +587,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                   ? Icon(Icons.video_library, color: _checkColor)
                   : Icon(Icons.video_collection_outlined, color: _checkColor),
               title: const Text(
-                'ວີດີໂອ VDO',
+                'ວີດີໂອ Video',
                 style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -597,7 +597,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
                     builder: (context) => VideoPage(
-                      title: 'ວີດີໂອ VDO',
+                      title: 'ວີດີໂອ Video',
                     ),
                   ),
                 ),

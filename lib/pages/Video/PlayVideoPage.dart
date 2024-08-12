@@ -43,8 +43,8 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
   List<List<dynamic>> _data = [];
 
   String? _videoLink;
-
   String _videoTitle = '';
+  String _videoID = '';
 
   InAppWebViewController? _webviewController;
 
@@ -54,7 +54,9 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
   void initState() {
     super.initState();
 
-    _videoTitle = widget.title ?? ''; // Initialize the title
+    _videoID = widget.id ?? ''; // Initialize ID
+    _videoTitle = widget.title ?? ''; // Initialize title
+    _videoLink = widget.link; // Initialize video link
 
     _checkConnectivity();
     _initialize();
@@ -243,9 +245,10 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
         return GestureDetector(
           onTap: () {
             setState(() {
-              _videoTitle = title; // Update title
-              _videoLink = videoLinks;
-              _initializeVideoLink(videoLinks);
+              _videoTitle = title; // Update the title
+              _videoLink = videoLinks; // Update the video link
+              _videoID = id; // Update the widget ID
+              _initializeVideoLink(videoLinks); // Load the video
             });
           },
           child: Card(
@@ -342,9 +345,10 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
             return GestureDetector(
               onTap: () {
                 setState(() {
-                  _videoTitle = title; // Update title
-                  _videoLink = videoLinks;
-                  _initializeVideoLink(videoLinks);
+                  _videoTitle = title; // Update the title
+                  _videoLink = videoLinks; // Update the video link
+                  _videoID = id; // Update the widget ID
+                  _initializeVideoLink(videoLinks); // Load the video
                 });
               },
               child: Card(
@@ -409,17 +413,17 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
 
   void _shareVideoLink() {
     final url =
-        'https://buddha-nature.web.app/#/playVideo/${widget.id}?videoLinks=${Uri.encodeComponent(_videoLink!)}';
+        'https://buddha-nature.web.app/#/playVideo/$_videoID?videoLinks=${Uri.encodeComponent(_videoLink!)}';
 
     String? title = _data.firstWhere(
       (row) => row.isNotEmpty && row[0] == widget.id,
       orElse: () => [],
     )[1];
 
-    final shareText = '$title\n $url';
+    final shareText = '$_videoTitle\n $url';
 
     if (_videoLink != null) {
-      Share.share(shareText, subject: title);
+      Share.share(shareText, subject: _videoTitle);
     } else {
       if (kDebugMode) {
         print('Video link is null, cannot share.');

@@ -354,7 +354,7 @@ List<MenuItem> menuItems(BuildContext context) => [
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (context) => VideoPage(
-                title: 'ວີດີໂອ VDO',
+                title: 'ວີດີໂອ Video',
               ),
             ),
           ),
