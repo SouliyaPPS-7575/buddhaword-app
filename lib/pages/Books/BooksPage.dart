@@ -235,8 +235,7 @@ class _BooksPageState extends State<BooksPage> {
             row.length > 2 && row[2] == selectedCategory)
         .toList();
 
-    // Reverse the filtered data
-    filteredData = filteredData.reversed.toList();
+    filteredData = filteredData;
 
     setState(() {
       _filteredData = filteredData;
