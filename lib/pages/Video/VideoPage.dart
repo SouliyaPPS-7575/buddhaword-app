@@ -660,18 +660,34 @@ class _VideoPageState extends State<VideoPage> {
                             },
                           )
                         : isTabletOrDesktop
-                            ? GridView.builder(
-                                padding: EdgeInsets.all(16.0),
-                                gridDelegate:
-                                    SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 4,
-                                  crossAxisSpacing: 16.0,
-                                  mainAxisSpacing: 16.0,
-                                  childAspectRatio: 16 / 12.5,
-                                ),
-                                itemCount: _filteredData.length,
-                                itemBuilder: (context, index) =>
-                                    _buildVideoCard(context, index),
+                            ? LayoutBuilder(
+                                builder: (context, constraints) {
+                                  // Adjust crossAxisCount based on the orientation
+                                  if (constraints.maxWidth > 375) {
+                                    crossAxisCount = 3;
+                                  } else {
+                                    crossAxisCount = 4;
+                                  }
+
+                                  return GridView.builder(
+                                    padding: EdgeInsets.all(16.0),
+                                    gridDelegate:
+                                        SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: crossAxisCount,
+                                      crossAxisSpacing: 16.0,
+                                      mainAxisSpacing: 16.0,
+                                      childAspectRatio:
+                                          16 / constraints.maxWidth >= 667
+                                              ? 0.8
+                                              : constraints.maxWidth >= 1024
+                                                  ? 1.3
+                                                  : 1.2,
+                                    ),
+                                    itemCount: _filteredData.length,
+                                    itemBuilder: (context, index) =>
+                                        _buildVideoCard(context, index),
+                                  );
+                                },
                               )
                             : ListView.builder(
                                 padding: EdgeInsets.all(16.0),

@@ -50,6 +50,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _initialize() async {
+    await fetchDataHomeFromAPI();
     await fetchDataFromAPI();
   }
 
@@ -95,7 +96,7 @@ class _HomePageState extends State<HomePage> {
     return prefs.get(key);
   }
 
-  Future<void> fetchDataFromAPI() async {
+  Future<void> fetchDataHomeFromAPI() async {
     bool hasInternet =
         await Connectivity().checkConnectivity() != ConnectivityResult.none;
 
@@ -160,6 +161,47 @@ class _HomePageState extends State<HomePage> {
           final List<dynamic> cachedValues = json.decode(cachedData);
           _data = cachedValues.cast<List<dynamic>>();
         }
+      }
+    }
+  }
+
+  Future<void> fetchDataFromAPI() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    String? cachedData = prefs.getString('cachedData');
+
+    bool hasInternet =
+        await Connectivity().checkConnectivity() != ConnectivityResult.none;
+
+    if (!hasInternet) {
+      if (cachedData != null && cachedData.isNotEmpty) {
+        final List<dynamic> cachedValues = json.decode(cachedData);
+        _data = cachedValues.cast<List<dynamic>>();
+      }
+    }
+
+    try {
+      final response = await http.get(Uri.parse(
+          'https://sheets.googleapis.com/v4/spreadsheets/1mKtgmZ_Is4e6P3P5lvOwIplqx7VQ3amicgienGN9zwA/values/Sheet1!1:1000000?key=AIzaSyDFjIl-SEHUsgK0sjMm7x0awpf8tTEPQjs'));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse = json.decode(response.body);
+        final List<dynamic> sheetValues =
+            jsonResponse['values'] as List<dynamic>;
+
+        final List<List<dynamic>> values =
+            sheetValues.skip(1).map((row) => List<dynamic>.from(row)).toList();
+
+        _data = values;
+        prefs.setString('cachedData', json.encode(_data));
+      } else {
+        if (kDebugMode) {
+          print('Failed to load data: ${response.statusCode}');
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching data: $e');
       }
     }
   }

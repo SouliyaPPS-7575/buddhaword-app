@@ -439,6 +439,11 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
       orElse: () => [],
     );
 
+    double screenWidth = MediaQuery.of(context).size.width;
+    int crossAxisCount = screenWidth < 600 ? 3 : (screenWidth > 900 ? 5 : 4);
+    double aspectRatio = screenWidth < 900 ? 0.8 : 1;
+    double cardHeight = screenWidth < 900 ? 200.0 : 250.0;
+
     return _videoLink == null
         ? RandomImagePage()
         : Scaffold(
@@ -562,19 +567,34 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
                     // Video List
                     Expanded(
                       child: isTabletOrDesktop
-                          ? GridView.builder(
-                              padding: EdgeInsets.all(5.0),
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount:
-                                    (constraints.maxWidth / 300).floor(),
-                                crossAxisSpacing: 16.0,
-                                mainAxisSpacing: 16.0,
-                                childAspectRatio: 16 / 12.5,
-                              ),
-                              itemCount: _data.length,
-                              itemBuilder: (context, index) =>
-                                  _buildVideoCard(context, index),
+                          ? LayoutBuilder(
+                              builder: (context, constraints) {
+                                // Adjust crossAxisCount based on the orientation
+                                if (constraints.maxWidth > 375) {
+                                  crossAxisCount = 3;
+                                } else {
+                                  crossAxisCount = 4;
+                                }
+
+                                return GridView.builder(
+                                  padding: EdgeInsets.all(16.0),
+                                  gridDelegate:
+                                      SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: crossAxisCount,
+                                    crossAxisSpacing: 16.0,
+                                    mainAxisSpacing: 16.0,
+                                    childAspectRatio:
+                                        16 / constraints.maxWidth >= 667
+                                            ? 0.8
+                                            : constraints.maxWidth >= 1024
+                                                ? 1.3
+                                                : 1.2,
+                                  ),
+                                  itemCount: _data.length,
+                                  itemBuilder: (context, index) =>
+                                      _buildVideoCard(context, index),
+                                );
+                              },
                             )
                           : ListView.builder(
                               padding: EdgeInsets.all(5.0),
