@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, must_be_immutable, file_names, library_private_types_in_public_api, prefer_const_constructors_in_immutables
+// ignore_for_file: prefer_const_constructors, must_be_immutable, file_names, library_private_types_in_public_api, prefer_const_constructors_in_immutables, prefer_const_declarations, depend_on_referenced_packages
 
 import 'dart:convert';
 
@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../layouts/NavigationDrawer.dart';
 import '../../themes/ThemeProvider.dart';
@@ -34,6 +35,8 @@ class _CategoryListPageState extends State<CategoryListPage> {
   final TextEditingController _searchController = TextEditingController();
   final Map<String, YoutubePlayerController> _controllers = {};
 
+  static String? _accessToken;
+
   @override
   void initState() {
     super.initState();
@@ -46,6 +49,59 @@ class _CategoryListPageState extends State<CategoryListPage> {
     _searchController.dispose();
     _controllers.forEach((key, controller) => controller.close());
     super.dispose();
+  }
+
+  static Future<String?> getAccessToken() async {
+    if (_accessToken == null || await _isTokenExpired()) {
+      _accessToken = await _refreshFacebookAccessToken();
+    }
+    return _accessToken;
+  }
+
+  static Future<String?> _refreshFacebookAccessToken() async {
+    const clientId = '1208039927182018';
+    const clientSecret = 'd720fe369470ee03f731846fa319d7cc';
+    const shortLivedAccessToken = initialAccessToken;
+
+    final refreshTokenUrl = Uri.parse(
+      'https://graph.facebook.com/oauth/access_token'
+      '?grant_type=fb_exchange_token'
+      '&client_id=$clientId'
+      '&client_secret=$clientSecret'
+      '&fb_exchange_token=$shortLivedAccessToken',
+    );
+
+    final response = await http.get(refreshTokenUrl);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final accessToken = data['access_token'];
+      final expiresIn = data['expires_in']; // Typically in seconds
+
+      if (accessToken != null && expiresIn != null) {
+        final prefs = await SharedPreferences.getInstance();
+        final expiresAt =
+            DateTime.now().millisecondsSinceEpoch + (expiresIn * 1000);
+
+        await prefs.setString('access_token', accessToken);
+        await prefs.setInt('expires_at', expiresAt as int);
+
+        return accessToken;
+      } else {
+        // Handle missing data scenario
+        return null;
+      }
+    } else {
+      // Log the error response for debugging
+      return null;
+    }
+  }
+
+  static Future<bool> _isTokenExpired() async {
+    final prefs = await SharedPreferences.getInstance();
+    final expiresAt = prefs.getInt('expires_at') ?? 0;
+
+    return DateTime.now().millisecondsSinceEpoch >= expiresAt;
   }
 
   List<List<dynamic>> _filterData(String searchTerm) {
@@ -162,10 +218,12 @@ class _CategoryListPageState extends State<CategoryListPage> {
         ),
       );
     } else if (isFacebook) {
-      // For Facebook videos, we can embed them directly or use a thumbnail
-      // Here, we'll use a generic thumbnail and link to the Facebook video
-      Future<String?> getFacebookVideoThumbnailUrl(
-          String videoId, String accessToken) async {
+      Future<String?> getFacebookVideoThumbnailUrl(String videoId) async {
+        final accessToken = await getAccessToken();
+        if (accessToken == null) {
+          return null;
+        }
+
         final url =
             'https://graph.facebook.com/v20.0/$videoId?fields=thumbnails&access_token=$accessToken';
 
@@ -189,14 +247,14 @@ class _CategoryListPageState extends State<CategoryListPage> {
       final videoId = uri.pathSegments.last;
 
       return FutureBuilder<String?>(
-        future: getFacebookVideoThumbnailUrl(videoId, accessToken),
+        future: getFacebookVideoThumbnailUrl(videoId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data == null) {
-            return Center(child: Text('No thumbnail available'));
+            return SizedBox.shrink(); // Skip invalid video links
           }
 
           final thumbnailUrl = snapshot.data!;

@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, prefer_const_constructors, use_key_in_widget_constructors, file_names, avoid_web_libraries_in_flutter, unnecessary_null_comparison, unrelated_type_equality_checks, use_build_context_synchronously, prefer_const_constructors_in_immutables, no_leading_underscores_for_local_identifiers, prefer_final_fields, depend_on_referenced_packages, unused_import
+// ignore_for_file: library_private_types_in_public_api, prefer_const_constructors, use_key_in_widget_constructors, file_names, avoid_web_libraries_in_flutter, unnecessary_null_comparison, unrelated_type_equality_checks, use_build_context_synchronously, prefer_const_constructors_in_immutables, no_leading_underscores_for_local_identifiers, prefer_final_fields, depend_on_referenced_packages, unused_import, constant_identifier_names, prefer_const_declarations
 
 import 'dart:convert';
 
@@ -18,8 +18,8 @@ import 'CategoryListPage.dart';
 import 'PlayVideoPage.dart';
 import 'RandomImagePage.dart';
 
-const accessToken =
-    'EAARKtLa78sIBO9Hnr8Vgt6g8odqmv3cWUKuKZBgkh3RwF4Pu1T5sLrBGbKMhzEVpwZAKd6HYeCkFan8VsQwweo53hZBpJaJqSZBoRdWy3girwZB8JZC9PPtizZAtSo50JRoNelkBafieMFvL7SxQSqJZBxgk8yljJUv8TAKIPsCI37kBaja7gt2nbPc2dwZDZD'; // Replace with your Facebook Access Token
+const initialAccessToken =
+    'EAARKtLa78sIBO6y3OZBT7jHgOPfFprCZC6UZBZCsvsNONC5Jya6bZAQKFkcHMhuBJJXj88mYPUDMlhaMOoPTFI85oOQrKCgePq6dKZBrOkigQyjVEITNQPD5jT2aPZC8FH8Qu164CrcpHjBsSdr8veY2ZBe9bPeRuofKyPNycpJr9Vw68hBWEQnYBYKmY3kCAbdGHI9F3z8Qhy83wBIZApAZDZD';
 
 class VideoPage extends StatefulWidget {
   final String title;
@@ -45,6 +45,8 @@ class _VideoPageState extends State<VideoPage> {
 
   Map<int, List<YoutubePlayerController>> _controllers = {};
 
+  static String? _accessToken;
+
   @override
   void initState() {
     super.initState();
@@ -52,11 +54,72 @@ class _VideoPageState extends State<VideoPage> {
     _initialize();
   }
 
+  static Future<String?> getAccessToken() async {
+    if (_accessToken == null || await _isTokenExpired()) {
+      _accessToken = await _refreshFacebookAccessToken();
+    }
+    return _accessToken;
+  }
+
+  static Future<String?> _refreshFacebookAccessToken() async {
+    const clientId = '1208039927182018';
+    const clientSecret = 'd720fe369470ee03f731846fa319d7cc';
+    const shortLivedAccessToken = initialAccessToken;
+
+    final refreshTokenUrl = Uri.parse(
+      'https://graph.facebook.com/oauth/access_token'
+      '?grant_type=fb_exchange_token'
+      '&client_id=$clientId'
+      '&client_secret=$clientSecret'
+      '&fb_exchange_token=$shortLivedAccessToken',
+    );
+
+    final response = await http.get(refreshTokenUrl);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final accessToken = data['access_token'];
+      final expiresIn = data['expires_in']; // Typically in seconds
+
+      if (accessToken != null && expiresIn != null) {
+        final prefs = await SharedPreferences.getInstance();
+        final expiresAt =
+            DateTime.now().millisecondsSinceEpoch + (expiresIn * 1000);
+
+        await prefs.setString('access_token', accessToken);
+        await prefs.setInt('expires_at', expiresAt as int);
+
+        return accessToken;
+      } else {
+        // Handle missing data scenario
+        return null;
+      }
+    } else {
+      // Log the error response for debugging
+      return null;
+    }
+  }
+
+  static Future<bool> _isTokenExpired() async {
+    final prefs = await SharedPreferences.getInstance();
+    final expiresAt = prefs.getInt('expires_at') ?? 0;
+
+    return DateTime.now().millisecondsSinceEpoch >= expiresAt;
+  }
+
   Future<void> _initialize() async {
     try {
       await Future.delayed(Duration(seconds: 1));
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? cachedData = prefs.getString('videoLocalData');
+
+      setState(() {
+        final List<dynamic> cachedValues = json.decode(cachedData!);
+        _data = cachedValues.cast<List<dynamic>>();
+        setState(() {
+          _data = cachedValues.cast<List<dynamic>>();
+        });
+      });
 
       if (title != '' ||
           title.isNotEmpty ||
@@ -130,204 +193,219 @@ class _VideoPageState extends State<VideoPage> {
   }
 
   Widget _buildVideoCard(BuildContext context, int index) {
-    final id = _filteredData[index][0].toString();
-    final title = _filteredData[index][1].toString();
-    final details = _filteredData[index][2].toString();
-    final category = _filteredData[index][3].toString();
-    final videoLinks = _filteredData[index][4].toString();
+    if (_filteredData.isEmpty ||
+        index >= _filteredData.length ||
+        _filteredData[index].length < 5) {
+      return SizedBox
+          .shrink(); // Prevents RangeError by returning an empty widget
+    }
 
-    final videoId = YoutubePlayerController.convertUrlToId(videoLinks.trim());
+    if (_data.isNotEmpty && index < _data.length) {
+      final id = _filteredData[index][0].toString();
+      final title = _filteredData[index][1].toString();
+      final details = _filteredData[index][2].toString();
+      final category = _filteredData[index][3].toString();
+      final videoLinks = _filteredData[index][4].toString();
 
-    // Check if the link is from YouTube or Facebook
-    final isYouTube =
-        videoLinks.contains('youtube.com') || videoLinks.contains('youtu.be');
-    final isFacebook = videoLinks.contains('facebook.com');
+      // Check if the link is from YouTube or Facebook
+      final isYouTube =
+          videoLinks.contains('youtube.com') || videoLinks.contains('youtu.be');
+      final isFacebook = videoLinks.contains('facebook.com');
 
-    if (isYouTube) {
-      if (videoId == null) {
-        return SizedBox.shrink(); // Skip invalid video links
-      }
+      if (isYouTube) {
+        final videoId =
+            YoutubePlayerController.convertUrlToId(videoLinks.trim());
 
-      // Get the thumbnail URL from YouTube
-      final thumbnailUrl =
-          'https://corsproxy.io/?https://img.youtube.com/vi/$videoId/hqdefault.jpg';
-
-      return GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => PlayVideoPage(
-                id: id,
-                title: title,
-                details: details,
-                category: category,
-                link: videoLinks,
-              ),
-            ),
-          );
-        },
-        child: Card(
-          elevation: 8,
-          margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15.0),
-          ),
-          shadowColor: Color.fromARGB(255, 91, 50, 35).withOpacity(0.9),
-          child: Column(
-            children: [
-              // Display the thumbnail image using CachedNetworkImage
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(15.0)),
-                  color: Colors.black,
-                ),
-                child: AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: CachedNetworkImage(
-                    imageUrl: thumbnailUrl,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) =>
-                        Center(child: CircularProgressIndicator()),
-                  ),
-                ),
-              ),
-              ListTile(
-                title: Padding(
-                  padding: const EdgeInsets.only(top: 1.5),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          title,
-                          style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.5),
-                          overflow: TextOverflow.ellipsis, // Handle overflow
-                          maxLines: 2, // Limit to one line
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    } else if (isFacebook) {
-      // For Facebook videos, we can embed them directly or use a thumbnail
-      // Here, we'll use a generic thumbnail and link to the Facebook video
-      Future<String?> getFacebookVideoThumbnailUrl(
-          String videoId, String accessToken) async {
-        final url =
-            'https://graph.facebook.com/v20.0/$videoId?fields=thumbnails&access_token=$accessToken';
-
-        final response = await http.get(Uri.parse(url));
-
-        if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
-          final thumbnailsData = data['thumbnails']?['data'];
-
-          if (thumbnailsData != null && thumbnailsData.isNotEmpty) {
-            // Get the URI from the first thumbnail in the list
-            final firstThumbnail = thumbnailsData[0];
-            return firstThumbnail['uri'];
-          }
+        if (videoId == null) {
+          return SizedBox.shrink(); // Skip invalid video links
         }
 
-        return null;
-      }
+        // Get the thumbnail URL from YouTube
+        final thumbnailUrl =
+            'https://corsproxy.io/?https://img.youtube.com/vi/$videoId/hqdefault.jpg';
 
-      final uri = Uri.parse(videoLinks);
-      final videoId = uri.pathSegments.last;
-
-      return FutureBuilder<String?>(
-        future: getFacebookVideoThumbnailUrl(videoId, accessToken),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data == null) {
-            return Center(child: Text('No thumbnail available'));
-          }
-
-          final thumbnailUrl = snapshot.data!;
-
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PlayVideoPage(
-                    id: id,
-                    title: title,
-                    details: details,
-                    category: category,
-                    link: videoLinks,
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PlayVideoPage(
+                  id: id,
+                  title: title,
+                  details: details,
+                  category: category,
+                  link: videoLinks,
+                ),
+              ),
+            );
+          },
+          child: Card(
+            elevation: 8,
+            margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            shadowColor: Color.fromARGB(255, 91, 50, 35).withOpacity(0.9),
+            child: Column(
+              children: [
+                // Display the thumbnail image using CachedNetworkImage
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(15.0)),
+                    color: Colors.black,
+                  ),
+                  child: AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: CachedNetworkImage(
+                      imageUrl: thumbnailUrl,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) =>
+                          Center(child: CircularProgressIndicator()),
+                    ),
                   ),
                 ),
-              );
-            },
-            child: Card(
-              elevation: 8,
-              margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15.0),
-              ),
-              shadowColor: Color.fromARGB(255, 91, 50, 35).withOpacity(0.9),
-              child: Column(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(15.0)),
-                    ),
-                    child: AspectRatio(
-                      aspectRatio: 16 / 9,
-                      child: CachedNetworkImage(
-                        imageUrl: thumbnailUrl,
-                        placeholder: (context, url) =>
-                            Center(child: CircularProgressIndicator()),
-                      ),
-                    ),
-                  ),
-                  ListTile(
-                    title: Padding(
-                      padding: const EdgeInsets.only(top: 0.5),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              title,
-                              style: const TextStyle(
+                ListTile(
+                  title: Padding(
+                    padding: const EdgeInsets.only(top: 1.5),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            title,
+                            style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                letterSpacing: 0.5,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
-                            ),
+                                letterSpacing: 0.5),
+                            overflow: TextOverflow.ellipsis, // Handle overflow
+                            maxLines: 2, // Limit to one line
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          );
-        },
-      );
+          ),
+        );
+      }
+      if (isFacebook) {
+        Future<String?> getFacebookVideoThumbnailUrl(String videoId) async {
+          final accessToken = await getAccessToken();
+          if (accessToken == null) {
+            return null;
+          }
+
+          final url =
+              'https://graph.facebook.com/v20.0/$videoId?fields=thumbnails&access_token=$accessToken';
+
+          final response = await http.get(Uri.parse(url));
+
+          if (response.statusCode == 200) {
+            final data = jsonDecode(response.body);
+            final thumbnailsData = data['thumbnails']?['data'];
+
+            if (thumbnailsData != null && thumbnailsData.isNotEmpty) {
+              // Get the URI from the first thumbnail in the list
+              final firstThumbnail = thumbnailsData[0];
+              return firstThumbnail['uri'];
+            }
+          }
+
+          return null;
+        }
+
+        final uri = Uri.parse(videoLinks);
+        final videoId = uri.pathSegments.last;
+
+        return FutureBuilder<String?>(
+          future: getFacebookVideoThumbnailUrl(videoId),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else if (!snapshot.hasData || snapshot.data == null) {
+              return SizedBox.shrink(); // Skip invalid video links
+            }
+
+            final thumbnailUrl = snapshot.data!;
+
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PlayVideoPage(
+                      id: id,
+                      title: title,
+                      details: details,
+                      category: category,
+                      link: videoLinks,
+                    ),
+                  ),
+                );
+              },
+              child: Card(
+                elevation: 8,
+                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                shadowColor: Color.fromARGB(255, 91, 50, 35).withOpacity(0.9),
+                child: Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(15.0)),
+                      ),
+                      child: AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: CachedNetworkImage(
+                          imageUrl: thumbnailUrl,
+                          placeholder: (context, url) =>
+                              Center(child: CircularProgressIndicator()),
+                        ),
+                      ),
+                    ),
+                    ListTile(
+                      title: Padding(
+                        padding: const EdgeInsets.only(top: 0.5),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                title,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      } else {
+        return SizedBox.shrink(); // Skip non-video links
+      }
     } else {
-      return SizedBox.shrink(); // Skip non-video links
+      return SizedBox.shrink();
     }
   }
 

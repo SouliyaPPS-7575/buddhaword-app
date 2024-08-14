@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, library_private_types_in_public_api, must_be_immutable, file_names, unrelated_type_equality_checks, avoid_web_libraries_in_flutter, unnecessary_null_comparison, use_build_context_synchronously, sized_box_for_whitespace, unused_local_variable, prefer_const_constructors_in_immutables, depend_on_referenced_packages
+// ignore_for_file: prefer_const_constructors, library_private_types_in_public_api, must_be_immutable, file_names, unrelated_type_equality_checks, avoid_web_libraries_in_flutter, unnecessary_null_comparison, use_build_context_synchronously, sized_box_for_whitespace, unused_local_variable, prefer_const_constructors_in_immutables, depend_on_referenced_packages, prefer_const_declarations
 
 import 'dart:async';
 import 'dart:convert';
@@ -48,7 +48,11 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
 
   InAppWebViewController? _webviewController;
 
+  String? _lastUrl;
+
   bool hasInternet = false;
+
+  static String? _accessToken;
 
   @override
   void initState() {
@@ -60,6 +64,81 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
 
     _checkConnectivity();
     _initialize();
+
+    _loadVideoInInAppWebView(widget.link ?? '', 0);
+
+    _restoreVideoPlayback();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_webviewController != null) {
+      _webviewController!.evaluateJavascript(source: """
+      document.addEventListener('fullscreenchange', function() {
+        if (document.fullscreenElement) {
+          document.querySelector('video').style.width = '100%';
+          document.querySelector('video').style.height = '100%';
+        } else {
+          document.querySelector('video').style.width = '';
+          document.querySelector('video').style.height = '';
+        }
+      });
+    """);
+    }
+  }
+
+  static Future<String?> getAccessToken() async {
+    if (_accessToken == null || await _isTokenExpired()) {
+      _accessToken = await _refreshFacebookAccessToken();
+    }
+    return _accessToken;
+  }
+
+  static Future<String?> _refreshFacebookAccessToken() async {
+    const clientId = '1208039927182018';
+    const clientSecret = 'd720fe369470ee03f731846fa319d7cc';
+    const shortLivedAccessToken = initialAccessToken;
+
+    final refreshTokenUrl = Uri.parse(
+      'https://graph.facebook.com/oauth/access_token'
+      '?grant_type=fb_exchange_token'
+      '&client_id=$clientId'
+      '&client_secret=$clientSecret'
+      '&fb_exchange_token=$shortLivedAccessToken',
+    );
+
+    final response = await http.get(refreshTokenUrl);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final accessToken = data['access_token'];
+      final expiresIn = data['expires_in']; // Typically in seconds
+
+      if (accessToken != null && expiresIn != null) {
+        final prefs = await SharedPreferences.getInstance();
+        final expiresAt =
+            DateTime.now().millisecondsSinceEpoch + (expiresIn * 1000);
+
+        await prefs.setString('access_token', accessToken);
+        await prefs.setInt('expires_at', expiresAt as int);
+
+        return accessToken;
+      } else {
+        // Handle missing data scenario
+        return null;
+      }
+    } else {
+      // Log the error response for debugging
+      return null;
+    }
+  }
+
+  static Future<bool> _isTokenExpired() async {
+    final prefs = await SharedPreferences.getInstance();
+    final expiresAt = prefs.getInt('expires_at') ?? 0;
+
+    return DateTime.now().millisecondsSinceEpoch >= expiresAt;
   }
 
   @override
@@ -87,10 +166,17 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
     }
   }
 
-  void _loadVideoInInAppWebView(String videoLink, double height) {
+  void _restoreVideoPlayback() {
+    if (_webviewController == null || _lastUrl == null) return;
+
+    _webviewController?.loadUrl(
+        urlRequest: URLRequest(url: Uri.parse(_lastUrl!)));
+  }
+
+  String _loadVideoInInAppWebView(String videoLink, double height) {
     if (_webviewController == null) {
       // The InAppWebViewController is not initialized
-      return;
+      return '';
     }
 
     String url = '';
@@ -98,20 +184,34 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
       final videoYoutubeLink = convertYoutubeLink(videoLink);
       final videoId = YoutubePlayerController.convertUrlToId(videoYoutubeLink);
       if (videoId != null) {
-        url = 'https://www.youtube.com/embed/$videoId';
+        url = 'https://www.youtube.com/embed/$videoId?autoplay=1&playsinline=1';
       }
     } else if (videoLink.contains('facebook.com')) {
       url = getFacebookEmbedUrl(videoLink, height);
     }
 
-    if (url.isNotEmpty) {
-      _webviewController?.loadUrl(urlRequest: URLRequest(url: Uri.parse(url)));
+    // Avoid reloading the same URL
+    if (url.isNotEmpty && _webviewController != null) {
+      _webviewController?.getUrl().then((currentUrl) {
+        if (currentUrl != url) {
+          _webviewController?.loadUrl(
+              urlRequest: URLRequest(url: Uri.parse(url)));
+        }
+      });
     }
+    if (kDebugMode) {
+      print('Loading video: $url');
+    }
+
+    return url;
   }
 
   String getFacebookEmbedUrl(String videoLink, double height) {
+    // Parse the video URL
     final uri = Uri.parse(videoLink);
     final videoId = uri.pathSegments.last; // Extract video ID
+
+    // Build the Facebook embed URL
     return 'https://www.facebook.com/plugins/video.php?height=${height.toInt()}&href=${Uri.encodeComponent(videoLink)}';
   }
 
@@ -224,8 +324,6 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
       final category = _data[index][3].toString();
       final videoLinks = _data[index][4].toString();
 
-      final videoId = YoutubePlayerController.convertUrlToId(videoLinks.trim());
-
       // Check if the link is from YouTube or Facebook
       final isYouTube =
           videoLinks.contains('youtube.com') || videoLinks.contains('youtu.be');
@@ -303,10 +401,12 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
           ),
         );
       } else if (isFacebook) {
-        // For Facebook videos, we can embed them directly or use a thumbnail
-        // Here, we'll use a generic thumbnail and link to the Facebook video
-        Future<String?> getFacebookVideoThumbnailUrl(
-            String videoId, String accessToken) async {
+        Future<String?> getFacebookVideoThumbnailUrl(String videoId) async {
+          final accessToken = await getAccessToken();
+          if (accessToken == null) {
+            return null;
+          }
+
           final url =
               'https://graph.facebook.com/v20.0/$videoId?fields=thumbnails&access_token=$accessToken';
 
@@ -330,14 +430,14 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
         final videoId = uri.pathSegments.last;
 
         return FutureBuilder<String?>(
-          future: getFacebookVideoThumbnailUrl(videoId, accessToken),
+          future: getFacebookVideoThumbnailUrl(videoId),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
             } else if (!snapshot.hasData || snapshot.data == null) {
-              return Center(child: Text('No thumbnail available'));
+              return SizedBox.shrink(); // Skip invalid video links
             }
 
             final thumbnailUrl = snapshot.data!;
@@ -521,11 +621,14 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
                 final isTabletOrDesktop =
                     MediaQuery.of(context).size.width > 600;
 
-                final String videoLink = convertYoutubeLink(_videoLink!);
-
                 // Assume getFromLocalStorage is a function that returns the list of videos
                 final videoLocalData =
                     getFromSharedPreferences('videoLocalData');
+
+                // final String videoLinks = _loadVideoInInAppWebView(
+                //     _videoLink ?? '', videoPlayerHeight);
+
+                final String videoLinks = convertYoutubeLink(_videoLink ?? '');
 
                 return Column(
                   children: [
@@ -535,26 +638,31 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
                       height: videoPlayerHeight,
                       child: InAppWebView(
                         initialUrlRequest:
-                            URLRequest(url: Uri.parse(videoLink)),
+                            URLRequest(url: Uri.parse(videoLinks)),
                         initialOptions: InAppWebViewGroupOptions(
                           crossPlatform: InAppWebViewOptions(
-                            mediaPlaybackRequiresUserGesture: true,
-                            useOnLoadResource:
-                                true, // Ensure all resources are loaded
+                            javaScriptEnabled: true,
+                            mediaPlaybackRequiresUserGesture: false,
+                            supportZoom: true,
                           ),
                         ),
-                        onWebViewCreated: (controller) {
+                        onWebViewCreated: (InAppWebViewController controller) {
                           _webviewController = controller;
                         },
-                        onLoadStart: (controller, url) {
-                          if (kDebugMode) {
-                            print('Loading: $url');
-                          }
-                        },
-                        onLoadStop: (controller, url) {
-                          if (kDebugMode) {
-                            print('Loaded: $url');
-                          }
+                        onLoadStop:
+                            (InAppWebViewController controller, Uri? url) {
+                          _webviewController = controller;
+                          _webviewController?.evaluateJavascript(source: """
+          document.addEventListener('fullscreenchange', function() {
+            if (document.fullscreenElement) {
+              document.querySelector('video').style.width = '100%';
+              document.querySelector('video').style.height = '100%';
+            } else {
+              document.querySelector('video').style.width = '';
+              document.querySelector('video').style.height = '';
+            }
+          });
+        """);
                         },
                       ),
                     ),
