@@ -110,14 +110,7 @@ class _VideoPageState extends State<VideoPage> {
   Future<void> _initialize() async {
     try {
       await Future.delayed(Duration(seconds: 1));
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? cachedData = prefs.getString('videoLocalData');
-
-      if (title != '' ||
-          title.isNotEmpty ||
-          cachedData == null ||
-          cachedData.isEmpty ||
-          cachedData == '{}') {
+      if (title != '') {
         await fetchDataFromAPI(_searchTerm);
       } else {
         await fetchDataOffline(_searchTerm);
