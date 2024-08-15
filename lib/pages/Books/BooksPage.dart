@@ -43,20 +43,9 @@ class _BooksPageState extends State<BooksPage> {
   Future<void> _initialize() async {
     try {
       await Future.delayed(Duration(seconds: 1));
-      final cachedDataLocal = await getFromSharedPreferences('booksLocalData');
 
-      if (hasInternet &&
-          (cachedDataLocal == '{}' ||
-              cachedDataLocal == null ||
-              cachedDataLocal.isEmpty)) {
+      if (hasInternet) {
         await fetchDataFromAPI(_searchTerm);
-      }
-
-      if (!hasInternet ||
-          cachedDataLocal != '{}' ||
-          cachedDataLocal != null ||
-          cachedDataLocal!.isNotEmpty) {
-        await fetchDataOffline(_searchTerm);
       }
     } catch (e) {
       if (kDebugMode) {
