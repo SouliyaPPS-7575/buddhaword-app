@@ -48,8 +48,6 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
 
   InAppWebViewController? _webviewController;
 
-  String? _lastUrl;
-
   bool hasInternet = false;
 
   static String? _accessToken;
@@ -65,27 +63,7 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
     _checkConnectivity();
     _initialize();
 
-    _loadVideoInInAppWebView(widget.link ?? '', 0);
-
-    _restoreVideoPlayback();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_webviewController != null) {
-      _webviewController!.evaluateJavascript(source: """
-      document.addEventListener('fullscreenchange', function() {
-        if (document.fullscreenElement) {
-          document.querySelector('video').style.width = '100%';
-          document.querySelector('video').style.height = '100%';
-        } else {
-          document.querySelector('video').style.width = '';
-          document.querySelector('video').style.height = '';
-        }
-      });
-    """);
-    }
+    _loadVideoInInAppWebView(_videoLink ?? '', 0);
   }
 
   static Future<String?> getAccessToken() async {
@@ -164,13 +142,6 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
             videoLink, MediaQuery.of(context).size.width > 600 ? 130 : 500);
       });
     }
-  }
-
-  void _restoreVideoPlayback() {
-    if (_webviewController == null || _lastUrl == null) return;
-
-    _webviewController?.loadUrl(
-        urlRequest: URLRequest(url: Uri.parse(_lastUrl!)));
   }
 
   String _loadVideoInInAppWebView(String videoLink, double height) {
@@ -648,21 +619,6 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
                         ),
                         onWebViewCreated: (InAppWebViewController controller) {
                           _webviewController = controller;
-                        },
-                        onLoadStop:
-                            (InAppWebViewController controller, Uri? url) {
-                          _webviewController = controller;
-                          _webviewController?.evaluateJavascript(source: """
-          document.addEventListener('fullscreenchange', function() {
-            if (document.fullscreenElement) {
-              document.querySelector('video').style.width = '100%';
-              document.querySelector('video').style.height = '100%';
-            } else {
-              document.querySelector('video').style.width = '';
-              document.querySelector('video').style.height = '';
-            }
-          });
-        """);
                         },
                       ),
                     ),

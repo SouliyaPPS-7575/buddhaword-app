@@ -113,14 +113,6 @@ class _VideoPageState extends State<VideoPage> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? cachedData = prefs.getString('videoLocalData');
 
-      setState(() {
-        final List<dynamic> cachedValues = json.decode(cachedData!);
-        _data = cachedValues.cast<List<dynamic>>();
-        setState(() {
-          _data = cachedValues.cast<List<dynamic>>();
-        });
-      });
-
       if (title != '' ||
           title.isNotEmpty ||
           cachedData == null ||

@@ -17,6 +17,7 @@ import '../../themes/ThemeProvider.dart';
 import '../Books/BooksPage.dart';
 import '../Sutra/ContactInfoPage.dart';
 import '../Sutra/FavoritePage.dart';
+import '../Sutra/RandomImagePage.dart';
 import '../Video/VideoPage.dart';
 
 class HomePage extends StatefulWidget {
@@ -231,72 +232,75 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       drawer: const NavigationDrawer(),
-      body: Column(
-        children: [
-          // Image Slider
-          SizedBox(
-            height: isTabletOrDesktop ? 400 : 220,
-            child: PageView.builder(
-              controller: _pageController,
-              itemCount: imageUrls.length,
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    // Open full-screen image viewer when the image is tapped
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            FullScreenImageView(imageUrl: imageUrls[index]),
-                      ),
-                    );
-                  },
-                  child: Image.network(
-                    imageUrls[index],
-                    fit: isTabletOrDesktop ? BoxFit.contain : BoxFit.cover,
+      body: _data.isEmpty
+          ? RandomImagePage()
+          : Column(
+              children: [
+                // Image Slider
+                SizedBox(
+                  height: isTabletOrDesktop ? 400 : 220,
+                  child: PageView.builder(
+                    controller: _pageController,
+                    itemCount: imageUrls.length,
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () {
+                          // Open full-screen image viewer when the image is tapped
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => FullScreenImageView(
+                                  imageUrl: imageUrls[index]),
+                            ),
+                          );
+                        },
+                        child: Image.network(
+                          imageUrls[index],
+                          fit:
+                              isTabletOrDesktop ? BoxFit.contain : BoxFit.cover,
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-          ),
-          SizedBox(height: isTabletOrDesktop ? 30 : 20),
-          // Menu Items
-          Expanded(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                int crossAxisCount;
+                ),
+                SizedBox(height: isTabletOrDesktop ? 30 : 20),
+                // Menu Items
+                Expanded(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      int crossAxisCount;
 
-                if (constraints.maxWidth >= 600) {
-                  // Tablet and Desktop screen
-                  crossAxisCount = 9;
-                } else {
-                  // Mobile screen
-                  crossAxisCount = 3;
-                }
+                      if (constraints.maxWidth >= 600) {
+                        // Tablet and Desktop screen
+                        crossAxisCount = 9;
+                      } else {
+                        // Mobile screen
+                        crossAxisCount = 3;
+                      }
 
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: GridView.count(
-                    crossAxisCount: crossAxisCount,
-                    crossAxisSpacing: 8.0,
-                    mainAxisSpacing: 8.0,
-                    children: List.generate(
-                      menuItems(context).length,
-                      (index) {
-                        final menuItem = menuItems(context)[index];
-                        return MenuItemCard(
-                          icon: menuItem.icon,
-                          title: menuItem.title,
-                          onTap: menuItem.onTap,
-                        );
-                      },
-                    ),
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: GridView.count(
+                          crossAxisCount: crossAxisCount,
+                          crossAxisSpacing: 8.0,
+                          mainAxisSpacing: 8.0,
+                          children: List.generate(
+                            menuItems(context).length,
+                            (index) {
+                              final menuItem = menuItems(context)[index];
+                              return MenuItemCard(
+                                icon: menuItem.icon,
+                                title: menuItem.title,
+                                onTap: menuItem.onTap,
+                              );
+                            },
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }
