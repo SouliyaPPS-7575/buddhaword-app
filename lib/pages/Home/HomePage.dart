@@ -288,8 +288,7 @@ class _HomePageState extends State<HomePage> {
                             (index) {
                               final menuItem = menuItems(context)[index];
                               return MenuItemCard(
-                                icon: menuItem.icon,
-                                title: menuItem.title,
+                                image: menuItem.image,
                                 onTap: menuItem.onTap,
                               );
                             },
@@ -345,17 +344,15 @@ void _openLinkChat() async {
 }
 
 class MenuItem {
-  final IconData icon;
-  final String title;
+  final dynamic image;
   final VoidCallback onTap;
 
-  MenuItem({required this.icon, required this.title, required this.onTap});
+  MenuItem({required this.image, required this.onTap});
 }
 
 List<MenuItem> menuItems(BuildContext context) => [
       MenuItem(
-        icon: Icons.library_books,
-        title: 'ພຣະສູດ & ສຽງ',
+        image: 'assets/home/ພຣະສູດ_ສຽງທຳ.jpg',
         onTap: () => {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
@@ -367,8 +364,7 @@ List<MenuItem> menuItems(BuildContext context) => [
         },
       ),
       MenuItem(
-        icon: Icons.favorite,
-        title: 'ພຣະສູດທີຖືກໃຈ',
+        image: 'assets/home/ພຣະສູດທີ່ຖືກໃຈ.jpg',
         onTap: () => {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
@@ -378,8 +374,7 @@ List<MenuItem> menuItems(BuildContext context) => [
         },
       ),
       MenuItem(
-        icon: Icons.book,
-        title: 'ປື້ມ & ເເຜນຜັງ',
+        image: 'assets/home/ປື້ມ_ແຜນຜັງ.jpg',
         onTap: () => {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
@@ -389,13 +384,11 @@ List<MenuItem> menuItems(BuildContext context) => [
         },
       ),
       MenuItem(
-        icon: Icons.sunny,
-        title: 'ພຣະທັມ',
+        image: 'assets/home/ພຣະທຳ.jpg',
         onTap: () => _openLinkDhamma(),
       ),
       MenuItem(
-        icon: Icons.video_library,
-        title: 'ວີດີໂອ Video',
+        image: 'assets/home/video.jpg',
         onTap: () => {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
@@ -407,23 +400,19 @@ List<MenuItem> menuItems(BuildContext context) => [
         },
       ),
       MenuItem(
-        icon: Icons.language,
-        title: 'Buddhaword English',
+        image: 'assets/home/Buddha_Word_English.jpg',
         onTap: () => _openLinkEnglish(),
       ),
       MenuItem(
-        icon: Icons.newspaper_rounded,
-        title: 'ຂ່າວສານ',
+        image: 'assets/home/ຂ່າວສານ.jpg',
         onTap: () => _openLinkNews(),
       ),
       MenuItem(
-        icon: Icons.message,
-        title: 'ສົນທະນາທັມ',
+        image: 'assets/home/ສົນທະນາທຳ.jpg',
         onTap: () => _openLinkChat(),
       ),
       MenuItem(
-        icon: Icons.contact_page_outlined,
-        title: 'ຂໍ້ມູນຕິດຕໍ່',
+        image: 'assets/home/ຂໍ້ມູນຕິດຕໍ່.jpg',
         onTap: () => {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
@@ -435,23 +424,17 @@ List<MenuItem> menuItems(BuildContext context) => [
     ];
 
 class MenuItemCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
+  final String image;
   final VoidCallback onTap;
 
   const MenuItemCard({
-    required this.icon,
-    required this.title,
+    required this.image,
     required this.onTap,
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Get the screen width to adjust sizes for mobile
-    double screenWidth = MediaQuery.of(context).size.width;
-    bool isMobile = screenWidth < 600;
-
     return InkWell(
       onTap: onTap,
       child: Card(
@@ -462,36 +445,19 @@ class MenuItemCard extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.0),
         ),
-        child: Padding(
-          padding: EdgeInsets.all(isMobile
-              ? 8.0
-              : 10.0), // Slightly smaller padding for desktop/tablet
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center, // Center the content
-            children: [
-              Icon(
-                icon,
-                size: isMobile
-                    ? 30.0
-                    : 44.0, // Smaller icon on mobile and slightly larger on desktop/tablet
-                color: Theme.of(context).colorScheme.primary,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Image widget
+            Expanded(
+              child: Image.asset(
+                image,
+                width: double.infinity, // Full width
+                height: double.infinity, // Full height
+                fit: BoxFit.cover, // Cover the entire space
               ),
-              SizedBox(
-                  height: isMobile
-                      ? 6.0
-                      : 10.0), // Smaller spacing on mobile and slightly larger on desktop/tablet
-              Text(
-                title,
-                textAlign: TextAlign.center, // Center the text
-                style: TextStyle(
-                  fontSize:
-                      isMobile ? 13.0 : 18.0, // Smaller font size on mobile
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
