@@ -245,6 +245,14 @@ class _BooksPageState extends State<BooksPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu_open, color: Colors.white),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+          ),
+        ),
         title: Text(
           'ປື້ມ & ເເຜນຜັງ',
           style: TextStyle(fontSize: 16, letterSpacing: 0.5),

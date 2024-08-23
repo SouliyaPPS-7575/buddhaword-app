@@ -546,7 +546,7 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
                 const SizedBox(width: 10),
                 Builder(
                   builder: (context) => IconButton(
-                    icon: const Icon(Icons.menu, color: Colors.white),
+                    icon: const Icon(Icons.menu_open, color: Colors.white),
                     onPressed: () {
                       Scaffold.of(context).openDrawer();
                     },

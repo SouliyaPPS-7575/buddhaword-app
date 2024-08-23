@@ -132,15 +132,6 @@ flutter:
     - assets/ເຫັນທຳ/loading_mobile.jpg
     - assets/ເຫັນທຳ/loading_desktop_tablet.jpg
     - assets/wooden_background.jpg
-    - assets/home/Buddha_Word_English.jpg
-    - assets/home/video.jpg
-    - assets/home/ຂໍ້ມູນຕິດຕໍ່.jpg
-    - assets/home/ຂ່າວສານ.jpg
-    - assets/home/ສົນທະນາທຳ.jpg
-    - assets/home/ປື້ມ_ແຜນຜັງ.jpg
-    - assets/home/ພຣະສູດ_ສຽງທຳ.jpg
-    - assets/home/ພຣະສູດທີ່ຖືກໃຈ.jpg
-    - assets/home/ພຣະທຳ.jpg
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

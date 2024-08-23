@@ -15,7 +15,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'layouts/NavigationDrawer.dart';
-import 'pages/Home/HomePage.dart';
 import 'pages/Sutra/CategoryListPage.dart';
 import 'pages/Sutra/DetailPage.dart';
 import 'pages/Sutra/RandomImagePage.dart';
@@ -361,38 +360,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: InkWell(
-          onTap: () {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => HomePage(),
-              ),
-            );
-          },
-          child: const Text(
-            'ທັມມະ',
-            style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu_open, color: Colors.white),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
           ),
         ),
+        title: const Text(
+          'ທັມມະ',
+          style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
+        ),
         actions: [
-          // _filteredData.isNotEmpty
-          //     ? IconButton(
-          //         icon: const Icon(Icons.auto_stories_outlined,
-          //             color: Colors.white),
-          //         onPressed: () {
-          //           // Implement your action here, e.g., navigate to book reading screen
-          //           Navigator.push(
-          //             context,
-          //             MaterialPageRoute(
-          //               builder: (context) => BookReadingScreenPage(
-          //                 filteredData: _filteredData,
-          //                 onFavoriteChanged: () => setState(() {}),
-          //               ),
-          //             ),
-          //           );
-          //         },
-          //       )
-          //     : const SizedBox(),
           IconButton(
             icon: const Icon(Icons.video_library, color: Colors.white),
             onPressed: () {

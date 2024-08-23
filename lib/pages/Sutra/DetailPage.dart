@@ -271,7 +271,7 @@ class _DetailPageState extends State<DetailPage> {
           const SizedBox(width: 4),
           Builder(
             builder: (context) => IconButton(
-              icon: const Icon(Icons.menu, color: Colors.white),
+              icon: const Icon(Icons.menu_open, color: Colors.white),
               onPressed: () {
                 Scaffold.of(context).openDrawer();
               },

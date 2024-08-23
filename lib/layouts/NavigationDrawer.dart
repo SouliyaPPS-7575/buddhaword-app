@@ -10,7 +10,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../main.dart';
 import '../pages/Books/BooksPage.dart';
-import '../pages/Home/HomePage.dart';
 import '../pages/Sutra/ContactInfoPage.dart';
 import '../pages/Sutra/FavoritePage.dart';
 import '../pages/Video/VideoPage.dart';
@@ -480,25 +479,6 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     builder: (context) => MyHomePage(
                       title: '',
                     ),
-                  ),
-                ),
-              },
-            ),
-            ListTile(
-              leading: _isChecked
-                  ? Icon(Icons.home_outlined, color: _checkColor)
-                  : Icon(Icons.home_rounded, color: _checkColor),
-              title: const Text(
-                'ເມນູ',
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5),
-              ),
-              onTap: () => {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => HomePage(),
                   ),
                 ),
               },

@@ -510,6 +510,14 @@ class _VideoPageState extends State<VideoPage> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu_open, color: Colors.white),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+          ),
+        ),
         title: Text(
           'ວີດີໂອ Video',
           style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
