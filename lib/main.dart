@@ -9,17 +9,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'layouts/NavigationDrawer.dart';
 import 'pages/Home/HomePage.dart';
-import 'pages/Sutra/BookReadingScreenPage.dart';
 import 'pages/Sutra/CategoryListPage.dart';
 import 'pages/Sutra/DetailPage.dart';
 import 'pages/Sutra/RandomImagePage.dart';
+import 'pages/Video/VideoPage.dart';
 import 'themes/ThemeProvider.dart';
 
 void main() {
@@ -67,7 +67,7 @@ class MyApp extends StatelessWidget {
                   return AppUpgradeAlert(
                     xApiKey: 'ZmRmNjE3ZDQtZmQwYS00OTgxLWIzZjAtNGE5Mzk4YWU1ZTYx',
                     appInfo: appInfo,
-                    child: HomePage(),
+                    child: MyHomePage(title: ''),
                   );
                 } else {
                   return MyHomePage(title: '');
@@ -361,30 +361,51 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'ທັມມະ',
-          style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
+        title: InkWell(
+          onTap: () {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => HomePage(),
+              ),
+            );
+          },
+          child: const Text(
+            'ທັມມະ',
+            style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
+          ),
         ),
         actions: [
-          _filteredData.isNotEmpty
-              ? IconButton(
-                  icon: const Icon(Icons.auto_stories_outlined,
-                      color: Colors.white),
-                  onPressed: () {
-                    // Implement your action here, e.g., navigate to book reading screen
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => BookReadingScreenPage(
-                          filteredData: _filteredData,
-                          onFavoriteChanged: () => setState(() {}),
-                        ),
-                      ),
-                    );
-                  },
-                )
-              : const SizedBox(),
-          const SizedBox(width: 12),
+          // _filteredData.isNotEmpty
+          //     ? IconButton(
+          //         icon: const Icon(Icons.auto_stories_outlined,
+          //             color: Colors.white),
+          //         onPressed: () {
+          //           // Implement your action here, e.g., navigate to book reading screen
+          //           Navigator.push(
+          //             context,
+          //             MaterialPageRoute(
+          //               builder: (context) => BookReadingScreenPage(
+          //                 filteredData: _filteredData,
+          //                 onFavoriteChanged: () => setState(() {}),
+          //               ),
+          //             ),
+          //           );
+          //         },
+          //       )
+          //     : const SizedBox(),
+          IconButton(
+            icon: const Icon(Icons.video_library, color: Colors.white),
+            onPressed: () {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => VideoPage(
+                    title: 'ວີດີໂອ Video',
+                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(width: 10),
           IconButton(
             icon: _data.isEmpty
                 ? const SizedBox(

@@ -213,9 +213,11 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'ທັມມະ',
-          style: TextStyle(fontSize: 17, letterSpacing: 0.5),
+        title: Center(
+          child: Text(
+            'ທັມມະ',
+            style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+          ),
         ),
         actions: [
           Consumer<ThemeProvider>(
