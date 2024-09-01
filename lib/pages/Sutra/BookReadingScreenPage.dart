@@ -61,6 +61,10 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
   bool hasInternet =
       Connectivity().checkConnectivity() != ConnectivityResult.none;
 
+  // check if the current theme is dark or not
+  bool? isDarkMode;
+  Timer? _themeCheckTimer;
+
   @override
   void initState() {
     super.initState();
@@ -76,6 +80,20 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
     });
 
     _checkInternetConnectivity();
+
+    // Start the timer to check theme value periodically
+    _themeCheckTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+      _checkTheme();
+    });
+  }
+
+  // Check the theme and update the state
+  void _checkTheme() {
+    final themeLocal =
+        Provider.of<ThemeProvider>(context, listen: false).isDarkMode;
+    setState(() {
+      isDarkMode = themeLocal;
+    });
   }
 
   Future<void> _initialize() async {
@@ -194,6 +212,9 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
   @override
   void dispose() {
     _disposeAudioPlayer();
+
+    _themeCheckTimer?.cancel();
+
     super.dispose();
   }
 
@@ -430,6 +451,11 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
                 minHeight: MediaQuery.of(context).size.height,
               ),
               padding: const EdgeInsets.all(8.0),
+              // Set the background color based on the theme
+              color: isDarkMode == true
+                  ? Colors.black // Dark theme background color
+                  : Color.fromRGBO(246, 238, 217,
+                      1.0), // Light theme background color (or any other color you prefer)
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -721,6 +747,9 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
                                           height: 1.8,
                                           textBaseline: TextBaseline.alphabetic,
                                           letterSpacing: 0.5,
+                                          color: isDarkMode == true
+                                              ? Colors.white
+                                              : Color.fromRGBO(88, 74, 54, 1.0),
                                         ),
                                       ),
                                     ),

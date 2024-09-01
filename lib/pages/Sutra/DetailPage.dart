@@ -60,6 +60,10 @@ class _DetailPageState extends State<DetailPage> {
   bool hasInternet =
       Connectivity().checkConnectivity() != ConnectivityResult.none;
 
+  // check if the current theme is dark or not
+  bool? isDarkMode;
+  Timer? _themeCheckTimer;
+
   @override
   void initState() {
     super.initState();
@@ -70,6 +74,20 @@ class _DetailPageState extends State<DetailPage> {
     if (hasInternet && widget.audio != '/') {
       _initializePlayer();
     }
+
+    // Start the timer to check theme value periodically
+    _themeCheckTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+      _checkTheme();
+    });
+  }
+
+  // Check the theme and update the state
+  void _checkTheme() {
+    final themeLocal =
+        Provider.of<ThemeProvider>(context, listen: false).isDarkMode;
+    setState(() {
+      isDarkMode = themeLocal;
+    });
   }
 
   void _initializePlayer() async {
@@ -108,6 +126,8 @@ class _DetailPageState extends State<DetailPage> {
     _playerStateSubscription?.cancel();
     _durationSubscription?.cancel();
     _positionSubscription?.cancel();
+
+    _themeCheckTimer?.cancel();
 
     super.dispose();
   }
@@ -299,6 +319,11 @@ class _DetailPageState extends State<DetailPage> {
             minHeight: MediaQuery.of(context).size.height,
           ),
           padding: const EdgeInsets.all(8.0),
+          // Set the background color based on the theme
+          color: isDarkMode == true
+              ? Colors.black // Dark theme background color
+              : Color.fromRGBO(246, 238, 217,
+                  1.0), // Light theme background color (or any other color you prefer)
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -491,6 +516,9 @@ class _DetailPageState extends State<DetailPage> {
                                       height: 1.8,
                                       textBaseline: TextBaseline.alphabetic,
                                       letterSpacing: 0.5,
+                                      color: isDarkMode == true
+                                          ? Colors.white
+                                          : Color.fromRGBO(88, 74, 54, 1.0),
                                     ),
                                   ),
                                 ),
