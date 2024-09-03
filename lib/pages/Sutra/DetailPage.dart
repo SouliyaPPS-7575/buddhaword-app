@@ -76,7 +76,7 @@ class _DetailPageState extends State<DetailPage> {
     }
 
     // Start the timer to check theme value periodically
-    _themeCheckTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+    _themeCheckTimer = Timer.periodic(Duration(seconds: 0), (timer) {
       _checkTheme();
     });
   }

@@ -451,11 +451,11 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
       );
 
   Widget buildMenuItems(BuildContext context) => Container(
-        padding: const EdgeInsets.all(24),
+        padding:
+            const EdgeInsets.only(top: 50, left: 24, right: 24, bottom: 24),
         child: Wrap(
           runSpacing: 0, //verticalSpacing
           children: [
-            SizedBox(height: 20),
             ListTile(
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.center,

@@ -505,10 +505,37 @@ class _BooksPageState extends State<BooksPage> {
                                               child: Image.network(
                                                 coverImageUrl,
                                                 fit: BoxFit.cover,
-                                                errorBuilder: (context, error,
-                                                        stackTrace) =>
-                                                    Icon(Icons.broken_image,
-                                                        size: 80),
+                                                loadingBuilder:
+                                                    (BuildContext context,
+                                                        Widget child,
+                                                        ImageChunkEvent?
+                                                            loadingProgress) {
+                                                  if (loadingProgress == null) {
+                                                    return child;
+                                                  } else {
+                                                    return Center(
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                        value: loadingProgress
+                                                                    .expectedTotalBytes !=
+                                                                null
+                                                            ? loadingProgress
+                                                                    .cumulativeBytesLoaded /
+                                                                (loadingProgress
+                                                                        .expectedTotalBytes ??
+                                                                    1)
+                                                            : null,
+                                                      ),
+                                                    );
+                                                  }
+                                                },
+                                                errorBuilder: (BuildContext
+                                                        context,
+                                                    Object exception,
+                                                    StackTrace? stackTrace) {
+                                                  return Image.asset(
+                                                      'assets/default_image.jpg'); // A local placeholder image
+                                                },
                                               ),
                                             ),
                                           ),

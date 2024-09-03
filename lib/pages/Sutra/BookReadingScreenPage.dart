@@ -82,7 +82,7 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
     _checkInternetConnectivity();
 
     // Start the timer to check theme value periodically
-    _themeCheckTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+    _themeCheckTimer = Timer.periodic(Duration(seconds: 0), (timer) {
       _checkTheme();
     });
   }
