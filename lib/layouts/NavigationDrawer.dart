@@ -455,6 +455,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
         child: Wrap(
           runSpacing: 0, //verticalSpacing
           children: [
+            SizedBox(height: 20),
             ListTile(
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
