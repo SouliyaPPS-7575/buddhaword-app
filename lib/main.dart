@@ -15,6 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'layouts/NavigationDrawer.dart';
+import 'pages/Books/BooksPage.dart';
 import 'pages/Sutra/CategoryListPage.dart';
 import 'pages/Sutra/DetailPage.dart';
 import 'pages/Sutra/RandomImagePage.dart';
@@ -370,7 +371,8 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         title: const Text(
           'ທັມມະ',
-          style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
+          style: TextStyle(
+              fontWeight: FontWeight.bold, letterSpacing: 0.5, fontSize: 17.0),
         ),
         actions: [
           IconButton(
@@ -381,6 +383,17 @@ class _MyHomePageState extends State<MyHomePage> {
                   builder: (context) => VideoPage(
                     title: 'ວີດີໂອ Video',
                   ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(width: 10),
+          IconButton(
+            icon: const Icon(Icons.auto_stories_outlined, color: Colors.white),
+            onPressed: () {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => BooksPage(),
                 ),
               );
             },
@@ -411,18 +424,35 @@ class _MyHomePageState extends State<MyHomePage> {
               );
             },
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
           Consumer<ThemeProvider>(
             builder: (context, themeProvider, child) {
-              return Switch(
-                value: themeProvider.isDarkMode,
-                onChanged: (isDarkMode) {
-                  themeProvider.toggleTheme(isDarkMode);
-                },
-                activeColor: Theme.of(context).colorScheme.secondary,
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      themeProvider.toggleTheme(!themeProvider.isDarkMode);
+                    },
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Text(
+                          themeProvider.isDarkMode ? "☀️" : "🌙",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               );
             },
           ),
+          const SizedBox(width: 15),
         ],
       ),
       drawer: const NavigationDrawer(),
@@ -818,6 +848,20 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          const String urlChat =
+              "https://tawk.to/chat/61763b9bf7c0440a591fc969/1fiqthn3u";
+
+          if (await canLaunch(urlChat)) {
+            await launch(urlChat);
+          } else {
+            throw 'Could not launch $urlChat';
+          }
+        },
+        tooltip: 'ສົນທະນາ',
+        child: const Icon(Icons.chat_sharp),
+      ),
     );
   }
 

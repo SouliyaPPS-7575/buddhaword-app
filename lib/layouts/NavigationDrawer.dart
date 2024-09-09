@@ -38,8 +38,10 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
       "https://www.facebook.com/profile.php?id=100077638042542";
   final String urlCalendar = "https://bit.ly/LaosCalendar";
   final String urlArnuta = "https://arnuta.blogspot.com/";
-  final String urlChat = "https://chat.whatsapp.com/CZ7j5fhSatK37v76zmmVCK";
-
+  final String urlGroupChat =
+      "https://chat.whatsapp.com/CZ7j5fhSatK37v76zmmVCK";
+  final String urlChat =
+      "https://tawk.to/chat/61763b9bf7c0440a591fc969/1fiqthn3u";
   // void _openLinkWebapp() async {
   //   if (await canLaunch(urlWebapp)) {
   //     await launch(urlWebapp);
@@ -95,6 +97,14 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
   //     throw 'Could not launch $urlArnuta';
   //   }
   // }
+
+  void _openLinkGroupChat() async {
+    if (await canLaunch(urlGroupChat)) {
+      await launch(urlGroupChat);
+    } else {
+      throw 'Could not launch $urlGroupChat';
+    }
+  }
 
   void _openLinkChat() async {
     if (await canLaunch(urlChat)) {
@@ -621,19 +631,31 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
             //   ),
             //   onTap: () => _openLinkCalendar(),
             // ),
-
             ListTile(
               leading: _isChecked
                   ? Icon(Icons.message, color: _checkColor)
                   : Icon(Icons.message_outlined, color: _checkColor),
               title: const Text(
-                'ສົນທະນາທັມ',
+                'ສົນທະນາ',
                 style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.5),
               ),
               onTap: () => _openLinkChat(),
+            ),
+            ListTile(
+              leading: _isChecked
+                  ? Icon(Icons.chat_bubble_rounded, color: _checkColor)
+                  : Icon(Icons.chat_bubble_rounded, color: _checkColor),
+              title: const Text(
+                'ກຸ່ມສົນທະນາທັມ',
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5),
+              ),
+              onTap: () => _openLinkGroupChat(),
             ),
             ListTile(
               leading: _isChecked

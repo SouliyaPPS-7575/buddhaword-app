@@ -421,18 +421,35 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
               },
             ),
           ),
-          const SizedBox(width: 5),
+          const SizedBox(width: 15),
           Consumer<ThemeProvider>(
             builder: (context, themeProvider, child) {
-              return Switch(
-                value: themeProvider.isDarkMode,
-                onChanged: (isDarkMode) {
-                  themeProvider.toggleTheme(isDarkMode);
-                },
-                activeColor: Theme.of(context).colorScheme.secondary,
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      themeProvider.toggleTheme(!themeProvider.isDarkMode);
+                    },
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Text(
+                          themeProvider.isDarkMode ? "☀️" : "🌙",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               );
             },
           ),
+          const SizedBox(width: 15),
         ],
       ),
       drawer: const NavigationDrawer(),
