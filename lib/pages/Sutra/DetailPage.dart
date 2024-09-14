@@ -622,7 +622,7 @@ class _DetailPageState extends State<DetailPage> {
 
   void _shareDetailLink() {
     final shareText =
-        '${widget.title}\n https://buddha-nature.web.app/#/details/${widget.id}';
+        '${widget.title}\n https://buddha-nature.web.app/#/details/${widget.id}?prev=sutra';
 
     Share.share(shareText, subject: widget.title);
   }

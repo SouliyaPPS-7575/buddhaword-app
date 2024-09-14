@@ -860,7 +860,7 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
     final currentTitle = getCurrentTitle();
 
     final currentRoute =
-        'https://buddha-nature.web.app/#/details/${widget.filteredData[_currentPageIndex][0]}';
+        'https://buddha-nature.web.app/#/details/${widget.filteredData[_currentPageIndex][0]}?prev=sutra';
 
     final shareText = '$currentTitle\n $currentRoute';
 
