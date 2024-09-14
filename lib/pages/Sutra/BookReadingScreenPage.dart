@@ -80,20 +80,19 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
     });
 
     _checkInternetConnectivity();
-
-    // Start the timer to check theme value periodically
-    _themeCheckTimer = Timer.periodic(Duration(seconds: 0), (timer) {
-      _checkTheme();
-    });
   }
 
-  // Check the theme and update the state
-  void _checkTheme() {
-    final themeLocal =
-        Provider.of<ThemeProvider>(context, listen: false).isDarkMode;
-    setState(() {
-      isDarkMode = themeLocal;
-    });
+  // Remove redundant theme-checking timer, instead rely on Theme changes directly via the provider
+  @override
+  void didChangeDependencies() {
+    // Track theme changes based on the current provider
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    if (themeProvider.isDarkMode != isDarkMode) {
+      setState(() {
+        isDarkMode = themeProvider.isDarkMode;
+      });
+    }
+    super.didChangeDependencies();
   }
 
   Future<void> _initialize() async {
