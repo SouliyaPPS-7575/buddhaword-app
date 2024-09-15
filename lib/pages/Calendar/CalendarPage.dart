@@ -100,19 +100,19 @@ class _CalendarPageState extends State<CalendarPage> {
 
   // Function to scroll the page based on direction
   void _scroll() {
-    double scrollAmount = 150.0; // Amount to scroll
+    double scrollAmount = 250.0; // Amount to scroll
 
     // Scroll down or up based on the current direction
     if (_isScrollingDown) {
       _scrollController.animateTo(
         _scrollController.position.pixels + scrollAmount,
-        duration: Duration(milliseconds: 150),
+        duration: Duration(milliseconds: 250),
         curve: Curves.easeInOut,
       );
     } else {
       _scrollController.animateTo(
         _scrollController.position.pixels - scrollAmount,
-        duration: Duration(milliseconds: 150),
+        duration: Duration(milliseconds: 250),
         curve: Curves.easeInOut,
       );
     }
@@ -617,7 +617,7 @@ class _CalendarPageState extends State<CalendarPage> {
 
                   // Event List Container
                   Container(
-                    height: isMobile ? deviceHeight * 0.3 : deviceHeight * 0.5,
+                    height: isMobile ? deviceHeight * 0.4 : deviceHeight * 0.7,
                     child: _selectedDay == null ||
                             _getEventsForDay(_selectedDay!).isEmpty
                         ? Center(child: Text('No events for this day'))
