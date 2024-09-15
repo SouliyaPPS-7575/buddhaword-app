@@ -1014,7 +1014,7 @@ class _CalendarPageState extends State<CalendarPage> {
                                                         event[0].isNotEmpty) {
                                                       // Share image and description when event[0] is available
                                                       Share.share(
-                                                        '${event[1]}\n\n ${event[0]}\n\n ລາຍລະອຽດ: ${event[4]}\n\n' +
+                                                        '${event[1]}\n Poster: ${event[0]}\n\n ລາຍລະອຽດ: ${event[4]}\n\n' +
                                                             (event[6] != '/'
                                                                 ? 'ສະຖານທີ່ 1: ${event[6]}\n\n'
                                                                 : '') +
