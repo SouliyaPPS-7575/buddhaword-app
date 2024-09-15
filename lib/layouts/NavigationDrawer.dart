@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:lao_tipitaka/pages/Calendar/CalendarPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -590,6 +591,27 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     builder: (context) => VideoPage(
                       title: 'ວີດີໂອ Video',
                     ),
+                  ),
+                ),
+              },
+            ),
+
+             ListTile(
+              leading: _isChecked
+                  ? Icon(Icons.calendar_month, color: _checkColor)
+                  : Icon(Icons.calendar_month_outlined, color: _checkColor),
+              title: const Text(
+                'ປະຕິທິນທັມ',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              onTap: () => {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => CalendarPage(),
                   ),
                 ),
               },

@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
+import 'package:lao_tipitaka/pages/Calendar/CalendarPage.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -45,7 +46,7 @@ class MyApp extends StatelessWidget {
         builder: (context, themeProvider, child) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
-            title: 'ທັມມະ',
+            title: '',
             theme: ThemeData(
               primarySwatch: Colors.brown,
               fontFamily: 'NotoSerifLao',
@@ -370,11 +371,22 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
         title: const Text(
-          'ທັມມະ',
+          '',
           style: TextStyle(
-              fontWeight: FontWeight.bold, letterSpacing: 0.5, fontSize: 17.0),
+              fontWeight: FontWeight.bold, letterSpacing: 0.5, fontSize: 16.0),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.calendar_month, color: Colors.white),
+            onPressed: () {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => CalendarPage(),
+                ),
+              );
+            },
+          ),
+          const SizedBox(width: 10),
           IconButton(
             icon: const Icon(Icons.video_library, color: Colors.white),
             onPressed: () {

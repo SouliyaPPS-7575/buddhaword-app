@@ -61,6 +61,8 @@ dependencies:
   youtube_player_iframe: ^3.1.0
   flutter_inappwebview: ^5.8.0
   youtube_player_flutter: ^8.1.2
+  table_calendar: ^3.0.8
+  intl: ^0.17.0
 
 flutter_icons:
   android: "launcher_icon"
@@ -128,6 +130,7 @@ flutter:
     - assets/ເຫັນທຳ/loading_mobile.jpg
     - assets/ເຫັນທຳ/loading_desktop_tablet.jpg
     - assets/wooden_background.jpg
+    - assets/wisdom.jpg
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
