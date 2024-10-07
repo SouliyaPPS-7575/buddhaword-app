@@ -33,7 +33,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
   final String urlBooks =
       "https://drive.google.com/drive/folders/1z6vIdR-fzXxxhCM-rjqq8F7ZHLNlP5E3?usp=sharing";
   final String urlDhamma =
-      "https://buddhaword.vercel.app/4d1689680be74b6f96071c8dda16db9e";
+      "https://buddhaword.notion.site/4d1689680be74b6f96071c8dda16db9e";
   final String urlEnglish = "https://buddhaword-english.blogspot.com";
   final String urlNews =
       "https://www.facebook.com/profile.php?id=100077638042542";
