@@ -426,6 +426,56 @@ class _CalendarPageState extends State<CalendarPage> {
     );
   }
 
+
+// Helper function to check if the event is before or ongoing from the current date
+  bool isBeforeEndDate(String startDateStr, String endDateStr) {
+    DateTime currentDate = DateTime.now();
+    DateFormat dateFormat = DateFormat('dd/MM/yyyy');
+
+    try {
+      DateTime endDate =
+          dateFormat.parse(endDateStr.isNotEmpty ? endDateStr : startDateStr);
+
+      // Show the image if current date is before or on the end date
+      return currentDate.isBefore(endDate
+          .add(Duration(days: 1))); // Extend end date by 1 day for inclusivity
+
+    } catch (e) {
+      print('Error parsing date: $e');
+      return false; // If there's an error parsing, consider it inactive/expired.
+    }
+  }
+
+//  filter both _data and imageUrls to only include the ones where the event is active based on start and end dates.
+  List<String> getActiveImages(List<List<dynamic>> data, List<String> images) {
+    List<String> activeImages = [];
+
+    // Ensure that data and image URLs are aligned
+    if (data.length != images.length) {
+      print('Data length and image URLs length mismatch');
+      return activeImages; // return empty if there is a mismatch
+    }
+
+    // Iterate over both data and imageUrls and filter based on active status
+    for (int i = 0; i < data.length; i++) {
+      final event = data[i];
+
+      // Get start and end dates from event data
+      String startDateStr =
+          event[2]; // Adjust index based on actual event structure
+      String endDateStr =
+          event[3]; // Adjust index based on actual event structure
+
+      // Check if the event is still relevant (i.e., not expired based on end date)
+      if (isBeforeEndDate(startDateStr, endDateStr)) {
+        activeImages.add(images[
+            i]); // Include the image if the event is valid (future or current)
+      }
+    }
+
+    return activeImages;
+  }
+
   @override
   Widget build(BuildContext context) {
     final isTabletOrDesktop = MediaQuery.of(context).size.width > 600;
@@ -451,6 +501,9 @@ class _CalendarPageState extends State<CalendarPage> {
       imageWidth = deviceWidth * 0.6;
       imageHeight = deviceHeight * 0.8;
     }
+
+    // Get the list of images where the event has not ended
+    List<String> activeImageUrls = getActiveImages(_data, imageUrls);
 
     return Scaffold(
       appBar: AppBar(
@@ -513,60 +566,68 @@ class _CalendarPageState extends State<CalendarPage> {
               physics: BouncingScrollPhysics(), // Enable touch gestures
               child: Column(
                 children: [
-                  // Image Slider
+                   // Image Slider
                   SizedBox(
                     height: isTabletOrDesktop ? 400 : 220,
-                    child: PageView.builder(
-                      controller: _pageController,
-                      itemCount: imageUrls.length,
-                      itemBuilder: (context, index) {
-                        return GestureDetector(
-                          onTap: () {
-                            // Open full-screen image viewer when the image is tapped
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => FullScreenImagePageView(
-                                    imageUrls: imageUrls),
-                              ),
-                            );
-                          },
-                          child: Image.network(
-                            imageUrls[index] == ''
-                                ? 'assets/wisdom.jpg'
-                                : imageUrls[index],
-                            fit: BoxFit
-                                .contain, // To make sure the image fits within the box
-                            loadingBuilder: (BuildContext context, Widget child,
-                                ImageChunkEvent? loadingProgress) {
-                              if (loadingProgress == null) {
-                                return child; // Return the image when it's fully loaded
-                              } else {
-                                // Display a loading spinner while the image is loading
-                                return Center(
-                                  child: CircularProgressIndicator(
-                                    value: loadingProgress.expectedTotalBytes !=
-                                            null
-                                        ? loadingProgress
-                                                .cumulativeBytesLoaded /
-                                            loadingProgress.expectedTotalBytes!
-                                        : null, // Indeterminate progress if total bytes are unknown
-                                  ),
-                                );
-                              }
-                            },
-                            errorBuilder: (BuildContext context, Object error,
-                                StackTrace? stackTrace) {
-                              // Fallback/default image if there is an error loading the network image
-                              return Image.asset(
-                                'assets/wisdom.jpg', // Path to your local default image
-                                fit: BoxFit
-                                    .contain, // Same fitting for consistency
+                    child: activeImageUrls.isEmpty // No active images
+                        ? Center(
+                            child: Text('No upcoming or current events'),
+                          )
+                        : PageView.builder(
+                            controller: _pageController,
+                            itemCount: activeImageUrls.length,
+                            itemBuilder: (context, index) {
+                              return GestureDetector(
+                                onTap: () {
+                                  // Open full-screen image viewer when the image is tapped
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          FullScreenImagePageView(
+                                              imageUrls: activeImageUrls),
+                                    ),
+                                  );
+                                },
+                                child: Image.network(
+                                  activeImageUrls[index] == ''
+                                      ? 'assets/wisdom.jpg'
+                                      : activeImageUrls[index],
+                                  fit: BoxFit
+                                      .contain, // To make sure the image fits within the box
+                                  loadingBuilder: (BuildContext context,
+                                      Widget child,
+                                      ImageChunkEvent? loadingProgress) {
+                                    if (loadingProgress == null) {
+                                      return child; // Return the image when it's fully loaded
+                                    } else {
+                                      // Display a loading spinner while the image is loading
+                                      return Center(
+                                        child: CircularProgressIndicator(
+                                          value: loadingProgress
+                                                      .expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  loadingProgress
+                                                      .expectedTotalBytes!
+                                              : null, // Indeterminate progress if total bytes are unknown
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  errorBuilder: (BuildContext context,
+                                      Object error, StackTrace? stackTrace) {
+                                    // Fallback/default image if there is an error loading the network image
+                                    return Image.asset(
+                                      'assets/wisdom.jpg', // Path to your local default image
+                                      fit: BoxFit
+                                          .contain, // Same fitting for consistency
+                                    );
+                                  },
+                                ),
                               );
                             },
                           ),
-                        );
-                      },
-                    ),
                   ),
 
                   SizedBox(height: 10),
