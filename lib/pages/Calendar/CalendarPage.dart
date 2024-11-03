@@ -426,7 +426,6 @@ class _CalendarPageState extends State<CalendarPage> {
     );
   }
 
-
 // Helper function to check if the event is before or ongoing from the current date
   bool isBeforeEndDate(String startDateStr, String endDateStr) {
     DateTime currentDate = DateTime.now();
@@ -503,7 +502,7 @@ class _CalendarPageState extends State<CalendarPage> {
     }
 
     // Get the list of images where the event has not ended
-    List<String> activeImageUrls = getActiveImages(_data, imageUrls);
+    // List<String> activeImageUrls = getActiveImages(_data, imageUrls);
 
     return Scaffold(
       appBar: AppBar(
@@ -566,69 +565,69 @@ class _CalendarPageState extends State<CalendarPage> {
               physics: BouncingScrollPhysics(), // Enable touch gestures
               child: Column(
                 children: [
-                   // Image Slider
-                  SizedBox(
-                    height: isTabletOrDesktop ? 400 : 220,
-                    child: activeImageUrls.isEmpty // No active images
-                        ? Center(
-                            child: Text('No upcoming or current events'),
-                          )
-                        : PageView.builder(
-                            controller: _pageController,
-                            itemCount: activeImageUrls.length,
-                            itemBuilder: (context, index) {
-                              return GestureDetector(
-                                onTap: () {
-                                  // Open full-screen image viewer when the image is tapped
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          FullScreenImagePageView(
-                                              imageUrls: activeImageUrls),
-                                    ),
-                                  );
-                                },
-                                child: Image.network(
-                                  activeImageUrls[index] == ''
-                                      ? 'assets/wisdom.jpg'
-                                      : activeImageUrls[index],
-                                  fit: BoxFit
-                                      .contain, // To make sure the image fits within the box
-                                  loadingBuilder: (BuildContext context,
-                                      Widget child,
-                                      ImageChunkEvent? loadingProgress) {
-                                    if (loadingProgress == null) {
-                                      return child; // Return the image when it's fully loaded
-                                    } else {
-                                      // Display a loading spinner while the image is loading
-                                      return Center(
-                                        child: CircularProgressIndicator(
-                                          value: loadingProgress
-                                                      .expectedTotalBytes !=
-                                                  null
-                                              ? loadingProgress
-                                                      .cumulativeBytesLoaded /
-                                                  loadingProgress
-                                                      .expectedTotalBytes!
-                                              : null, // Indeterminate progress if total bytes are unknown
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  errorBuilder: (BuildContext context,
-                                      Object error, StackTrace? stackTrace) {
-                                    // Fallback/default image if there is an error loading the network image
-                                    return Image.asset(
-                                      'assets/wisdom.jpg', // Path to your local default image
-                                      fit: BoxFit
-                                          .contain, // Same fitting for consistency
-                                    );
-                                  },
-                                ),
-                              );
-                            },
-                          ),
-                  ),
+                  // Image Slider
+                  // SizedBox(
+                  //   height: isTabletOrDesktop ? 400 : 220,
+                  //   child: activeImageUrls.isEmpty // No active images
+                  //       ? Center(
+                  //           child: Text('No upcoming or current events'),
+                  //         )
+                  //       : PageView.builder(
+                  //           controller: _pageController,
+                  //           itemCount: activeImageUrls.length,
+                  //           itemBuilder: (context, index) {
+                  //             return GestureDetector(
+                  //               onTap: () {
+                  //                 // Open full-screen image viewer when the image is tapped
+                  //                 Navigator.of(context).push(
+                  //                   MaterialPageRoute(
+                  //                     builder: (context) =>
+                  //                         FullScreenImagePageView(
+                  //                             imageUrls: activeImageUrls),
+                  //                   ),
+                  //                 );
+                  //               },
+                  //               child: Image.network(
+                  //                 activeImageUrls[index] == ''
+                  //                     ? 'assets/wisdom.jpg'
+                  //                     : activeImageUrls[index],
+                  //                 fit: BoxFit
+                  //                     .contain, // To make sure the image fits within the box
+                  //                 loadingBuilder: (BuildContext context,
+                  //                     Widget child,
+                  //                     ImageChunkEvent? loadingProgress) {
+                  //                   if (loadingProgress == null) {
+                  //                     return child; // Return the image when it's fully loaded
+                  //                   } else {
+                  //                     // Display a loading spinner while the image is loading
+                  //                     return Center(
+                  //                       child: CircularProgressIndicator(
+                  //                         value: loadingProgress
+                  //                                     .expectedTotalBytes !=
+                  //                                 null
+                  //                             ? loadingProgress
+                  //                                     .cumulativeBytesLoaded /
+                  //                                 loadingProgress
+                  //                                     .expectedTotalBytes!
+                  //                             : null, // Indeterminate progress if total bytes are unknown
+                  //                       ),
+                  //                     );
+                  //                   }
+                  //                 },
+                  //                 errorBuilder: (BuildContext context,
+                  //                     Object error, StackTrace? stackTrace) {
+                  //                   // Fallback/default image if there is an error loading the network image
+                  //                   return Image.asset(
+                  //                     'assets/wisdom.jpg', // Path to your local default image
+                  //                     fit: BoxFit
+                  //                         .contain, // Same fitting for consistency
+                  //                   );
+                  //                 },
+                  //               ),
+                  //             );
+                  //           },
+                  //         ),
+                  // ),
 
                   SizedBox(height: 10),
 
