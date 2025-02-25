@@ -10,17 +10,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
-import 'package:lao_tipitaka/pages/Calendar/CalendarPage.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'layouts/NavigationDrawer.dart';
-import 'pages/Books/BooksPage.dart';
 import 'pages/Sutra/CategoryListPage.dart';
 import 'pages/Sutra/DetailPage.dart';
 import 'pages/Sutra/RandomImagePage.dart';
-import 'pages/Video/VideoPage.dart';
 import 'themes/ThemeProvider.dart';
 
 void main() {
@@ -353,12 +350,97 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  void _openLinkVideo() async {
+    if (await canLaunch('https://buddhaword.netlify.app/video')) {
+      await launch('https://buddhaword.netlify.app/video');
+    } else {
+      throw 'Could not launch';
+    }
+  }
+
+  void _openLinkCalendar() async {
+    if (await canLaunch('https://buddhaword.netlify.app/calendar')) {
+      await launch('https://buddhaword.netlify.app/calendar');
+    } else {
+      throw 'Could not launch';
+    }
+  }
+
+  void _openLinkBooks() async {
+    if (await canLaunch('https://buddhaword.netlify.app/book')) {
+      await launch('https://buddhaword.netlify.app/book');
+    } else {
+      throw 'Could not launch';
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     int crossAxisCount = screenWidth < 600 ? 3 : (screenWidth > 900 ? 5 : 4);
     double aspectRatio = screenWidth < 900 ? 0.8 : 1;
     double cardHeight = screenWidth < 900 ? 200.0 : 250.0;
+
+    TextSpan highlightSearchTerm(
+        BuildContext context, String text, String searchTerm) {
+      if (searchTerm.isEmpty) {
+        return TextSpan(
+          text: text,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+              ),
+        );
+      }
+
+      final RegExp regex =
+          RegExp(searchTerm, caseSensitive: false); //Case Insensitive
+      final List<TextSpan> spans = [];
+      int lastIndex = 0;
+
+      regex.allMatches(text).forEach((match) {
+        final String beforeMatch = text.substring(lastIndex, match.start);
+        final String matchedText = text.substring(match.start, match.end);
+
+        // Add normal text before match
+        spans.add(TextSpan(
+          text: beforeMatch,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+              ),
+        ));
+
+        // Add highlighted matched text
+        spans.add(TextSpan(
+          text: matchedText,
+          style: const TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+            color: Colors.black, // Highlight color
+            backgroundColor: Color(0xFFFFD700), // Yellow highlight
+          ),
+        ));
+
+        lastIndex = match.end;
+      });
+
+      // Add remaining text with theme color
+      spans.add(TextSpan(
+        text: text.substring(lastIndex),
+        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              fontSize: 17,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
+            ),
+      ));
+
+      return TextSpan(children: spans);
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -378,37 +460,17 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.calendar_month, color: Colors.white),
-            onPressed: () {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (context) => CalendarPage(),
-                ),
-              );
-            },
+            onPressed: () => _openLinkCalendar(),
           ),
           const SizedBox(width: 10),
           IconButton(
             icon: const Icon(Icons.video_library, color: Colors.white),
-            onPressed: () {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (context) => VideoPage(
-                    title: 'ວີດີໂອ Video',
-                  ),
-                ),
-              );
-            },
+            onPressed: () => _openLinkVideo(),
           ),
           const SizedBox(width: 10),
           IconButton(
             icon: const Icon(Icons.auto_stories_outlined, color: Colors.white),
-            onPressed: () {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (context) => BooksPage(),
-                ),
-              );
-            },
+            onPressed: () => _openLinkBooks(),
           ),
           const SizedBox(width: 10),
           IconButton(
@@ -643,31 +705,24 @@ class _MyHomePageState extends State<MyHomePage> {
                                   ),
                                   child: ListTile(
                                     title: Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 1.5), // Add top margin here
+                                      padding: const EdgeInsets.only(top: 1.5),
                                       child: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Expanded(
-                                            child: Text(
-                                              title,
-                                              style: const TextStyle(
-                                                  fontSize: 17,
-                                                  fontWeight: FontWeight.bold,
-                                                  letterSpacing: 0.5),
+                                            child: RichText(
+                                              text: highlightSearchTerm(
+                                                  context, title, _searchTerm),
                                             ),
                                           ),
-                                          SizedBox(
-                                              width:
-                                                  10), // Space between the button and title
+                                          const SizedBox(width: 10),
                                           if (audio != '/')
                                             CircleAvatar(
-                                              radius:
-                                                  22, // Smaller radius for a smaller button
-                                              backgroundColor: Colors
-                                                  .transparent, // Transparent background for CircleAvatar
+                                              radius: 22,
+                                              backgroundColor:
+                                                  Colors.transparent,
                                               child: Container(
                                                 decoration: BoxDecoration(
                                                   gradient: LinearGradient(
@@ -688,11 +743,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                                             _isPlaying
                                                         ? Icons.pause
                                                         : Icons.play_arrow,
-                                                    color: Colors
-                                                        .white, // Icon color
+                                                    color: Colors.white,
                                                   ),
-                                                  iconSize:
-                                                      20, // Smaller icon size
+                                                  iconSize: 20,
                                                   onPressed: () async {
                                                     await _playPauseAudio(
                                                         index, audio);
@@ -703,6 +756,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         ],
                                       ),
                                     ),
+
                                     subtitle: audio != '/'
                                         ? Column(
                                             crossAxisAlignment:
@@ -844,6 +898,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                             details: detailLink,
                                             category: category,
                                             audio: audio,
+                                             searchTerm:
+                                                _searchTerm,
                                             onFavoriteChanged: () {
                                               fetchData(_searchTerm);
                                             },
@@ -860,20 +916,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          const String urlChat =
-              "https://tawk.to/chat/61763b9bf7c0440a591fc969/1fiqthn3u";
-
-          if (await canLaunch(urlChat)) {
-            await launch(urlChat);
-          } else {
-            throw 'Could not launch $urlChat';
-          }
-        },
-        tooltip: 'ສົນທະນາ',
-        child: const Icon(Icons.chat_sharp),
-      ),
     );
   }
 

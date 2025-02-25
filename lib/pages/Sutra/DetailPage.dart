@@ -1,8 +1,6 @@
 // ignore_for_file: depend_on_referenced_packages, file_names, use_key_in_widget_constructors, library_private_types_in_public_api, unrelated_type_equality_checks, prefer_const_constructors, avoid_web_libraries_in_flutter, unused_local_variable, deprecated_member_use
-
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:just_audio/just_audio.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart';
@@ -13,7 +11,6 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../../layouts/NavigationDrawer.dart';
 import '../../themes/ThemeProvider.dart';
 import 'SearchPage.dart';
@@ -24,18 +21,17 @@ class DetailPage extends StatefulWidget {
   final String details;
   final String category;
   final String audio;
-
+  final String searchTerm; // ✅ Add searchTerm
   final VoidCallback onFavoriteChanged; // Add this line
-
   const DetailPage({
     required this.id,
     required this.title,
     required this.details,
     required this.category,
     required this.audio,
+    required this.searchTerm,
     required this.onFavoriteChanged, // Add this line
   });
-
   @override
   _DetailPageState createState() => _DetailPageState();
 }
@@ -43,39 +39,31 @@ class DetailPage extends StatefulWidget {
 class _DetailPageState extends State<DetailPage> {
   double _fontSize = 18.0;
   double get fontSize => _fontSize;
-
   bool _isFavorited = false; // Add this line
-
   final AudioPlayer _player = AudioPlayer();
   bool _isPlaying = false;
   Duration _duration = Duration.zero;
   Duration _position = Duration.zero;
   // Add the repeat functionality
   bool _isRepeating = false;
-
   StreamSubscription<PlayerState>? _playerStateSubscription;
   StreamSubscription<Duration?>? _durationSubscription;
   StreamSubscription<Duration>? _positionSubscription;
-
   bool hasInternet =
       Connectivity().checkConnectivity() != ConnectivityResult.none;
-
   // check if the current theme is dark or not
   bool? isDarkMode;
   Timer? _themeCheckTimer;
-
   @override
   void initState() {
     super.initState();
-
     _loadFavoriteState();
     _loadFontSizeFromSharedPreferences();
-
     if (hasInternet && widget.audio != '/') {
       _initializePlayer();
     }
   }
-  
+
   // Remove redundant theme-checking timer, instead rely on Theme changes directly via the provider
   @override
   void didChangeDependencies() {
@@ -92,20 +80,17 @@ class _DetailPageState extends State<DetailPage> {
   void _initializePlayer() async {
     try {
       await _player.setUrl(widget.audio);
-
       _playerStateSubscription =
           _player.playerStateStream.listen((playerState) {
         setState(() {
           _isPlaying = playerState.playing;
         });
       });
-
       _durationSubscription = _player.durationStream.listen((duration) {
         setState(() {
           _duration = duration ?? Duration.zero;
         });
       });
-
       _positionSubscription = _player.positionStream.listen((position) {
         setState(() {
           _position = position;
@@ -121,20 +106,16 @@ class _DetailPageState extends State<DetailPage> {
   @override
   void dispose() {
     _player.dispose();
-
     _playerStateSubscription?.cancel();
     _durationSubscription?.cancel();
     _positionSubscription?.cancel();
-
     _themeCheckTimer?.cancel();
-
     super.dispose();
   }
 
   void _disposeAudioPlayer() {
     // clear state playing audio
     _player.stop();
-
     // Cancel subscriptions here to avoid LateInitializationError
     _playerStateSubscription?.cancel();
     _durationSubscription?.cancel();
@@ -159,7 +140,6 @@ class _DetailPageState extends State<DetailPage> {
     final hours = twoDigits(duration.inHours);
     final minutes = twoDigits(duration.inMinutes.remainder(60));
     final seconds = twoDigits(duration.inSeconds.remainder(60));
-
     return [
       if (duration.inHours > 0) hours,
       minutes,
@@ -191,22 +171,16 @@ class _DetailPageState extends State<DetailPage> {
         });
       } else {
         _isFavorited = false;
-
         // Initialize the favorites list
         prefs.setStringList('favorites', []);
-
         // Initialize the favorite state for the current detail
-
         prefs.setBool(
             '${widget.id}_${widget.title}_${widget.details}_${widget.category}_${widget.audio}',
             false);
-
         // Notify the parent widget
         widget.onFavoriteChanged();
-
         // Load the favorite state again
         _loadFavoriteState();
-
         // Return to avoid calling the setState method
         return;
       }
@@ -220,7 +194,6 @@ class _DetailPageState extends State<DetailPage> {
       prefs.setBool(
           '${widget.id}_${widget.title}_${widget.details}_${widget.category}_${widget.audio}',
           _isFavorited);
-
       List<String> currentFavorites = prefs.getStringList('favorites') ?? [];
       if (_isFavorited) {
         currentFavorites.add(json.encode({
@@ -241,7 +214,6 @@ class _DetailPageState extends State<DetailPage> {
         });
       }
       prefs.setStringList('favorites', currentFavorites);
-
       widget.onFavoriteChanged(); // Notify the parent widget
     });
   }
@@ -261,7 +233,6 @@ class _DetailPageState extends State<DetailPage> {
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () {
             _disposeAudioPlayer();
-
             Navigator.of(context).pop();
           },
         ),
@@ -278,7 +249,6 @@ class _DetailPageState extends State<DetailPage> {
             icon: const Icon(Icons.search, color: Colors.white),
             onPressed: () {
               _disposeAudioPlayer();
-
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -296,7 +266,7 @@ class _DetailPageState extends State<DetailPage> {
               },
             ),
           ),
-           const SizedBox(width: 15),
+          const SizedBox(width: 15),
           // Add a switch to toggle dark mode
           Consumer<ThemeProvider>(
             builder: (context, themeProvider, child) {
@@ -365,7 +335,6 @@ class _DetailPageState extends State<DetailPage> {
               const Divider(color: Colors.black, thickness: 1, height: 1),
               const SizedBox(height: 10),
               // Add buttons to control audio playback
-
               if (widget.audio != '/' && hasInternet)
                 LayoutBuilder(
                   builder: (context, constraints) {
@@ -374,7 +343,6 @@ class _DetailPageState extends State<DetailPage> {
                         ? 8.0 // Smaller padding for mobile devices
                         : constraints.maxWidth *
                             0.1; // 10% of the width as padding for larger screens
-
                     return Center(
                       child: ConstrainedBox(
                         constraints: BoxConstraints(
@@ -458,7 +426,6 @@ class _DetailPageState extends State<DetailPage> {
                                     final position =
                                         Duration(seconds: value.toInt());
                                     await _player.seek(position);
-
                                     setState(() {
                                       _position = position;
                                     });
@@ -484,7 +451,6 @@ class _DetailPageState extends State<DetailPage> {
                     );
                   },
                 ),
-
               const SizedBox(height: 10),
               FutureBuilder<String>(
                 future: _fetchData(widget.details),
@@ -497,6 +463,59 @@ class _DetailPageState extends State<DetailPage> {
                             ? 0.0 // Smaller padding for mobile devices
                             : constraints.maxWidth *
                                 0.1; // 10% of the width as padding for larger screens
+                List<TextSpan> highlightSearchTerm(BuildContext context,
+                            String text, String searchTerm, double fontSize) {
+                          final TextStyle defaultStyle =
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                        fontSize: fontSize,
+                                      ) ??
+                                  TextStyle(
+                                      fontSize: fontSize, color: Colors.black);
+
+                          final Color highlightTextColor =
+                              Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.black
+                                  : Colors.black;
+
+                          if (searchTerm.isEmpty) {
+                            return parseContent(context, text,
+                                fontSize); // ✅ Parse content normally if no search term
+                          }
+
+                          final RegExp regex =
+                              RegExp(searchTerm, caseSensitive: false);
+                          final List<TextSpan> spans = [];
+                          int lastIndex = 0;
+
+                          regex.allMatches(text).forEach((match) {
+                            final String beforeMatch =
+                                text.substring(lastIndex, match.start);
+                            final String matchedText =
+                                text.substring(match.start, match.end);
+
+                            spans.addAll(parseContent(context, beforeMatch,
+                                fontSize)); // ✅ Parse before highlight
+
+                            spans.add(TextSpan(
+                              text: matchedText,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: fontSize,
+                                color:
+                                    highlightTextColor, // ✅ Adjusted per theme
+                                backgroundColor:
+                                    const Color(0xFFFFD700), // Yellow highlight
+                              ),
+                            ));
+
+                            lastIndex = match.end;
+                          });
+
+                          spans.addAll(parseContent(
+                              context, text.substring(lastIndex), fontSize));
+
+                          return spans;
+                        }
 
                         return SingleChildScrollView(
                           physics: const ClampingScrollPhysics(),
@@ -519,7 +538,11 @@ class _DetailPageState extends State<DetailPage> {
                                   ), // Add horizontal padding to center the text
                                   child: SelectableText.rich(
                                     TextSpan(
-                                      children: parseContent(widget.details),
+                                      children: highlightSearchTerm(
+                                          context,
+                                          widget.details,
+                                          widget.searchTerm,
+                                          _fontSize),
                                     ),
                                     toolbarOptions: const ToolbarOptions(
                                       copy: true,
@@ -531,7 +554,6 @@ class _DetailPageState extends State<DetailPage> {
                                     style: TextStyle(
                                       fontSize: _fontSize,
                                       height: 1.8,
-                                      textBaseline: TextBaseline.alphabetic,
                                       letterSpacing: 0.5,
                                       color: isDarkMode == true
                                           ? Colors.white
@@ -621,8 +643,7 @@ class _DetailPageState extends State<DetailPage> {
 
   void _shareDetailLink() {
     final shareText =
-        '${widget.title}\n https://buddha-nature.web.app/#/details/${widget.id}?prev=sutra';
-
+        '${widget.title}\n https://buddhaword.netlify.app/sutra/details/${widget.id}';
     Share.share(shareText, subject: widget.title);
   }
 
@@ -651,7 +672,6 @@ class _DetailPageState extends State<DetailPage> {
   Future<void> _loadFontSizeFromSharedPreferences() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final double fontSize = prefs.getDouble('fontSize') ?? 18.0;
-
     setState(() {
       _fontSize = fontSize;
     });
@@ -666,7 +686,6 @@ class _DetailPageState extends State<DetailPage> {
     setState(() {
       _fontSize += 2.0;
     });
-
     _saveFontSizeToSharedPreferences(_fontSize);
   }
 
@@ -674,24 +693,32 @@ class _DetailPageState extends State<DetailPage> {
     setState(() {
       _fontSize = _fontSize > 2.0 ? _fontSize - 2.0 : _fontSize;
     });
-
     _saveFontSizeToSharedPreferences(_fontSize);
   }
 }
 
-List<TextSpan> parseContent(String content) {
+List<TextSpan> parseContent(
+    BuildContext context, String content, double fontSize) {
+  final TextStyle defaultStyle =
+      Theme.of(context).textTheme.bodyLarge?.copyWith(
+                fontSize: fontSize,
+              ) ??
+          TextStyle(fontSize: fontSize, color: Colors.black);
+
   final List<TextSpan> children = [];
+  final List<String> parts = content.split(RegExp(r'(<b>|<\/b>)'));
 
-  final List<String> chunks = content.split(RegExp(r'<\/?b>'));
+  for (int i = 0; i < parts.length; i++) {
+    final String part = parts[i];
 
-  for (int i = 0; i < chunks.length; i++) {
-    final String chunk = chunks[i];
     if (i % 2 == 0) {
-      children.add(TextSpan(text: chunk));
+      // ✅ Normal text
+      children.add(TextSpan(text: part, style: defaultStyle));
     } else {
+      // ✅ Bold text
       children.add(TextSpan(
-        text: chunk,
-        style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
+        text: part,
+        style: defaultStyle.copyWith(fontWeight: FontWeight.bold),
       ));
     }
   }

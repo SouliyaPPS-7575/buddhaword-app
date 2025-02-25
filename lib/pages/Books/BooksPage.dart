@@ -232,7 +232,7 @@ class _BooksPageState extends State<BooksPage> {
   }
 
   void _shareAllBooksLink() {
-    const url = 'https://buddha-nature.web.app/#/books';
+    const url = 'https://buddhaword.netlify.app/book';
 
     String? title = 'ປື້ມ & ເເຜນຜັງ';
 

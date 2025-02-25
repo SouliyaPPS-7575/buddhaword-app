@@ -67,6 +67,32 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
     }
   }
 
+  void _openLinkVideo() async {
+    if (await canLaunch('https://buddhaword.netlify.app/video')) {
+      await launch('https://buddhaword.netlify.app/video');
+    } else {
+      throw 'Could not launch';
+    }
+  }
+
+  void _openLinkCalendar() async {
+    if (await canLaunch('https://buddhaword.netlify.app/calendar')) {
+      await launch('https://buddhaword.netlify.app/calendar');
+    } else {
+      throw 'Could not launch';
+    }
+  }
+
+
+  void _openLinkBooks() async {
+    if (await canLaunch('https://buddhaword.netlify.app/book')) {
+      await launch('https://buddhaword.netlify.app/book');
+    } else {
+      throw 'Could not launch';
+    }
+  }
+
+
   void _openLinkEnglish() async {
     if (await canLaunch(urlEnglish)) {
       await launch(urlEnglish);
@@ -550,13 +576,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                   letterSpacing: 0.5,
                 ),
               ),
-              onTap: () => {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => BooksPage(),
-                  ),
-                ),
-              },
+            onTap: () => _openLinkBooks(),
             ),
 
             ListTile(
@@ -585,15 +605,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.5),
               ),
-              onTap: () => {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => VideoPage(
-                      title: 'ວີດີໂອ Video',
-                    ),
-                  ),
-                ),
-              },
+              onTap: () => _openLinkVideo(),
             ),
 
              ListTile(
@@ -608,13 +620,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
                   letterSpacing: 0.5,
                 ),
               ),
-              onTap: () => {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => CalendarPage(),
-                  ),
-                ),
-              },
+              onTap: () => _openLinkCalendar(),
             ),
 
             ListTile(

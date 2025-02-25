@@ -55,7 +55,7 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   void _shareCalendar() {
-    final url = 'https://buddha-nature.web.app/#/calendar';
+    final url = 'https://buddhaword.netlify.app/calendar';
     String? title = 'ປະຕິທິນທັມ';
     final shareText = '$title\n $url';
 

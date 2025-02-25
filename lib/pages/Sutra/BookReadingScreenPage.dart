@@ -749,7 +749,8 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
                                       ), // Add horizontal padding to center the text
                                       child: SelectableText.rich(
                                         TextSpan(
-                                          children: parseContent(detailLink),
+                                          children:
+                                              parseContent(context, detailLink, _fontSize),
                                         ),
                                         toolbarOptions: const ToolbarOptions(
                                           copy: true,
@@ -859,7 +860,7 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
     final currentTitle = getCurrentTitle();
 
     final currentRoute =
-        'https://buddha-nature.web.app/#/details/${widget.filteredData[_currentPageIndex][0]}?prev=sutra';
+        'https://buddhaword.netlify.app/sutra/details/${widget.filteredData[_currentPageIndex][0]}';
 
     final shareText = '$currentTitle\n $currentRoute';
 
