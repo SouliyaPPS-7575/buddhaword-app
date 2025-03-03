@@ -15,7 +15,7 @@ class ThemeProvider extends ChangeNotifier {
   void toggleTheme(bool isDarkMode) {
     _isDarkMode = isDarkMode;
     _saveThemeToPreferences(isDarkMode);
-    notifyListeners();
+    notifyListeners();  // ✅ Important: Updates the UI when the theme changes
   }
 
   Future<void> _saveThemeToPreferences(bool isDarkMode) async {

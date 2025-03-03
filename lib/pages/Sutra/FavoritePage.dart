@@ -220,19 +220,22 @@ class _FavoritePageState extends State<FavoritePage> {
   Widget build(BuildContext context) {
     TextSpan highlightSearchTerm(
         BuildContext context, String text, String searchTerm) {
+      final theme = Theme.of(context);
+      final textColor =
+          theme.textTheme.bodyLarge?.color; // Dynamically get the color
+
       if (searchTerm.isEmpty) {
         return TextSpan(
           text: text,
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 0.5,
-              ),
+          style: theme.textTheme.bodyLarge?.copyWith(
+            fontSize: 17,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
         );
       }
 
-      final RegExp regex =
-          RegExp(searchTerm, caseSensitive: false); //Case Insensitive
+      final RegExp regex = RegExp(searchTerm, caseSensitive: false);
       final List<TextSpan> spans = [];
       int lastIndex = 0;
 
@@ -240,39 +243,37 @@ class _FavoritePageState extends State<FavoritePage> {
         final String beforeMatch = text.substring(lastIndex, match.start);
         final String matchedText = text.substring(match.start, match.end);
 
-        // Add normal text before match
         spans.add(TextSpan(
           text: beforeMatch,
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 0.5,
-              ),
-        ));
-
-        // Add highlighted matched text
-        spans.add(TextSpan(
-          text: matchedText,
-          style: const TextStyle(
+          style: theme.textTheme.bodyLarge?.copyWith(
             fontSize: 17,
             fontWeight: FontWeight.bold,
             letterSpacing: 0.5,
-            color: Colors.black, // Highlight color
-            backgroundColor: Color(0xFFFFD700), // Yellow highlight
+          ),
+        ));
+
+        spans.add(TextSpan(
+          text: matchedText,
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+            color: Colors.black, // Keep highlight color for visibility
+            backgroundColor: Color(0xFFFFD700),
           ),
         ));
 
         lastIndex = match.end;
       });
 
-      // Add remaining text with theme color
       spans.add(TextSpan(
         text: text.substring(lastIndex),
-        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              fontSize: 17,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.5,
-            ),
+        style: theme.textTheme.bodyLarge?.copyWith(
+          fontSize: 17,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 0.5,
+          color: textColor, // Dynamically get theme color
+        ),
       ));
 
       return TextSpan(children: spans);
@@ -474,9 +475,14 @@ class _FavoritePageState extends State<FavoritePage> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                      Expanded(
-                                      child: RichText(
-                                        text: highlightSearchTerm(
-                                            context, title, _searchTerm),
+                                       child: Consumer<ThemeProvider>(
+                                        builder:
+                                            (context, themeProvider, child) {
+                                          return RichText(
+                                            text: highlightSearchTerm(context,
+                                                title, _searchController.text),
+                                          );
+                                        },
                                       ),
                                     ),
                                     SizedBox(
