@@ -374,6 +374,15 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+// Create a safer filtered list with null safety
+  List<String> get safeCategories {
+    if (_categories.isEmpty) return [];
+    return _categories
+        .where((category) => category != null && category.isNotEmpty)
+        .map((category) => category.trim())
+        .where((category) => category.isNotEmpty)
+        .toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -441,6 +450,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
       return TextSpan(children: spans);
     }
+    
 
     return Scaffold(
       appBar: AppBar(
@@ -576,9 +586,10 @@ class _MyHomePageState extends State<MyHomePage> {
                               crossAxisSpacing: 1.0,
                               childAspectRatio: aspectRatio,
                             ),
-                            itemCount: _categories.length,
+                            itemCount: safeCategories.length,
                             itemBuilder: (context, index) {
-                              final category = _categories[index];
+                             
+                              final category = safeCategories[index];
                               final imageAsset = 'assets/$category.jpg';
                               return GestureDetector(
                                 onTap: () {
