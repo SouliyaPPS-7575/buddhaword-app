@@ -14,7 +14,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'layouts/NavigationDrawer.dart';
+import 'layouts/NavigationDrawer.dart' as custom_nav;
 import 'pages/Sutra/CategoryListPage.dart';
 import 'pages/Sutra/DetailPage.dart';
 import 'pages/Sutra/RandomImagePage.dart';
@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AppInfo appInfo = AppInfo(
-        appId: 'com.buddha.lao_tipitaka',
+        appId: 'com.buddha.buddhaword',
         appName: 'buddha nature', // Your app name
         appVersion: '5.0.0', // Your app version
         platform: 'android', // App Platform, android or ios
@@ -539,7 +539,7 @@ class _MyHomePageState extends State<MyHomePage> {
           const SizedBox(width: 15),
         ],
       ),
-      drawer: const NavigationDrawer(),
+      drawer: const custom_nav.NavigationDrawer(),
       body: _data.isEmpty
           ? RandomImagePage()
           : Padding(

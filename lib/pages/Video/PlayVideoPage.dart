@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, library_private_types_in_public_api, must_be_immutable, file_names, unrelated_type_equality_checks, avoid_web_libraries_in_flutter, unnecessary_null_comparison, use_build_context_synchronously, sized_box_for_whitespace, unused_local_variable, prefer_const_constructors_in_immutables, depend_on_referenced_packages, prefer_const_declarations
+// ignore_for_file: prefer_const_constructors, library_private_types_in_public_api, must_be_immutable, file_names, unrelated_type_equality_checks, avoid_web_libraries_in_flutter, unnecessary_null_comparison, use_build_context_synchronously, sized_box_for_whitespace, unused_local_variable, prefer_const_constructors_in_immutables, depend_on_referenced_packages, prefer_const_declarations, deprecated_member_use
 
 import 'dart:async';
 import 'dart:convert';
@@ -14,7 +14,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
-import '../../layouts/NavigationDrawer.dart';
+import '../../layouts/NavigationDrawer.dart' as custom_nav;
 import '../../themes/ThemeProvider.dart';
 import 'RandomImagePage.dart';
 import 'VideoPage.dart';
@@ -585,7 +585,7 @@ class _PlayVideoPageState extends State<PlayVideoPage> {
                 const SizedBox(width: 15),
               ],
             ),
-            drawer: const NavigationDrawer(),
+            drawer: const custom_nav.NavigationDrawer(),
             body: LayoutBuilder(
               builder: (context, constraints) {
                 // Define a base aspect ratio for the video player

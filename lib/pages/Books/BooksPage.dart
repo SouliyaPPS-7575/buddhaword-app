@@ -11,7 +11,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../layouts/NavigationDrawer.dart';
+import '../../layouts/NavigationDrawer.dart' as custom_nav;
 import '../../themes/ThemeProvider.dart';
 import 'RandomImagePage.dart';
 
@@ -321,7 +321,7 @@ class _BooksPageState extends State<BooksPage> {
           const SizedBox(width: 15),
         ],
       ),
-      drawer: const NavigationDrawer(),
+      drawer: const custom_nav.NavigationDrawer(),
       body: _data.isEmpty
           ? RandomImagePage()
           : Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [

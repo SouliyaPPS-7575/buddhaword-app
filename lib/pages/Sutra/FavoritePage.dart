@@ -10,7 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../layouts/NavigationDrawer.dart';
+import '../../layouts/NavigationDrawer.dart' as custom_nav;
 import '../../themes/ThemeProvider.dart';
 import 'BookReadingScreenPage.dart';
 import 'DetailPage.dart';
@@ -392,7 +392,7 @@ class _FavoritePageState extends State<FavoritePage> {
                 const SizedBox(width: 15),
               ],
       ),
-      drawer: const NavigationDrawer(),
+      drawer: const custom_nav.NavigationDrawer(),
       body: _favorites.isEmpty
           ? const Center(child: Text('No favorites added.'))
           : Padding(

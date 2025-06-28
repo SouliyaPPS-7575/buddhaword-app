@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, must_be_immutable, file_names, library_private_types_in_public_api, prefer_const_constructors_in_immutables, prefer_const_declarations, depend_on_referenced_packages
+// ignore_for_file: prefer_const_constructors, must_be_immutable, file_names, library_private_types_in_public_api, prefer_const_constructors_in_immutables, prefer_const_declarations, depend_on_referenced_packages, deprecated_member_use
 
 import 'dart:convert';
 
@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../layouts/NavigationDrawer.dart';
+import '../../layouts/NavigationDrawer.dart' as custom_nav;
 import '../../themes/ThemeProvider.dart';
 import 'PlayVideoPage.dart';
 import 'VideoPage.dart';
@@ -397,7 +397,7 @@ class _CategoryListPageState extends State<CategoryListPage> {
           const SizedBox(width: 15),
         ],
       ),
-      drawer: const NavigationDrawer(),
+      drawer: const custom_nav.NavigationDrawer(),
       body: Column(
         children: [
           Padding(

@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../layouts/NavigationDrawer.dart';
+import '../../layouts/NavigationDrawer.dart' as custom_nav;
 import '../../themes/ThemeProvider.dart';
 import 'BookReadingScreenPage.dart';
 import 'DetailPage.dart';
@@ -296,7 +296,7 @@ class _SearchPageState extends State<SearchPage> {
           const SizedBox(width: 15),
         ],
       ),
-      drawer: const NavigationDrawer(),
+      drawer: const custom_nav.NavigationDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(2.0),
         child: Column(

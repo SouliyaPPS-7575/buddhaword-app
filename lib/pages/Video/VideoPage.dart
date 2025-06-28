@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, prefer_const_constructors, use_key_in_widget_constructors, file_names, avoid_web_libraries_in_flutter, unnecessary_null_comparison, unrelated_type_equality_checks, use_build_context_synchronously, prefer_const_constructors_in_immutables, no_leading_underscores_for_local_identifiers, prefer_final_fields, depend_on_referenced_packages, unused_import, constant_identifier_names, prefer_const_declarations
+// ignore_for_file: library_private_types_in_public_api, prefer_const_constructors, use_key_in_widget_constructors, file_names, avoid_web_libraries_in_flutter, unnecessary_null_comparison, unrelated_type_equality_checks, use_build_context_synchronously, prefer_const_constructors_in_immutables, no_leading_underscores_for_local_identifiers, prefer_final_fields, depend_on_referenced_packages, unused_import, constant_identifier_names, prefer_const_declarations, deprecated_member_use
 
 import 'dart:convert';
 
@@ -12,7 +12,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
-import '../../layouts/NavigationDrawer.dart';
+import '../../layouts/NavigationDrawer.dart' as custom_nav;
 import '../../themes/ThemeProvider.dart';
 import 'CategoryListPage.dart';
 import 'PlayVideoPage.dart';
@@ -582,7 +582,7 @@ class _VideoPageState extends State<VideoPage> {
           const SizedBox(width: 15),
         ],
       ),
-      drawer: const NavigationDrawer(),
+      drawer: const custom_nav.NavigationDrawer(),
       body: _data.isEmpty
           ? RandomImagePage()
           : Padding(

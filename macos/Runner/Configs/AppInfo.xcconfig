@@ -8,7 +8,7 @@
 PRODUCT_NAME = lao_tipitaka
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.buddha.lao_tipitaka
+PRODUCT_BUNDLE_IDENTIFIER = com.buddha.buddhaword
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2023 com.buddha. All rights reserved.

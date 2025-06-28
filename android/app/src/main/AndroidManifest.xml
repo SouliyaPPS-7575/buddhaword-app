@@ -1,8 +1,8 @@
 <manifest 
     xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.buddha.lao_tipitaka"
-    android:versionCode="50"
-    android:versionName="50.0"
+    package="com.buddha.buddhaword"
+    android:versionCode="51"
+    android:versionName="51.0"
 >
    <application
         android:label="ຄຳສອນພຣະພຸດທະເຈົ້າ"

@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_declarations, library_private_types_in_public_api, file_names, use_key_in_widget_constructors, prefer_const_constructors, avoid_web_libraries_in_flutter, unnecessary_null_comparison, unrelated_type_equality_checks, avoid_print, sized_box_for_whitespace, prefer_interpolation_to_compose_strings, deprecated_member_use, depend_on_referenced_packages
+// ignore_for_file: prefer_const_declarations, library_private_types_in_public_api, file_names, use_key_in_widget_constructors, prefer_const_constructors, avoid_web_libraries_in_flutter, unnecessary_null_comparison, unrelated_type_equality_checks, avoid_print, sized_box_for_whitespace, prefer_interpolation_to_compose_strings, deprecated_member_use, depend_on_referenced_packages, use_build_context_synchronously
 
 import 'dart:async';
 import 'dart:convert';
@@ -15,7 +15,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../layouts/NavigationDrawer.dart';
+import '../../layouts/NavigationDrawer.dart' as custom_nav;
 import '../../themes/ThemeProvider.dart';
 import '../Books/RandomImagePage.dart';
 
@@ -402,7 +402,7 @@ class _CalendarPageState extends State<CalendarPage> {
 
                     // WhatsApp icon
                     IconButton(
-                      icon: Icon(Icons.whatsapp),
+                      icon: Icon(Icons.phone),
                       onPressed: () async {
                         final whatsappUrl = 'https://wa.me/$cleanPhoneNumber';
                         if (await canLaunch(whatsappUrl)) {
@@ -555,7 +555,7 @@ class _CalendarPageState extends State<CalendarPage> {
         ],
       ),
 
-      drawer: const NavigationDrawer(),
+      drawer: const custom_nav.NavigationDrawer(),
 
       // Make the entire page scrollable using SingleChildScrollView
       body: _data.isEmpty
