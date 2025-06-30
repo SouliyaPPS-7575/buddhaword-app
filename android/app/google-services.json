@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "209240803256",
+    "project_id": "lao-tipitaka",
+    "storage_bucket": "lao-tipitaka.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:209240803256:android:6c450883a4f5bc6596f14d",
+        "android_client_info": {
+          "package_name": "com.buddha.lao_tipitaka"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "209240803256-hh8aqt5f6qdnt0v46ed1sv29djgiiof9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBo7FGTu_nIe-Ie9moJlaZJCQiZ-q219ho"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "209240803256-hh8aqt5f6qdnt0v46ed1sv29djgiiof9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
