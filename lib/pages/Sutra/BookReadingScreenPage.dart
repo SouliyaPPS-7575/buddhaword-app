@@ -136,8 +136,9 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
       if (url != null && url != '/') {
         await _player.setUrl(url);
 
-        _playerStateSubscription =
-            _player.playerStateStream.listen((playerState) {
+        _playerStateSubscription = _player.playerStateStream.listen((
+          playerState,
+        ) {
           setState(() {
             _isPlaying = playerState.playing;
           });
@@ -172,8 +173,9 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
         _durationSubscription?.cancel();
         _positionSubscription?.cancel();
 
-        _playerStateSubscription =
-            _player.playerStateStream.listen((playerState) {
+        _playerStateSubscription = _player.playerStateStream.listen((
+          playerState,
+        ) {
           setState(() {
             _isPlaying = playerState.playing;
             if (playerState.processingState == ProcessingState.completed) {
@@ -304,8 +306,9 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
         // Initialize the favorite state for the current detail
 
         prefs.setBool(
-            '${getCurrentID()}_${getCurrentTitle()}_${getCurrentDetail()}_${getCurrentCategory()}',
-            false);
+          '${getCurrentID()}_${getCurrentTitle()}_${getCurrentDetail()}_${getCurrentCategory()}',
+          false,
+        );
 
         // Notify the parent widget
         widget.onFavoriteChanged();
@@ -324,18 +327,21 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
     setState(() {
       _isFavorited = !_isFavorited;
       prefs.setBool(
-          '${getCurrentID()}_${getCurrentTitle()}_${getCurrentDetail()}_${getCurrentCategory()}',
-          _isFavorited);
+        '${getCurrentID()}_${getCurrentTitle()}_${getCurrentDetail()}_${getCurrentCategory()}',
+        _isFavorited,
+      );
 
       List<String> currentFavorites = prefs.getStringList('favorites') ?? [];
       if (_isFavorited) {
-        currentFavorites.add(json.encode({
-          'id': getCurrentID(),
-          'title': getCurrentTitle(),
-          'details': getCurrentDetail(),
-          'category': getCurrentCategory(),
-          'audio': getCurrentAudio(),
-        }));
+        currentFavorites.add(
+          json.encode({
+            'id': getCurrentID(),
+            'title': getCurrentTitle(),
+            'details': getCurrentDetail(),
+            'category': getCurrentCategory(),
+            'audio': getCurrentAudio(),
+          }),
+        );
       } else {
         currentFavorites.removeWhere((item) {
           Map<String, dynamic> current = json.decode(item);
@@ -373,9 +379,10 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
         title: const Text(
           'ພຣະສູດ',
           style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.5, color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+            color: Colors.white,
           ), // Adjust the font size as needed
         ),
         leading: IconButton(
@@ -407,9 +414,7 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
 
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => SearchPage(),
-                ),
+                MaterialPageRoute(builder: (context) => SearchPage()),
               );
             },
           ),
@@ -471,9 +476,14 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
               padding: const EdgeInsets.all(8.0),
               // Set the background color based on the theme
               color: isDarkMode == true
-                  ? Colors.black // Dark theme background color
-                  : Color.fromRGBO(246, 238, 217,
-                      1.0), // Light theme background color (or any other color you prefer)
+                  ? Colors
+                        .black // Dark theme background color
+                  : Color.fromRGBO(
+                      246,
+                      238,
+                      217,
+                      1.0,
+                    ), // Light theme background color (or any other color you prefer)
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -489,9 +499,10 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
                       ),
                       showCursor: true,
                       style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5),
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -506,7 +517,7 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
                             final double paddingValue = isMobile
                                 ? 8.0 // Smaller padding for mobile devices
                                 : constraints.maxWidth *
-                                    0.1; // 10% of the width as padding for larger screens
+                                      0.1; // 10% of the width as padding for larger screens
 
                             return Center(
                               child: ConstrainedBox(
@@ -530,17 +541,21 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
                                             MainAxisAlignment.center,
                                         children: [
                                           IconButton(
-                                            icon: Icon(_isRepeating
-                                                ? Icons.repeat_one
-                                                : Icons.repeat),
+                                            icon: Icon(
+                                              _isRepeating
+                                                  ? Icons.repeat_one
+                                                  : Icons.repeat,
+                                            ),
                                             color: Colors.brown, // Icon color
                                             iconSize: 25,
                                             onPressed: () {
                                               setState(() {
                                                 _isRepeating = !_isRepeating;
-                                                _player.setLoopMode(_isRepeating
-                                                    ? LoopMode.one
-                                                    : LoopMode.off);
+                                                _player.setLoopMode(
+                                                  _isRepeating
+                                                      ? LoopMode.one
+                                                      : LoopMode.off,
+                                                );
                                               });
                                             },
                                           ),
@@ -564,9 +579,11 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
                                                 shape: BoxShape.circle,
                                               ),
                                               child: IconButton(
-                                                icon: Icon(_isPlaying
-                                                    ? Icons.pause
-                                                    : Icons.play_arrow),
+                                                icon: Icon(
+                                                  _isPlaying
+                                                      ? Icons.pause
+                                                      : Icons.play_arrow,
+                                                ),
                                                 color: Colors.white,
                                                 iconSize: 25,
                                                 onPressed: _playPause,
@@ -595,27 +612,31 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
                                                   getCurrentAudio() != '/' &&
                                                   hasInternet)
                                                 IconButton(
-                                                  icon:
-                                                      Icon(Icons.skip_previous),
+                                                  icon: Icon(
+                                                    Icons.skip_previous,
+                                                  ),
                                                   onPressed: () {
                                                     if (index > 0) {
                                                       final previousAudio = widget
-                                                          .filteredData[
-                                                              _currentPageIndex -
-                                                                  1][5]
+                                                          .filteredData[_currentPageIndex -
+                                                              1][5]
                                                           .toString();
-                                                      _playPauseAudio(index - 1,
-                                                              previousAudio)
-                                                          .then(
+                                                      _playPauseAudio(
+                                                        index - 1,
+                                                        previousAudio,
+                                                      ).then(
                                                         (value) => {
                                                           // back Pageview
-                                                          _pageController.previousPage(
-                                                              duration:
-                                                                  const Duration(
+                                                          _pageController
+                                                              .previousPage(
+                                                                duration:
+                                                                    const Duration(
                                                                       milliseconds:
-                                                                          500),
-                                                              curve: Curves
-                                                                  .easeInOut),
+                                                                          500,
+                                                                    ),
+                                                                curve: Curves
+                                                                    .easeInOut,
+                                                              ),
                                                         },
                                                       );
                                                     }
@@ -636,18 +657,23 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
                                                         .inMilliseconds
                                                         .toDouble()
                                                         .clamp(
-                                                            0.0,
-                                                            _duration
-                                                                .inMilliseconds
-                                                                .toDouble()),
+                                                          0.0,
+                                                          _duration
+                                                              .inMilliseconds
+                                                              .toDouble(),
+                                                        ),
                                                     onChanged: (value) {
-                                                      _seek(Duration(
+                                                      _seek(
+                                                        Duration(
                                                           milliseconds: value
                                                               .toInt()
                                                               .clamp(
-                                                                  0,
-                                                                  _duration
-                                                                      .inMilliseconds)));
+                                                                0,
+                                                                _duration
+                                                                    .inMilliseconds,
+                                                              ),
+                                                        ),
+                                                      );
                                                     },
                                                   ),
                                                 ),
@@ -661,21 +687,21 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
                                                     if (index <
                                                         detailLink.length - 1) {
                                                       final nextAudio = widget
-                                                          .filteredData[
-                                                              _currentPageIndex +
-                                                                  1][5]
+                                                          .filteredData[_currentPageIndex +
+                                                              1][5]
                                                           .toString();
-                                                      _playPauseAudio(index + 1,
-                                                              nextAudio)
-                                                          .then(
+                                                      _playPauseAudio(
+                                                        index + 1,
+                                                        nextAudio,
+                                                      ).then(
                                                         (value) => {
                                                           // next pageview
-                                                          _pageController
-                                                              .nextPage(
+                                                          _pageController.nextPage(
                                                             duration:
                                                                 const Duration(
-                                                                    milliseconds:
-                                                                        500),
+                                                                  milliseconds:
+                                                                      500,
+                                                                ),
                                                             curve: Curves
                                                                 .easeInOut,
                                                           ),
@@ -693,16 +719,21 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
                                             Padding(
                                               padding:
                                                   const EdgeInsets.symmetric(
-                                                      horizontal: 16.0),
+                                                    horizontal: 16.0,
+                                                  ),
                                               child: Row(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment
                                                         .spaceBetween,
                                                 children: [
-                                                  Text(_formatDuration(
-                                                      _position)),
-                                                  Text(_formatDuration(
-                                                      _duration - _position)),
+                                                  Text(
+                                                    _formatDuration(_position),
+                                                  ),
+                                                  Text(
+                                                    _formatDuration(
+                                                      _duration - _position,
+                                                    ),
+                                                  ),
                                                 ],
                                               ),
                                             ),
@@ -728,13 +759,15 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
                             final double paddingValue = isMobile
                                 ? 0.0 // Smaller padding for mobile devices
                                 : constraints.maxWidth *
-                                    0.1; // 10% of the width as padding for larger screens
+                                      0.1; // 10% of the width as padding for larger screens
 
                             return SingleChildScrollView(
                               physics: const ClampingScrollPhysics(),
                               child: Padding(
                                 padding: EdgeInsets.symmetric(
-                                    horizontal: paddingValue, vertical: 16.0),
+                                  horizontal: paddingValue,
+                                  vertical: 16.0,
+                                ),
                                 child: Align(
                                   alignment: Alignment
                                       .center, // Center align text for larger screens
@@ -751,8 +784,11 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
                                       ), // Add horizontal padding to center the text
                                       child: SelectableText.rich(
                                         TextSpan(
-                                          children:
-                                              parseContent(context, detailLink, _fontSize),
+                                          children: parseContent(
+                                            context,
+                                            detailLink,
+                                            _fontSize,
+                                          ),
                                         ),
                                         toolbarOptions: const ToolbarOptions(
                                           copy: true,
@@ -794,7 +830,6 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
       ),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.max,
         children: [
           SizedBox(
             width: 48,
@@ -810,6 +845,7 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
               ),
             ),
           ),
+          const SizedBox(width: 12),
           SizedBox(
             width: 48, // Adjusted width for custom size
             height: 48, // Adjusted height for custom size
@@ -824,7 +860,7 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 12),
           SizedBox(
             width: 48, // Adjusted width for custom size
             height: 48, // Adjusted height for custom size
@@ -839,6 +875,7 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
               ),
             ),
           ),
+          const SizedBox(width: 12),
           SizedBox(
             width: 48, // Adjusted width for custom size
             height: 48, // Adjusted height for custom size
@@ -872,7 +909,9 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
   Future<void> _copyContentToClipboard() async {
     String detailText = widget.filteredData[_currentPageIndex][3].toString();
     String cleanedText = detailText.replaceAll(
-        RegExp(r'<\/?b>'), ''); // Remove <b> and </b> tags
+      RegExp(r'<\/?b>'),
+      '',
+    ); // Remove <b> and </b> tags
     Clipboard.setData(ClipboardData(text: cleanedText));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Content copied to clipboard')),

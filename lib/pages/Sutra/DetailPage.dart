@@ -638,7 +638,7 @@ class _DetailPageState extends State<DetailPage> {
               ),
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           SizedBox(
             width: 48,
             height: 48,
@@ -652,7 +652,7 @@ class _DetailPageState extends State<DetailPage> {
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 12),
           SizedBox(
             width: 48,
             height: 48,
@@ -666,7 +666,7 @@ class _DetailPageState extends State<DetailPage> {
               ),
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           SizedBox(
             width: 48,
             height: 48,
