@@ -21,10 +21,12 @@ import 'pages/Sutra/RandomImagePage.dart';
 import 'themes/ThemeProvider.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     AppInfo appInfo = AppInfo(
@@ -56,20 +58,20 @@ class MyApp extends StatelessWidget {
             themeMode: themeProvider.isDarkMode
                 ? ThemeMode.dark
                 : ThemeMode.light,
-            home: FutureBuilder(
+            home: FutureBuilder<List<ConnectivityResult>>(
               future: Connectivity().checkConnectivity(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: RandomImagePage());
                 } else if (snapshot.hasData &&
-                    snapshot.data != ConnectivityResult.none) {
+                    !snapshot.data!.contains(ConnectivityResult.none)) {
                   return AppUpgradeAlert(
                     xApiKey: 'ZmRmNjE3ZDQtZmQwYS00OTgxLWIzZjAtNGE5Mzk4YWU1ZTYx',
                     appInfo: appInfo,
-                    child: MyHomePage(title: ''),
+                    child: const MyHomePage(title: ''),
                   );
                 } else {
-                  return MyHomePage(title: '');
+                  return const MyHomePage(title: 'ພຣະສູດ & ສຽງ');
                 }
               },
             ),
@@ -91,6 +93,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
 
   List<List<dynamic>> _data = [];
   List<String> _categories = [];
@@ -124,6 +127,26 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {
       fetchDataFromAPI(_searchTerm);
     }
+  }
+
+  int _findNextValidAudioIndex(int currentIndex) {
+    for (int i = currentIndex + 1; i < _filteredData.length; i++) {
+      final audio = _filteredData[i][5].toString();
+      if (audio.isNotEmpty && audio != '/') {
+        return i;
+      }
+    }
+    return -1; // No next valid audio
+  }
+
+  int _findPreviousValidAudioIndex(int currentIndex) {
+    for (int i = currentIndex - 1; i >= 0; i--) {
+      final audio = _filteredData[i][5].toString();
+      if (audio.isNotEmpty && audio != '/') {
+        return i;
+      }
+    }
+    return -1; // No previous valid audio
   }
 
   Future<void> fetchDataFromAPI(String searchTerm) async {
@@ -269,7 +292,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _setupAudio(int index, String audio) async {
     try {
-      if (audio != null && audio != '/' && audio != _currentUrl) {
+      if (audio.isNotEmpty && audio != '/' && audio != _currentUrl) {
         await _player.setUrl(audio);
         _currentUrl = audio;
 
@@ -314,6 +337,11 @@ class _MyHomePageState extends State<MyHomePage> {
       if (kDebugMode) {
         print('Error initializing player: $e');
       }
+      // If there's an error setting up audio, try to play the next one
+      if (index < _filteredData.length - 1) {
+        final nextAudio = _filteredData[index + 1][5].toString();
+        _playPauseAudio(index + 1, nextAudio);
+      }
     }
   }
 
@@ -326,6 +354,16 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _playPauseAudio(int index, String audioUrl) async {
+    if (audioUrl.isEmpty || audioUrl == '/') {
+      // If the current audioUrl is invalid, try to find the next valid one
+      final nextIndex = _findNextValidAudioIndex(index);
+      if (nextIndex != -1) {
+        final nextAudio = _filteredData[nextIndex][5].toString();
+        _playPauseAudio(nextIndex, nextAudio);
+      }
+      return; // Stop if no valid audio found
+    }
+
     if (_currentlyPlayingIndex == index) {
       if (_player.playing) {
         await _player.pause();
@@ -333,6 +371,9 @@ class _MyHomePageState extends State<MyHomePage> {
         await _player.play();
       }
     } else {
+      setState(() {
+        _currentlyPlayingIndex = index;
+      });
       await _setupAudio(index, audioUrl); // Setup the new audio
       await _player.play(); // Play the audio immediately after setup
     }
@@ -352,6 +393,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void dispose() {
     _searchController.dispose();
+    _focusNode.dispose();
     _disposeAudioPlayer();
 
     super.dispose();
@@ -513,10 +555,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           const SizedBox(width: 10),
           IconButton(
-            icon: const Icon(
-              Icons.update_outlined,
-              color: Colors.white,
-            ),
+            icon: const Icon(Icons.update_outlined, color: Colors.white),
             onPressed: () async {
               await fetchDataFromAPI(_searchTerm);
 
@@ -825,13 +864,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                                             Icons.skip_previous,
                                                           ),
                                                           onPressed: () {
-                                                            if (index > 0) {
-                                                              final previousAudio =
-                                                                  _filteredData[index -
-                                                                          1][5]
-                                                                      .toString();
+                                                            final previousIndex = _findPreviousValidAudioIndex(index);
+                                                            if (previousIndex != -1) {
+                                                              final previousAudio = _filteredData[previousIndex][5].toString();
                                                               _playPauseAudio(
-                                                                index - 1,
+                                                                previousIndex,
                                                                 previousAudio,
                                                               );
                                                             }
@@ -872,16 +909,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                                             Icons.skip_next,
                                                           ),
                                                           onPressed: () {
-                                                            if (index <
-                                                                _filteredData
-                                                                        .length -
-                                                                    1) {
-                                                              final nextAudio =
-                                                                  _filteredData[index +
-                                                                          1][5]
-                                                                      .toString();
+                                                            final nextIndex = _findNextValidAudioIndex(index);
+                                                            if (nextIndex != -1) {
+                                                              final nextAudio = _filteredData[nextIndex][5].toString();
                                                               _playPauseAudio(
-                                                                index + 1,
+                                                                nextIndex,
                                                                 nextAudio,
                                                               );
                                                             }

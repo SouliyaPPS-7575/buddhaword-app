@@ -50,6 +50,28 @@ class _FavoritePageState extends State<FavoritePage> {
     _loadFavorites();
   }
 
+  int _findNextValidAudioIndex(int currentIndex) {
+    for (int i = currentIndex + 1; i < _filteredFavorites.length; i++) {
+      final itemData = jsonDecode(_filteredFavorites[i]);
+      final audio = itemData['audio'].toString();
+      if (audio.isNotEmpty && audio != '/') {
+        return i;
+      }
+    }
+    return -1; // No next valid audio
+  }
+
+  int _findPreviousValidAudioIndex(int currentIndex) {
+    for (int i = currentIndex - 1; i >= 0; i--) {
+      final itemData = jsonDecode(_filteredFavorites[i]);
+      final audio = itemData['audio'].toString();
+      if (audio.isNotEmpty && audio != '/') {
+        return i;
+      }
+    }
+    return -1; // No previous valid audio
+  }
+
   Future<void> _loadFavorites() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -125,7 +147,7 @@ class _FavoritePageState extends State<FavoritePage> {
 
   Future<void> _setupAudio(int index, String audio) async {
     try {
-      if (audio != null && audio != '/' && audio != _currentUrl) {
+      if (audio.isNotEmpty && audio != '/' && audio != _currentUrl) {
         await _player.setUrl(audio);
         _currentUrl = audio;
 
@@ -162,13 +184,22 @@ class _FavoritePageState extends State<FavoritePage> {
           });
         });
 
-        setState(() {
-          _currentlyPlayingIndex = index;
-        });
+        if (mounted) {
+          setState(() {
+            _currentlyPlayingIndex = index;
+          });
+        }
       }
     } catch (e) {
       if (kDebugMode) {
         print('Error initializing player: $e');
+      }
+      // If there's an error setting up audio, try to play the next one
+      if (index < _filteredFavorites.length - 1) {
+        final nextAudio = jsonDecode(
+          _filteredFavorites[index + 1],
+        )['audio']; // Decode and get the next audio URL
+        _playPauseAudio(index + 1, nextAudio);
       }
     }
   }
@@ -182,6 +213,18 @@ class _FavoritePageState extends State<FavoritePage> {
   }
 
   Future<void> _playPauseAudio(int index, String audioUrl) async {
+    if (audioUrl.isEmpty || audioUrl == '/') {
+      // If the current audioUrl is invalid, try to find the next valid one
+      final nextIndex = _findNextValidAudioIndex(index);
+      if (nextIndex != -1) {
+        final nextAudio = jsonDecode(
+          _filteredFavorites[nextIndex],
+        )['audio'].toString();
+        _playPauseAudio(nextIndex, nextAudio);
+      }
+      return; // Stop if no valid audio found
+    }
+
     if (_currentlyPlayingIndex == index) {
       if (_player.playing) {
         await _player.pause();
@@ -189,6 +232,9 @@ class _FavoritePageState extends State<FavoritePage> {
         await _player.play();
       }
     } else {
+      setState(() {
+        _currentlyPlayingIndex = index;
+      });
       await _setupAudio(index, audioUrl); // Setup the new audio
       await _player.play(); // Play the audio immediately after setup
     }
@@ -328,7 +374,7 @@ class _FavoritePageState extends State<FavoritePage> {
                 ),
                 const SizedBox(width: 6), // Custom space
                 IconButton(
-                  icon: const Icon(Icons.delete),
+                  icon: const Icon(Icons.delete, color: Colors.white),
                   onPressed: _deleteAllFavorites,
                 ),
                 const SizedBox(width: 15),
@@ -573,14 +619,13 @@ class _FavoritePageState extends State<FavoritePage> {
                                                       Icons.skip_previous,
                                                     ),
                                                     onPressed: () {
-                                                      if (index > 0) {
-                                                        final previousAudio =
-                                                            jsonDecode(
-                                                              _filteredFavorites[index -
-                                                                  1],
-                                                            )['audio'].toString();
+                                                      final previousIndex = _findPreviousValidAudioIndex(index);
+                                                      if (previousIndex != -1) {
+                                                        final previousAudio = jsonDecode(
+                                                          _filteredFavorites[previousIndex],
+                                                        )['audio'].toString();
                                                         _playPauseAudio(
-                                                          index - 1,
+                                                          previousIndex,
                                                           previousAudio,
                                                         );
                                                       }
@@ -619,16 +664,13 @@ class _FavoritePageState extends State<FavoritePage> {
                                                   IconButton(
                                                     icon: Icon(Icons.skip_next),
                                                     onPressed: () {
-                                                      if (index <
-                                                          _filteredFavorites
-                                                                  .length -
-                                                              1) {
+                                                      final nextIndex = _findNextValidAudioIndex(index);
+                                                      if (nextIndex != -1) {
                                                         final nextAudio = jsonDecode(
-                                                          _filteredFavorites[index +
-                                                              1],
+                                                          _filteredFavorites[nextIndex],
                                                         )['audio'].toString();
                                                         _playPauseAudio(
-                                                          index + 1,
+                                                          nextIndex,
                                                           nextAudio,
                                                         );
                                                       }

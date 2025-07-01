@@ -67,7 +67,7 @@ class RandomImagePage extends StatelessWidget {
                 ),
                 Positioned(
                   bottom: 50, // Position the button at the bottom center
-                  left: screenWidth / 2 - 135,
+                  left: screenWidth / 2 - 142,
                     child: ElevatedButton(
                     onPressed: () {
                       Navigator.of(context).pushReplacement(

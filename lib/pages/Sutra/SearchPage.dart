@@ -1,4 +1,4 @@
-// ignore_for_file: depend_on_referenced_packages, file_names, use_key_in_widget_constructors, library_private_types_in_public_api, prefer_const_constructors, deprecated_member_use
+// ignore_for_file: depend_on_referenced_packages, file_names, use_key_in_widget_constructors, library_private_types_in_public_api, prefer_const_constructors, deprecated_member_use, use_build_context_synchronously
 
 import 'dart:async';
 import 'dart:convert';
@@ -91,13 +91,20 @@ class _SearchPageState extends State<SearchPage> {
           });
         });
 
-        setState(() {
-          _currentlyPlayingIndex = index;
-        });
+        if (mounted) {
+          setState(() {
+            _currentlyPlayingIndex = index;
+          });
+        }
       }
     } catch (e) {
       if (kDebugMode) {
         print('Error initializing player: $e');
+      }
+      // If there's an error setting up audio, try to play the next one
+      if (index < _filteredData.length - 1) {
+        final nextAudio = _filteredData[index + 1][5].toString();
+        _playPauseAudio(index + 1, nextAudio);
       }
     }
   }
@@ -111,6 +118,16 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Future<void> _playPauseAudio(int index, String audioUrl) async {
+    if (audioUrl.isEmpty || audioUrl == '/') {
+      // If the current audioUrl is invalid, try to find the next valid one
+      final nextIndex = _findNextValidAudioIndex(index);
+      if (nextIndex != -1) {
+        final nextAudio = _filteredData[nextIndex][5].toString();
+        _playPauseAudio(nextIndex, nextAudio);
+      }
+      return; // Stop if no valid audio found
+    }
+
     if (_currentlyPlayingIndex == index) {
       if (_player.playing) {
         await _player.pause();
@@ -118,6 +135,9 @@ class _SearchPageState extends State<SearchPage> {
         await _player.play();
       }
     } else {
+      setState(() {
+        _currentlyPlayingIndex = index;
+      });
       await _setupAudio(index, audioUrl); // Setup the new audio
       await _player.play(); // Play the audio immediately after setup
     }
@@ -141,6 +161,26 @@ class _SearchPageState extends State<SearchPage> {
     _disposeAudioPlayer();
 
     super.dispose();
+  }
+
+  int _findNextValidAudioIndex(int currentIndex) {
+    for (int i = currentIndex + 1; i < _filteredData.length; i++) {
+      final audio = _filteredData[i][5].toString();
+      if (audio.isNotEmpty && audio != '/') {
+        return i;
+      }
+    }
+    return -1; // No next valid audio found
+  }
+
+  int _findPreviousValidAudioIndex(int currentIndex) {
+    for (int i = currentIndex - 1; i >= 0; i--) {
+      final audio = _filteredData[i][5].toString();
+      if (audio.isNotEmpty && audio != '/') {
+        return i;
+      }
+    }
+    return -1; // No previous valid audio found
   }
 
   void _downloadAudio(String urlAudio) async {
@@ -541,13 +581,11 @@ class _SearchPageState extends State<SearchPage> {
                                             IconButton(
                                               icon: Icon(Icons.skip_previous),
                                               onPressed: () {
-                                                if (index > 0) {
-                                                  final previousAudio =
-                                                      _filteredData[index -
-                                                              1][5]
-                                                          .toString();
+                                                final previousIndex = _findPreviousValidAudioIndex(index);
+                                                if (previousIndex != -1) {
+                                                  final previousAudio = _filteredData[previousIndex][5].toString();
                                                   _playPauseAudio(
-                                                    index - 1,
+                                                    previousIndex,
                                                     previousAudio,
                                                   );
                                                 }
@@ -583,14 +621,11 @@ class _SearchPageState extends State<SearchPage> {
                                             IconButton(
                                               icon: Icon(Icons.skip_next),
                                               onPressed: () {
-                                                if (index <
-                                                    _filteredData.length - 1) {
-                                                  final nextAudio =
-                                                      _filteredData[index +
-                                                              1][5]
-                                                          .toString();
+                                                final nextIndex = _findNextValidAudioIndex(index);
+                                                if (nextIndex != -1) {
+                                                  final nextAudio = _filteredData[nextIndex][5].toString();
                                                   _playPauseAudio(
-                                                    index + 1,
+                                                    nextIndex,
                                                     nextAudio,
                                                   );
                                                 }
@@ -649,24 +684,28 @@ class _SearchPageState extends State<SearchPage> {
                                 ],
                               )
                             : null,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DetailPage(
-                                id: id,
-                                title: title,
-                                details: detailLink,
-                                category: category,
-                                audio: audio,
-                                searchTerm: _searchTerm,
-                                onFavoriteChanged: () {
-                                  // Update data when favorite state changes
-                                  fetchData(_searchTerm);
-                                },
+                        onTap: () async {
+                          {
+                            if (audio != '/') {
+                              await _playPauseAudio(index, audio);
+                            }
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DetailPage(
+                                  id: id,
+                                  title: title,
+                                  details: detailLink,
+                                  category: category,
+                                  audio: audio,
+                                  searchTerm: _searchTerm,
+                                  onFavoriteChanged: () {
+                                    fetchData(_searchTerm);
+                                  },
+                                ),
                               ),
-                            ),
-                          );
+                            );
+                          }
                         },
                       ),
                     ),
@@ -692,7 +731,7 @@ class _SearchPageState extends State<SearchPage> {
                 );
               },
               tooltip: 'ອ່ານປຶ້ມ',
-                backgroundColor: Colors.brown,
+              backgroundColor: Colors.brown,
               child: const Icon(
                 Icons.auto_stories_outlined,
                 color: Colors.white,

@@ -3,9 +3,12 @@
 <plist version="1.0">
 <dict>
 	<key>NSAppTransportSecurity</key>
-     <key>NSAllowsArbitraryLoads</key>
-     <key>NSLocalNetworkUsageDescription</key>
-     <string>Allow access to the local network for debugging and hot reload.</string>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSLocalNetworkUsageDescription</key>
+		<string>Allow access to the local network for debugging and hot reload.</string>
+	</dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
