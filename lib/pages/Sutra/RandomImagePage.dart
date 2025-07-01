@@ -1,16 +1,47 @@
-// ignore_for_file: file_names, prefer_const_constructors
+// ignore_for_file: file_names, prefer_const_constructors, library_private_types_in_public_api, use_build_context_synchronously
 
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-
 import '../../main.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'dart:async';
 
-class RandomImagePage extends StatelessWidget {
+class RandomImagePage extends StatefulWidget {
   // Generate a random key for each instance to ensure it rebuilds
   final Key randomKey = ValueKey(Random().nextInt(10000));
 
   RandomImagePage({super.key});
+
+  @override
+  _RandomImagePageState createState() => _RandomImagePageState();
+}
+
+class _RandomImagePageState extends State<RandomImagePage> {
+  late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((
+      List<ConnectivityResult> results,
+    ) {
+      if (results.contains(ConnectivityResult.none)) {
+        // No internet connection, navigate to MyHomePage
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => MyHomePage(title: 'ພຣະສູດ & ສຽງ'),
+          ),
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,13 +61,9 @@ class RandomImagePage extends StatelessWidget {
               'assets/ເຫັນທຳ/loading_desktop_tablet.jpg',
             ];
 
-            List<String> tabletImages = [
-              'assets/ເຫັນທຳ/loading_mobile.jpg',
-            ];
+            List<String> tabletImages = ['assets/ເຫັນທຳ/loading_mobile.jpg'];
 
-            List<String> mobileImages = [
-              'assets/ເຫັນທຳ/loading_mobile.jpg',
-            ];
+            List<String> mobileImages = ['assets/ເຫັນທຳ/loading_mobile.jpg'];
 
             // Select the list of images based on the screen size
             List<String> selectedImages;
@@ -64,37 +91,6 @@ class RandomImagePage extends StatelessWidget {
                   height: imageHeight,
                   fit: BoxFit
                       .cover, // Ensures the image covers the entire screen
-                ),
-                Positioned(
-                  bottom: 50, // Position the button at the bottom center
-                  left: screenWidth / 2 - 142,
-                    child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(
-                        builder: (context) => MyHomePage(
-                        title: 'ພຣະສູດ & ສຽງ',
-                        ),
-                      ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.brown,
-                      padding:
-                        EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      foregroundColor: Colors.white, // Set text color to white
-                    ),
-                    child: Center(
-                      child: Text(
-                      'Skip Offline Mode (ໃຊ້ໂໝດອ໋ອບໄລນ໌)',
-                      style: TextStyle(
-                        fontSize: 15,
-                        letterSpacing: 0.5,
-                        color: Colors.white, // Ensure text is white
-                      ),
-                      ),
-                    ),
-                  ),
                 ),
               ],
             );

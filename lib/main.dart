@@ -3,7 +3,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:app_upgrade_flutter_sdk/app_upgrade_flutter_sdk.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -29,16 +28,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AppInfo appInfo = AppInfo(
-      appId: 'com.buddha.lao_tipitaka',
-      appName: 'buddha nature', // Your app name
-      appVersion: '5.0.0', // Your app version
-      platform: 'android', // App Platform, android or ios
-      environment:
-          'production', // Environment in which app is running, production, staging or development etc.
-      appLanguage: 'es', //Your app language ex: en, es etc. //Optional
-    );
-
     return ChangeNotifierProvider(
       create: (context) => ThemeProvider(),
       child: Consumer<ThemeProvider>(
@@ -61,18 +50,7 @@ class MyApp extends StatelessWidget {
             home: FutureBuilder<List<ConnectivityResult>>(
               future: Connectivity().checkConnectivity(),
               builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: RandomImagePage());
-                } else if (snapshot.hasData &&
-                    !snapshot.data!.contains(ConnectivityResult.none)) {
-                  return AppUpgradeAlert(
-                    xApiKey: 'ZmRmNjE3ZDQtZmQwYS00OTgxLWIzZjAtNGE5Mzk4YWU1ZTYx',
-                    appInfo: appInfo,
-                    child: const MyHomePage(title: ''),
-                  );
-                } else {
                   return const MyHomePage(title: 'ພຣະສູດ & ສຽງ');
-                }
               },
             ),
           );
