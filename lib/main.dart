@@ -386,24 +386,24 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _openLinkVideo() async {
-    if (await canLaunch('https://buddhaword.netlify.app/video')) {
-      await launch('https://buddhaword.netlify.app/video');
+    if (await canLaunch('https://buddha-nature.firebaseapp.com/video')) {
+      await launch('https://buddha-nature.firebaseapp.com/video');
     } else {
       throw 'Could not launch';
     }
   }
 
   void _openLinkCalendar() async {
-    if (await canLaunch('https://buddhaword.netlify.app/calendar')) {
-      await launch('https://buddhaword.netlify.app/calendar');
+    if (await canLaunch('https://buddha-nature.firebaseapp.com/calendar')) {
+      await launch('https://buddha-nature.firebaseapp.com/calendar');
     } else {
       throw 'Could not launch';
     }
   }
 
   void _openLinkBooks() async {
-    if (await canLaunch('https://buddhaword.netlify.app/book')) {
-      await launch('https://buddhaword.netlify.app/book');
+    if (await canLaunch('https://buddha-nature.firebaseapp.com/book')) {
+      await launch('https://buddha-nature.firebaseapp.com/book');
     } else {
       throw 'Could not launch';
     }

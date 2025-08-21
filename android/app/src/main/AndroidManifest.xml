@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.buddha.lao_tipitaka"
-    android:versionCode="55"
-    android:versionName="55"
+    android:versionCode="56"
+    android:versionName="56"
 >
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
