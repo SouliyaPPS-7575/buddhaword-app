@@ -899,7 +899,7 @@ class _BookReadingScreenPageState extends State<BookReadingScreenPage> {
     final currentTitle = getCurrentTitle();
 
     final currentRoute =
-        'https://buddha-nature.firebaseapp.com/sutra/details/${widget.filteredData[_currentPageIndex][0]}';
+        'https://buddhaword.net/sutra/details/${widget.filteredData[_currentPageIndex][0]}';
 
     final shareText = '$currentTitle\n $currentRoute';
 

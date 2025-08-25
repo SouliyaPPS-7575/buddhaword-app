@@ -232,7 +232,7 @@ class _BooksPageState extends State<BooksPage> {
   }
 
   void _shareAllBooksLink() {
-    const url = 'https://buddha-nature.firebaseapp.com/book';
+    const url = 'https://buddhaword.net/book';
 
     String? title = 'ປື້ມ & ເເຜນຜັງ';
 

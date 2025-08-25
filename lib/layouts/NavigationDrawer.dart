@@ -67,16 +67,16 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
   }
 
   void _openLinkVideo() async {
-    if (await canLaunch('https://buddha-nature.firebaseapp.com/video')) {
-      await launch('https://buddha-nature.firebaseapp.com/video');
+    if (await canLaunch('https://buddhaword.net/video')) {
+      await launch('https://buddhaword.net/video');
     } else {
       throw 'Could not launch';
     }
   }
 
   void _openLinkCalendar() async {
-    if (await canLaunch('https://buddha-nature.firebaseapp.com/calendar')) {
-      await launch('https://buddha-nature.firebaseapp.com/calendar');
+    if (await canLaunch('https://buddhaword.net/calendar')) {
+      await launch('https://buddhaword.net/calendar');
     } else {
       throw 'Could not launch';
     }
@@ -84,8 +84,8 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
 
 
   void _openLinkBooks() async {
-    if (await canLaunch('https://buddha-nature.firebaseapp.com/book')) {
-      await launch('https://buddha-nature.firebaseapp.com/book');
+    if (await canLaunch('https://buddhaword.net/book')) {
+      await launch('https://buddhaword.net/book');
     } else {
       throw 'Could not launch';
     }
