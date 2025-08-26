@@ -19,7 +19,7 @@ class ContactInfoPage extends StatelessWidget {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset('assets/buddha_nature_logo.png', height: 32),
+            Image.asset('assets/buddha_nature_logo.png', height: 44),
             const SizedBox(width: 10),
             const Text(
               'ຂໍ້​ມູນ​ຕິດ​ຕໍ່',
@@ -87,7 +87,7 @@ class ContactInfoPage extends StatelessWidget {
             children: [
               const SizedBox(height: 10),
               Center(
-                child: Image.asset('assets/buddha_nature_logo.png', width: 120),
+                child: Image.asset('assets/buddha_nature_logo.png', width: 220),
               ),
               const SizedBox(height: 20),
               Center(

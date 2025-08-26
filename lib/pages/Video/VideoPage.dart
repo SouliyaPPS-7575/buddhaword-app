@@ -722,7 +722,7 @@ class _VideoPageState extends State<VideoPage> {
                                                   } else {
                                                     // Asset doesn't exist, load default image
                                                     return Image.asset(
-                                                      'assets/default_image.png',
+                                                      'assets/default_image.jpg',
                                                       fit: BoxFit.cover,
                                                       width: double.infinity,
                                                       height: cardHeight,

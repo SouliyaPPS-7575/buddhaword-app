@@ -482,7 +482,7 @@ class _BooksPageState extends State<BooksPage> {
                                       : 'Unknown Title';
                                   final coverImageUrl = book.length > 1
                                       ? book[5]
-                                        : 'assets/default_image.png';
+                                        : 'assets/default_image.jpg';
 
                                   final linkOpen = book.length > 1
                                       ? book[4]
@@ -552,7 +552,7 @@ class _BooksPageState extends State<BooksPage> {
                                                     Object exception,
                                                     StackTrace? stackTrace) {
                                                   return Image.asset(
-                                                          'assets/default_image.png',
+                                                          'assets/default_image.jpg',
                                                         ); // A local placeholder image
                                                 },
                                               ),
