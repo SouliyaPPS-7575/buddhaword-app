@@ -47,14 +47,45 @@ class MyApp extends StatelessWidget {
             themeMode: themeProvider.isDarkMode
                 ? ThemeMode.dark
                 : ThemeMode.light,
-            home: FutureBuilder<List<ConnectivityResult>>(
-              future: Connectivity().checkConnectivity(),
-              builder: (context, snapshot) {
-                  return const MyHomePage(title: 'ພຣະສູດ & ສຽງ');
-              },
-            ),
+            initialRoute: '/splash',
+            routes: {
+              '/': (context) => const MyHomePage(title: 'ພຣະສູດ & ສຽງ'),
+              '/splash': (context) => const SplashScreen(),
+            },
           );
         },
+      ),
+    );
+  }
+}
+
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Delay then navigate to home
+    Future.delayed(const Duration(seconds: 2), () {
+      if (!mounted) return;
+      Navigator.of(context).pushReplacementNamed('/');
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [Image.asset('assets/buddha_nature_logo.png', width: 320)],
+        ),
       ),
     );
   }
@@ -385,21 +416,21 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void _openLinkVideo() async {
-    if (await canLaunch('https://buddhaword.net/video')) {
-      await launch('https://buddhaword.net/video');
-    } else {
-      throw 'Could not launch';
-    }
-  }
+  // void _openLinkVideo() async {
+  //   if (await canLaunch('https://buddhaword.net/video')) {
+  //     await launch('https://buddhaword.net/video');
+  //   } else {
+  //     throw 'Could not launch';
+  //   }
+  // }
 
-  void _openLinkCalendar() async {
-    if (await canLaunch('https://buddhaword.net/calendar')) {
-      await launch('https://buddhaword.net/calendar');
-    } else {
-      throw 'Could not launch';
-    }
-  }
+  // void _openLinkCalendar() async {
+  //   if (await canLaunch('https://buddhaword.net/calendar')) {
+  //     await launch('https://buddhaword.net/calendar');
+  //   } else {
+  //     throw 'Could not launch';
+  //   }
+  // }
 
   void _openLinkBooks() async {
     if (await canLaunch('https://buddhaword.net/book')) {
@@ -508,25 +539,19 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
         ),
-        title: const Text(
-          '',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            letterSpacing: 0.5,
-            fontSize: 16.0,
-          ),
+        title: Image.asset('assets/buddha_nature_logo.png', height: 36,
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.calendar_month, color: Colors.white),
-            onPressed: () => _openLinkCalendar(),
-          ),
-          const SizedBox(width: 10),
-          IconButton(
-            icon: const Icon(Icons.video_library, color: Colors.white),
-            onPressed: () => _openLinkVideo(),
-          ),
-          const SizedBox(width: 10),
+          // IconButton(
+          //   icon: const Icon(Icons.calendar_month, color: Colors.white),
+          //   onPressed: () => _openLinkCalendar(),
+          // ),
+          // const SizedBox(width: 10),
+          // IconButton(
+          //   icon: const Icon(Icons.video_library, color: Colors.white),
+          //   onPressed: () => _openLinkVideo(),
+          // ),
+          // const SizedBox(width: 10),
           IconButton(
             icon: const Icon(Icons.auto_stories_outlined, color: Colors.white),
             onPressed: () => _openLinkBooks(),
@@ -686,7 +711,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                   } else {
                                                     // Asset doesn't exist, load default image
                                                     return Image.asset(
-                                                      'assets/default_image.jpg',
+                                                      'assets/default_image.png',
                                                       fit: BoxFit.cover,
                                                       width: double.infinity,
                                                       height: cardHeight,

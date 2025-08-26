@@ -16,19 +16,25 @@ class ContactInfoPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.brown,
-        title: const Text(
-          'ຂໍ້​ມູນ​ຕິດ​ຕໍ່',
-          style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5, color: Colors.white,
-          ),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset('assets/buddha_nature_logo.png', height: 32),
+            const SizedBox(width: 10),
+            const Text(
+              'ຂໍ້​ມູນ​ຕິດ​ຕໍ່',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+                color: Colors.white,
+              ),
+            ),
+          ],
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () {
-            Navigator.pushNamedAndRemoveUntil(
-              context,
-              '/',
-              (route) => false,
-            );
+            Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
           },
         ),
         actions: [
@@ -79,6 +85,10 @@ class ContactInfoPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center, // Changed alignment
             children: [
+              const SizedBox(height: 10),
+              Center(
+                child: Image.asset('assets/buddha_nature_logo.png', width: 120),
+              ),
               const SizedBox(height: 20),
               Center(
                 child: const Text(
@@ -94,11 +104,41 @@ class ContactInfoPage extends StatelessWidget {
               const Text(
                 'ຕິດ​ຕໍ່​ພວກ​ເຮົາ',
                 style: TextStyle(
-                    fontSize: 30, // Increased font size
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5),
+                  fontSize: 30, // Increased font size
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
               ),
               const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.phone, color: Colors.brown),
+                    onPressed: () async {
+                      await launchWhatsApp('+8562056118850');
+                    },
+                  ),
+                  const SizedBox(width: 10),
+                  GestureDetector(
+                    onTap: () {
+                      Clipboard.setData(
+                        const ClipboardData(text: '+8562056118850'),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Phone number copied to clipboard'),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      '+8562056118850',
+                      style: TextStyle(fontSize: 20, letterSpacing: 0.5),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -112,7 +152,8 @@ class ContactInfoPage extends StatelessWidget {
                   GestureDetector(
                     onTap: () {
                       Clipboard.setData(
-                          const ClipboardData(text: '+8562078287509'));
+                        const ClipboardData(text: '+8562078287509'),
+                      );
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Phone number copied to clipboard'),
@@ -140,7 +181,8 @@ class ContactInfoPage extends StatelessWidget {
                   GestureDetector(
                     onTap: () {
                       Clipboard.setData(
-                          const ClipboardData(text: '+8562077801610'));
+                        const ClipboardData(text: '+8562077801610'),
+                      );
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Phone number copied to clipboard'),
@@ -154,90 +196,161 @@ class ContactInfoPage extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.email, color: Colors.brown),
-                    onPressed: () async {
-                      await launchEmail('souliyappsdev@gmail.com');
-                    },
-                  ),
-                  const SizedBox(width: 10),
-                  GestureDetector(
-                    onTap: () {
-                      Clipboard.setData(
-                          const ClipboardData(text: 'souliyappsdev@gmail.com'));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Email copied to clipboard'),
-                        ),
-                      );
-                    },
-                    child: const Text(
-                      'souliyappsdev@gmail.com',
-                      style: TextStyle(fontSize: 20, letterSpacing: 0.5),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.email, color: Colors.brown),
-                    onPressed: () async {
-                      await launchEmail('Katiya921@gmail.com');
-                    },
-                  ),
-                  const SizedBox(width: 10),
-                  GestureDetector(
-                    onTap: () {
-                      Clipboard.setData(
-                          const ClipboardData(text: 'Katiya921@gmail.com'));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Email copied to clipboard'),
-                        ),
-                      );
-                    },
-                    child: const Text(
-                      'Katiya921@gmail.com',
-                      style: TextStyle(fontSize: 20, letterSpacing: 0.5),
-                    ),
-                  ),
-                ],
-              ),
+              // const SizedBox(height: 10),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              //   children: [
+              //     IconButton(
+              //       icon: const Icon(Icons.email, color: Colors.brown),
+              //       onPressed: () async {
+              //         await launchEmail('souliyappsdev@gmail.com');
+              //       },
+              //     ),
+              //     const SizedBox(width: 10),
+              //     GestureDetector(
+              //       onTap: () {
+              //         Clipboard.setData(
+              //             const ClipboardData(text: 'souliyappsdev@gmail.com'));
+              //         ScaffoldMessenger.of(context).showSnackBar(
+              //           const SnackBar(
+              //             content: Text('Email copied to clipboard'),
+              //           ),
+              //         );
+              //       },
+              //       child: const Text(
+              //         'souliyappsdev@gmail.com',
+              //         style: TextStyle(fontSize: 20, letterSpacing: 0.5),
+              //       ),
+              //     ),
+              //   ],
+              // ),
+              // const SizedBox(height: 10),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              //   children: [
+              //     IconButton(
+              //       icon: const Icon(Icons.email, color: Colors.brown),
+              //       onPressed: () async {
+              //         await launchEmail('Katiya921@gmail.com');
+              //       },
+              //     ),
+              //     const SizedBox(width: 10),
+              //     GestureDetector(
+              //       onTap: () {
+              //         Clipboard.setData(
+              //           const ClipboardData(text: 'Katiya921@gmail.com'),
+              //         );
+              //         ScaffoldMessenger.of(context).showSnackBar(
+              //           const SnackBar(
+              //             content: Text('Email copied to clipboard'),
+              //           ),
+              //         );
+              //       },
+              //       child: const Text(
+              //         'Katiya921@gmail.com',
+              //         style: TextStyle(fontSize: 20, letterSpacing: 0.5),
+              //       ),
+              //     ),
+              //   ],
+              // ),
               const SizedBox(height: 20),
               const Text(
                 'Follow Us',
                 style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5),
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
               ),
               const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.center, // Centered follow icons
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   GestureDetector(
-                    onTap: () {
-                      _launchFacebookURL();
+                    onTap: () async {
+                      await launchWebUrl('https://web.facebook.com/watdanpra');
                     },
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
                         Icon(Icons.facebook, color: Colors.blue),
                         SizedBox(width: 10),
                         Text(
-                          'Facebook',
+                          'ວັດປ່າດານພຣະ',
                           style: TextStyle(
-                              fontSize: 20,
-                              color: Colors.blue,
-                              letterSpacing:
-                                  0.5), // Increased font size and changed color
+                            fontSize: 20,
+                            color: Colors.blue,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  GestureDetector(
+                    onTap: () async {
+                      await launchWebUrl(
+                        'https://web.facebook.com/dhammakonnon',
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.facebook, color: Colors.blue),
+                        SizedBox(width: 10),
+                        Text(
+                          'ທັມມະກ່ອນນອນ',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.blue,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  GestureDetector(
+                    onTap: () async {
+                      await launchWebUrl(
+                        'https://web.facebook.com/watpavimokkhavanaram.la',
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.facebook, color: Colors.blue),
+                        SizedBox(width: 10),
+                        Text(
+                          'ຕະຖາຄົຕພາສິຕ',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.blue,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  GestureDetector(
+                    onTap: () async {
+                      await launchWebUrl(
+                        'https://www.facebook.com/profile.php?id=100077638042542',
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.facebook, color: Colors.blue),
+                        SizedBox(width: 10),
+                        Text(
+                          'ຄຳສອນພຣະພຸດທະເຈົ້າ',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.blue,
+                            letterSpacing: 0.5,
+                          ),
                         ),
                       ],
                     ),
@@ -252,8 +365,7 @@ class ContactInfoPage extends StatelessWidget {
   }
 }
 
-void _launchFacebookURL() async {
-  const url = 'https://www.facebook.com/profile.php?id=100077638042542';
+Future<void> launchWebUrl(String url) async {
   if (await canLaunch(url)) {
     await launch(url, forceSafariVC: false, forceWebView: false);
   } else {
@@ -271,10 +383,7 @@ Future<void> launchWhatsApp(String phoneNumber) async {
 }
 
 Future<void> launchEmail(String email) async {
-  final Uri emailLaunchUri = Uri(
-    scheme: 'mailto',
-    path: email,
-  );
+  final Uri emailLaunchUri = Uri(scheme: 'mailto', path: email);
   if (await canLaunch(emailLaunchUri.toString())) {
     await launch(emailLaunchUri.toString());
   } else {

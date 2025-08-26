@@ -82,7 +82,6 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
     }
   }
 
-
   void _openLinkBooks() async {
     if (await canLaunch('https://buddhaword.net/book')) {
       await launch('https://buddhaword.net/book');
@@ -90,7 +89,6 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
       throw 'Could not launch';
     }
   }
-
 
   void _openLinkEnglish() async {
     if (await canLaunch(urlEnglish)) {
@@ -438,16 +436,21 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
     await Future.delayed(Duration(seconds: 1)); // Add delay here
 
     try {
-      final response = await http.get(Uri.parse(
-          'https://sheets.googleapis.com/v4/spreadsheets/1mKtgmZ_Is4e6P3P5lvOwIplqx7VQ3amicgienGN9zwA/values/Sheet1!1:1000000?key=AIzaSyDFjIl-SEHUsgK0sjMm7x0awpf8tTEPQjs'));
+      final response = await http.get(
+        Uri.parse(
+          'https://sheets.googleapis.com/v4/spreadsheets/1mKtgmZ_Is4e6P3P5lvOwIplqx7VQ3amicgienGN9zwA/values/Sheet1!1:1000000?key=AIzaSyDFjIl-SEHUsgK0sjMm7x0awpf8tTEPQjs',
+        ),
+      );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonResponse = json.decode(response.body);
         final List<dynamic> sheetValues =
             jsonResponse['values'] as List<dynamic>;
 
-        final List<List<dynamic>> values =
-            sheetValues.skip(1).map((row) => List<dynamic>.from(row)).toList();
+        final List<List<dynamic>> values = sheetValues
+            .skip(1)
+            .map((row) => List<dynamic>.from(row))
+            .toList();
 
         _data = values;
         prefs.setString('cachedData', json.encode(_data));
@@ -467,651 +470,700 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
     await fetchDataFromAPI();
 
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => MyHomePage(
-          title: '',
-        ),
-      ),
+      MaterialPageRoute(builder: (context) => MyHomePage(title: '')),
     );
   }
 
   @override
   Widget build(BuildContext context) => Drawer(
-        child: SingleChildScrollView(
-            child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            buildMenuItems(context),
-          ],
-        )),
-      );
+    child: SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[buildMenuItems(context)],
+      ),
+    ),
+  );
 
   Widget buildMenuItems(BuildContext context) => Container(
-        padding:
-            const EdgeInsets.only(top: 50, left: 24, right: 24, bottom: 24),
-        child: Wrap(
-          runSpacing: 0, //verticalSpacing
-          children: [
-            ListTile(
-              title: Row(
+    padding: const EdgeInsets.only(top: 50, left: 24, right: 24, bottom: 24),
+    child: Wrap(
+      runSpacing: 0, //verticalSpacing
+      children: [
+        ListTile(
+          title: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Add your logo images here
-                  Image.asset(
-                    'assets/buddha_nature_logo.png',
-                    fit: BoxFit.cover,
-                    width: 60,
+                  GestureDetector(
+                    onTap: () async {
+                      await _launchWebUrl('https://web.facebook.com/watdanpra');
+                    },
+                    child: Image.asset(
+                      'assets/buddha_nature_logo.png',
+                      fit: BoxFit.cover,
+                      width: 60,
+                    ),
                   ),
-                  SizedBox(width: 20), // Adjust the spacing between the logos
-                  Image.asset(
-                    'assets/tathakod_logo.png',
-                    fit: BoxFit.cover,
-                    width: 50,
+                  const SizedBox(width: 20),
+                  GestureDetector(
+                    onTap: () async {
+                      await _launchWebUrl(
+                        'https://web.facebook.com/dhammakonnon',
+                      );
+                    },
+                    child: Image.asset(
+                      'assets/dhammakonnon.png',
+                      fit: BoxFit.cover,
+                      width: 60,
+                    ),
                   ),
                 ],
               ),
-              onTap: () => {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => MyHomePage(
-                      title: '',
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      await _launchWebUrl(
+                        'https://web.facebook.com/watpavimokkhavanaram.la',
+                      );
+                    },
+                    child: Image.asset(
+                      'assets/tathakod_logo.png',
+                      fit: BoxFit.cover,
+                      width: 50,
                     ),
                   ),
-                ),
-              },
-            ),
-            ListTile(
-              leading: _isChecked
-                  ? Icon(Icons.library_books, color: _checkColor)
-                  : Icon(Icons.library_books_outlined, color: _checkColor),
-              title: const Text(
-                'ພຣະສູດ & ສຽງ',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              onTap: () => {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => MyHomePage(
-                      title: 'ພຣະສູດ & ສຽງ',
+                  const SizedBox(width: 20),
+                  GestureDetector(
+                    onTap: () async {
+                      await _launchWebUrl(
+                        'https://web.facebook.com/profile.php?id=100077638042542',
+                      );
+                    },
+                    child: Image.asset(
+                      'assets/buddha_nature_logo_old.png',
+                      fit: BoxFit.cover,
+                      width: 60,
                     ),
                   ),
-                ),
-              },
-            ),
-            ListTile(
-              leading: _isChecked
-                  ? Icon(Icons.favorite, color: _checkColor)
-                  : Icon(Icons.favorite, color: _checkColor),
-              title: const Text(
-                'ພຣະສູດທີຖືກໃຈ',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
-                ),
+                ],
               ),
-              onTap: () => {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => FavoritePage(),
-                  ),
-                ),
-              },
+            ],
+          ),
+          onTap: () => {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => MyHomePage(title: '')),
             ),
+          },
+        ),
+        ListTile(
+          leading: _isChecked
+              ? Icon(Icons.library_books, color: _checkColor)
+              : Icon(Icons.library_books_outlined, color: _checkColor),
+          title: const Text(
+            'ພຣະສູດ & ສຽງ',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
+            ),
+          ),
+          onTap: () => {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => MyHomePage(title: 'ພຣະສູດ & ສຽງ'),
+              ),
+            ),
+          },
+        ),
+        ListTile(
+          leading: _isChecked
+              ? Icon(Icons.favorite, color: _checkColor)
+              : Icon(Icons.favorite, color: _checkColor),
+          title: const Text(
+            'ພຣະສູດທີຖືກໃຈ',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
+            ),
+          ),
+          onTap: () => {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => FavoritePage()),
+            ),
+          },
+        ),
 
-            ListTile(
-              leading: _isChecked
-                  ? Icon(Icons.book, color: _checkColor)
-                  : Icon(Icons.book_outlined, color: _checkColor),
-              title: const Text(
-                'ປື້ມ & ເເຜນຜັງ',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
-                ),
-              ),
-            onTap: () => _openLinkBooks(),
+        ListTile(
+          leading: _isChecked
+              ? Icon(Icons.book, color: _checkColor)
+              : Icon(Icons.book_outlined, color: _checkColor),
+          title: const Text(
+            'ປື້ມ & ເເຜນຜັງ',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
             ),
+          ),
+          onTap: () => _openLinkBooks(),
+        ),
 
-            ListTile(
-              leading: _isChecked
-                  ? Icon(Icons.filter_vintage, color: _checkColor)
-                  : Icon(Icons.sunny, color: _checkColor),
-              title: const Text(
-                'ພຣະທັມ',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              onTap: () => _openLinkDhamma(),
+        ListTile(
+          leading: _isChecked
+              ? Icon(Icons.filter_vintage, color: _checkColor)
+              : Icon(Icons.sunny, color: _checkColor),
+          title: const Text(
+            'ພຣະທັມ',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
             ),
+          ),
+          onTap: () => _openLinkDhamma(),
+        ),
 
-            ListTile(
-              leading: _isChecked
-                  ? Icon(Icons.video_library, color: _checkColor)
-                  : Icon(Icons.video_collection_outlined, color: _checkColor),
-              title: const Text(
-                'ວີດີໂອ Video',
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5),
-              ),
-              onTap: () => _openLinkVideo(),
+        ListTile(
+          leading: _isChecked
+              ? Icon(Icons.video_library, color: _checkColor)
+              : Icon(Icons.video_collection_outlined, color: _checkColor),
+          title: const Text(
+            'ວີດີໂອ Video',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
             ),
+          ),
+          onTap: () => _openLinkVideo(),
+        ),
 
-             ListTile(
-              leading: _isChecked
-                  ? Icon(Icons.calendar_month, color: _checkColor)
-                  : Icon(Icons.calendar_month_outlined, color: _checkColor),
-              title: const Text(
-                'ປະຕິທິນທັມ',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              onTap: () => _openLinkCalendar(),
+        ListTile(
+          leading: _isChecked
+              ? Icon(Icons.calendar_month, color: _checkColor)
+              : Icon(Icons.calendar_month_outlined, color: _checkColor),
+          title: const Text(
+            'ປະຕິທິນທັມ',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
             ),
+          ),
+          onTap: () => _openLinkCalendar(),
+        ),
 
-            ListTile(
-              leading: _isChecked
-                  ? Icon(Icons.language, color: _checkColor)
-                  : Icon(Icons.language_outlined, color: _checkColor),
-              title: const Text(
-                'Buddhaword English',
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5),
-              ),
-              onTap: () => _openLinkEnglish(),
+        ListTile(
+          leading: _isChecked
+              ? Icon(Icons.language, color: _checkColor)
+              : Icon(Icons.language_outlined, color: _checkColor),
+          title: const Text(
+            'Buddhaword English',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
             ),
-            ListTile(
-              leading: _isChecked
-                  ? Icon(Icons.newspaper_outlined, color: _checkColor)
-                  : Icon(Icons.newspaper_rounded, color: _checkColor),
-              title: const Text(
-                'ຂ່າວສານ',
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5),
-              ),
-              onTap: () => _openLinkNews(),
+          ),
+          onTap: () => _openLinkEnglish(),
+        ),
+        ListTile(
+          leading: _isChecked
+              ? Icon(Icons.newspaper_outlined, color: _checkColor)
+              : Icon(Icons.newspaper_rounded, color: _checkColor),
+          title: const Text(
+            'ຂ່າວສານ',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
             ),
-            // ListTile(
-            //   leading: _isChecked
-            //       ? Icon(Icons.calendar_month, color: _checkColor)
-            //       : Icon(Icons.calendar_month_outlined, color: _checkColor),
-            //   title: const Text(
-            //     'ປະຕິທິນທັມ',
-            //     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: 0.5),
-            //   ),
-            //   onTap: () => _openLinkCalendar(),
-            // ),
-            ListTile(
-              leading: _isChecked
-                  ? Icon(Icons.message, color: _checkColor)
-                  : Icon(Icons.message_outlined, color: _checkColor),
-              title: const Text(
-                'ສົນທະນາ',
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5),
-              ),
-              onTap: () => _openLinkChat(),
+          ),
+          onTap: () => _openLinkNews(),
+        ),
+        // ListTile(
+        //   leading: _isChecked
+        //       ? Icon(Icons.calendar_month, color: _checkColor)
+        //       : Icon(Icons.calendar_month_outlined, color: _checkColor),
+        //   title: const Text(
+        //     'ປະຕິທິນທັມ',
+        //     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+        //   ),
+        //   onTap: () => _openLinkCalendar(),
+        // ),
+        ListTile(
+          leading: _isChecked
+              ? Icon(Icons.message, color: _checkColor)
+              : Icon(Icons.message_outlined, color: _checkColor),
+          title: const Text(
+            'ສົນທະນາ',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
             ),
-            ListTile(
-              leading: _isChecked
-                  ? Icon(Icons.chat_bubble_rounded, color: _checkColor)
-                  : Icon(Icons.chat_bubble_rounded, color: _checkColor),
-              title: const Text(
-                'ກຸ່ມສົນທະນາທັມ',
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5),
-              ),
-              onTap: () => _openLinkGroupChat(),
+          ),
+          onTap: () => _openLinkChat(),
+        ),
+        ListTile(
+          leading: _isChecked
+              ? Icon(Icons.chat_bubble_rounded, color: _checkColor)
+              : Icon(Icons.chat_bubble_rounded, color: _checkColor),
+          title: const Text(
+            'ກຸ່ມສົນທະນາທັມ',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
             ),
-            ListTile(
-              leading: _isChecked
-                  ? Icon(Icons.contact_page_outlined, color: _checkColor)
-                  : Icon(Icons.contact_page_outlined, color: _checkColor),
-              title: const Text(
-                'ຂໍ້ມູນຕິດຕໍ່',
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5),
-              ),
-              onTap: () => {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => ContactInfoPage(),
-                  ),
-                ),
-              },
+          ),
+          onTap: () => _openLinkGroupChat(),
+        ),
+        ListTile(
+          leading: _isChecked
+              ? Icon(Icons.contact_page_outlined, color: _checkColor)
+              : Icon(Icons.contact_page_outlined, color: _checkColor),
+          title: const Text(
+            'ຂໍ້ມູນຕິດຕໍ່',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
             ),
+          ),
+          onTap: () => {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => ContactInfoPage()),
+            ),
+          },
+        ),
 
-            ListTile(
-              leading: _isChecked
-                  ? Icon(Icons.refresh_outlined, color: _checkColor)
-                  : Icon(Icons.update_outlined, color: _checkColor),
-              title: const Text(
-                'ອັບເດດຂໍ້ມູນໃໝ່',
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5),
-              ),
-              onTap: _handleTap,
+        ListTile(
+          leading: _isChecked
+              ? Icon(Icons.refresh_outlined, color: _checkColor)
+              : Icon(Icons.update_outlined, color: _checkColor),
+          title: const Text(
+            'ອັບເດດຂໍ້ມູນໃໝ່',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
             ),
+          ),
+          onTap: _handleTap,
+        ),
 
+        ExpansionTile(
+          leading: Icon(
+            Icons.hearing,
+            color: const Color.fromARGB(241, 179, 93, 78),
+          ),
+          title: Text(
+            'ໝວດສຽງ',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
+            ),
+          ),
+          children: [
             ExpansionTile(
-              leading: Icon(Icons.hearing,
-                  color: const Color.fromARGB(241, 179, 93, 78)),
               title: Text(
-                'ໝວດສຽງ',
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5),
+                'ທັມໃນເບື້ອງຕົ້ນ',
+                style: TextStyle(fontSize: 18, letterSpacing: 0.5),
               ),
               children: [
-                ExpansionTile(
+                ListTile(
                   title: Text(
-                    'ທັມໃນເບື້ອງຕົ້ນ',
+                    'ຄະຣາວາດຊັ້ນເລີດ',
                     style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                   ),
-                  children: [
-                    ListTile(
-                      title: Text(
-                        'ຄະຣາວາດຊັ້ນເລີດ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openSoundKarawatSunlert(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ສາທະຍາຍທັມ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openLinkSathayaiytham(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ທານ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openLinkTarn(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ປະຖົມທັມ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openPathomtham(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ຄູ່ມືໂສດາບັນ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openSodabun(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ພຸດທະວະຈະນະ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openBuddhawajana(),
-                    ),
-                  ],
+                  onTap: () => _openSoundKarawatSunlert(),
                 ),
                 const Divider(
                   color: Color.fromARGB(255, 221, 220, 217),
                   thickness: 1,
                   height: 1,
                 ),
-                ExpansionTile(
+                ListTile(
                   title: Text(
-                    'ທັມໃນທ່າມກາງ',
+                    'ສາທະຍາຍທັມ',
                     style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                   ),
-                  children: [
-                    ListTile(
-                      title: Text(
-                        'ກໍາ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openurlKaekam(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ສະຕິປັຕຖານ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openurlStiputarn_4(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ອານາປານະສະຕິ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openurlRnapa(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ຂໍ້ປະຕິບັດວິ​ທີ​ທີ່​ງ່າຍ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openurlKorpatibutngaiy(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ອິນຊີສັງວອນ​',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openurlInseesungvone(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ຕາມຮອຍທັມ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openurlTarmhoytham(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ກ້າວຍ່າງຢ່າງພຸດທະ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openurlKaoyangyabuddha(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ຕາຖາຄົດ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openurlTatarkod(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ປະຕິບັດສະມາທະ&ວິປັດຊະນາ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openurlSmataviputsna(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ພົບພູມ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openurlpobpoum(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ເດຍລະສານວິຊາ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openurldaylasarnvisa(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ສະກະທາຄາມີ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openurlskatakarmi(),
-                    ),
-                  ],
+                  onTap: () => _openLinkSathayaiytham(),
                 ),
                 const Divider(
                   color: Color.fromARGB(255, 221, 220, 217),
                   thickness: 1,
                   height: 1,
                 ),
-                ExpansionTile(
+                ListTile(
                   title: Text(
-                    'ທັມໃນທີສຸດ',
+                    'ທານ',
                     style: TextStyle(fontSize: 18, letterSpacing: 0.5),
                   ),
-                  children: [
-                    ListTile(
-                      title: Text(
-                        'ຈິດ ມະໂນ ວິນຍານ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openurljitmanovinyarn(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ສັຕ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openurlzut(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ອະນາຄາມີ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openurlRnakarmi(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ສັງໂຢດ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openurlSangyort(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ອະຣິຍະສັດຈາກພຣະໂອດ ພາກຕົ້ນ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openurlpartton(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ອະຣິຍະສັດຈາກພຣະໂອດ ພາກປາຍ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openurlpartpaiy(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ພຸດທະປະຫວັດຈາກພຣະໂອດ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openurlphutapawat(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ປະຕິຈະສະມຸບາດຈາກພຣະໂອດ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openurlpatijasmobard(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ລວມພຸດທະວະຈະນະບັນລະຍາຍ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openurlluambunyaiy(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ລວມພຸດທະວະຈະນະໝວດອື່ນໆ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openurletc(),
-                    ),
-                    const Divider(
-                      color: Color.fromARGB(255, 221, 220, 217),
-                      thickness: 1,
-                      height: 1,
-                    ),
-                    ListTile(
-                      title: Text(
-                        'ລາຍການ FAQ ພຸດທະວະຈະນະຈາກພຣະໂອດ',
-                        style: TextStyle(fontSize: 18, letterSpacing: 0.5),
-                      ),
-                      onTap: () => _openurlFAQ(),
-                    ),
-                  ],
+                  onTap: () => _openLinkTarn(),
+                ),
+                const Divider(
+                  color: Color.fromARGB(255, 221, 220, 217),
+                  thickness: 1,
+                  height: 1,
+                ),
+                ListTile(
+                  title: Text(
+                    'ປະຖົມທັມ',
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+                  ),
+                  onTap: () => _openPathomtham(),
+                ),
+                const Divider(
+                  color: Color.fromARGB(255, 221, 220, 217),
+                  thickness: 1,
+                  height: 1,
+                ),
+                ListTile(
+                  title: Text(
+                    'ຄູ່ມືໂສດາບັນ',
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+                  ),
+                  onTap: () => _openSodabun(),
+                ),
+                const Divider(
+                  color: Color.fromARGB(255, 221, 220, 217),
+                  thickness: 1,
+                  height: 1,
+                ),
+                ListTile(
+                  title: Text(
+                    'ພຸດທະວະຈະນະ',
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+                  ),
+                  onTap: () => _openBuddhawajana(),
                 ),
               ],
             ),
-            // // Add a version number at the end
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.end,
-            //   children: const [
-            //     Text(
-            //       'Version 1.0.0', // Update version number as needed
-            //       style: TextStyle(
-            //         fontSize: 12, // Adjust the font size as needed
-            //         color: Colors.grey, // Adjust the color as needed
-            //       ),
-            //     ),
-            //   ],
-            // ),
+            const Divider(
+              color: Color.fromARGB(255, 221, 220, 217),
+              thickness: 1,
+              height: 1,
+            ),
+            ExpansionTile(
+              title: Text(
+                'ທັມໃນທ່າມກາງ',
+                style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+              ),
+              children: [
+                ListTile(
+                  title: Text(
+                    'ກໍາ',
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+                  ),
+                  onTap: () => _openurlKaekam(),
+                ),
+                const Divider(
+                  color: Color.fromARGB(255, 221, 220, 217),
+                  thickness: 1,
+                  height: 1,
+                ),
+                ListTile(
+                  title: Text(
+                    'ສະຕິປັຕຖານ',
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+                  ),
+                  onTap: () => _openurlStiputarn_4(),
+                ),
+                const Divider(
+                  color: Color.fromARGB(255, 221, 220, 217),
+                  thickness: 1,
+                  height: 1,
+                ),
+                ListTile(
+                  title: Text(
+                    'ອານາປານະສະຕິ',
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+                  ),
+                  onTap: () => _openurlRnapa(),
+                ),
+                const Divider(
+                  color: Color.fromARGB(255, 221, 220, 217),
+                  thickness: 1,
+                  height: 1,
+                ),
+                ListTile(
+                  title: Text(
+                    'ຂໍ້ປະຕິບັດວິ​ທີ​ທີ່​ງ່າຍ',
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+                  ),
+                  onTap: () => _openurlKorpatibutngaiy(),
+                ),
+                const Divider(
+                  color: Color.fromARGB(255, 221, 220, 217),
+                  thickness: 1,
+                  height: 1,
+                ),
+                ListTile(
+                  title: Text(
+                    'ອິນຊີສັງວອນ​',
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+                  ),
+                  onTap: () => _openurlInseesungvone(),
+                ),
+                const Divider(
+                  color: Color.fromARGB(255, 221, 220, 217),
+                  thickness: 1,
+                  height: 1,
+                ),
+                ListTile(
+                  title: Text(
+                    'ຕາມຮອຍທັມ',
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+                  ),
+                  onTap: () => _openurlTarmhoytham(),
+                ),
+                const Divider(
+                  color: Color.fromARGB(255, 221, 220, 217),
+                  thickness: 1,
+                  height: 1,
+                ),
+                ListTile(
+                  title: Text(
+                    'ກ້າວຍ່າງຢ່າງພຸດທະ',
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+                  ),
+                  onTap: () => _openurlKaoyangyabuddha(),
+                ),
+                const Divider(
+                  color: Color.fromARGB(255, 221, 220, 217),
+                  thickness: 1,
+                  height: 1,
+                ),
+                ListTile(
+                  title: Text(
+                    'ຕາຖາຄົດ',
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+                  ),
+                  onTap: () => _openurlTatarkod(),
+                ),
+                const Divider(
+                  color: Color.fromARGB(255, 221, 220, 217),
+                  thickness: 1,
+                  height: 1,
+                ),
+                ListTile(
+                  title: Text(
+                    'ປະຕິບັດສະມາທະ&ວິປັດຊະນາ',
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+                  ),
+                  onTap: () => _openurlSmataviputsna(),
+                ),
+                const Divider(
+                  color: Color.fromARGB(255, 221, 220, 217),
+                  thickness: 1,
+                  height: 1,
+                ),
+                ListTile(
+                  title: Text(
+                    'ພົບພູມ',
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+                  ),
+                  onTap: () => _openurlpobpoum(),
+                ),
+                const Divider(
+                  color: Color.fromARGB(255, 221, 220, 217),
+                  thickness: 1,
+                  height: 1,
+                ),
+                ListTile(
+                  title: Text(
+                    'ເດຍລະສານວິຊາ',
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+                  ),
+                  onTap: () => _openurldaylasarnvisa(),
+                ),
+                const Divider(
+                  color: Color.fromARGB(255, 221, 220, 217),
+                  thickness: 1,
+                  height: 1,
+                ),
+                ListTile(
+                  title: Text(
+                    'ສະກະທາຄາມີ',
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+                  ),
+                  onTap: () => _openurlskatakarmi(),
+                ),
+              ],
+            ),
+            const Divider(
+              color: Color.fromARGB(255, 221, 220, 217),
+              thickness: 1,
+              height: 1,
+            ),
+            ExpansionTile(
+              title: Text(
+                'ທັມໃນທີສຸດ',
+                style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+              ),
+              children: [
+                ListTile(
+                  title: Text(
+                    'ຈິດ ມະໂນ ວິນຍານ',
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+                  ),
+                  onTap: () => _openurljitmanovinyarn(),
+                ),
+                const Divider(
+                  color: Color.fromARGB(255, 221, 220, 217),
+                  thickness: 1,
+                  height: 1,
+                ),
+                ListTile(
+                  title: Text(
+                    'ສັຕ',
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+                  ),
+                  onTap: () => _openurlzut(),
+                ),
+                const Divider(
+                  color: Color.fromARGB(255, 221, 220, 217),
+                  thickness: 1,
+                  height: 1,
+                ),
+                ListTile(
+                  title: Text(
+                    'ອະນາຄາມີ',
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+                  ),
+                  onTap: () => _openurlRnakarmi(),
+                ),
+                const Divider(
+                  color: Color.fromARGB(255, 221, 220, 217),
+                  thickness: 1,
+                  height: 1,
+                ),
+                ListTile(
+                  title: Text(
+                    'ສັງໂຢດ',
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+                  ),
+                  onTap: () => _openurlSangyort(),
+                ),
+                const Divider(
+                  color: Color.fromARGB(255, 221, 220, 217),
+                  thickness: 1,
+                  height: 1,
+                ),
+                ListTile(
+                  title: Text(
+                    'ອະຣິຍະສັດຈາກພຣະໂອດ ພາກຕົ້ນ',
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+                  ),
+                  onTap: () => _openurlpartton(),
+                ),
+                const Divider(
+                  color: Color.fromARGB(255, 221, 220, 217),
+                  thickness: 1,
+                  height: 1,
+                ),
+                ListTile(
+                  title: Text(
+                    'ອະຣິຍະສັດຈາກພຣະໂອດ ພາກປາຍ',
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+                  ),
+                  onTap: () => _openurlpartpaiy(),
+                ),
+                const Divider(
+                  color: Color.fromARGB(255, 221, 220, 217),
+                  thickness: 1,
+                  height: 1,
+                ),
+                ListTile(
+                  title: Text(
+                    'ພຸດທະປະຫວັດຈາກພຣະໂອດ',
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+                  ),
+                  onTap: () => _openurlphutapawat(),
+                ),
+                const Divider(
+                  color: Color.fromARGB(255, 221, 220, 217),
+                  thickness: 1,
+                  height: 1,
+                ),
+                ListTile(
+                  title: Text(
+                    'ປະຕິຈະສະມຸບາດຈາກພຣະໂອດ',
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+                  ),
+                  onTap: () => _openurlpatijasmobard(),
+                ),
+                const Divider(
+                  color: Color.fromARGB(255, 221, 220, 217),
+                  thickness: 1,
+                  height: 1,
+                ),
+                ListTile(
+                  title: Text(
+                    'ລວມພຸດທະວະຈະນະບັນລະຍາຍ',
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+                  ),
+                  onTap: () => _openurlluambunyaiy(),
+                ),
+                const Divider(
+                  color: Color.fromARGB(255, 221, 220, 217),
+                  thickness: 1,
+                  height: 1,
+                ),
+                ListTile(
+                  title: Text(
+                    'ລວມພຸດທະວະຈະນະໝວດອື່ນໆ',
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+                  ),
+                  onTap: () => _openurletc(),
+                ),
+                const Divider(
+                  color: Color.fromARGB(255, 221, 220, 217),
+                  thickness: 1,
+                  height: 1,
+                ),
+                ListTile(
+                  title: Text(
+                    'ລາຍການ FAQ ພຸດທະວະຈະນະຈາກພຣະໂອດ',
+                    style: TextStyle(fontSize: 18, letterSpacing: 0.5),
+                  ),
+                  onTap: () => _openurlFAQ(),
+                ),
+              ],
+            ),
           ],
         ),
-      );
+        // // Add a version number at the end
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.end,
+        //   children: const [
+        //     Text(
+        //       'Version 1.0.0', // Update version number as needed
+        //       style: TextStyle(
+        //         fontSize: 12, // Adjust the font size as needed
+        //         color: Colors.grey, // Adjust the color as needed
+        //       ),
+        //     ),
+        //   ],
+        // ),
+      ],
+    ),
+  );
+
+  Future<void> _launchWebUrl(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url, forceSafariVC: false, forceWebView: false);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
 }
