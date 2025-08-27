@@ -18,12 +18,14 @@ android {
     ndkVersion = "27.0.12077973"
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        // Use Java 17 to avoid obsolete Java 8 warnings
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        // Align Kotlin bytecode target with Java 17
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
     defaultConfig {
