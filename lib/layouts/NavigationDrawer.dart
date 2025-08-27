@@ -476,91 +476,148 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
 
   @override
   Widget build(BuildContext context) => Drawer(
-    child: SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[buildMenuItems(context)],
+    child: Theme(
+      // Make tiles more compact vertically within the drawer only
+      data: Theme.of(
+        context,
+      ).copyWith(visualDensity: const VisualDensity(vertical: -2)),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[buildMenuItems(context)],
+        ),
       ),
     ),
   );
 
-  Widget buildMenuItems(BuildContext context) => Container(
-    padding: const EdgeInsets.only(top: 50, left: 24, right: 24, bottom: 24),
-    child: Wrap(
-      runSpacing: 0, //verticalSpacing
-      children: [
-        ListTile(
-          title: Column(
-            mainAxisSize: MainAxisSize.min,
+  Widget buildMenuItems(BuildContext context) {
+    // This variable controls the order of the logo grid and menu list.
+    // Set to true to show the logo grid at the top, false to show it at the bottom.
+    // You can change this manually
+
+    final logoGrid = Padding(
+      padding: const EdgeInsets.only(top: 10.0, bottom: 0.0),
+      child: Center(
+        child: SizedBox(
+          width: 280,
+          child: GridView.count(
+            crossAxisCount: 4,
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  GestureDetector(
-                    onTap: () async {
-                      await _launchWebUrl('https://web.facebook.com/watdanpra');
-                    },
-                    child: Image.asset(
-                      'assets/buddha_nature_logo.png',
-                      fit: BoxFit.cover,
-                      width: 60,
-                    ),
-                  ),
-                  const SizedBox(width: 20),
-                  GestureDetector(
-                    onTap: () async {
-                      await _launchWebUrl(
-                        'https://web.facebook.com/dhammakonnon',
-                      );
-                    },
-                    child: Image.asset(
-                      'assets/dhammakonnon.png',
-                      fit: BoxFit.cover,
-                      width: 60,
-                    ),
-                  ),
-                ],
+              GestureDetector(
+                onTap: () async {
+                  await _launchWebUrl('https://web.facebook.com/watdanpra');
+                },
+                child: Image.asset(
+                  'assets/buddha_nature_logo.png',
+                  fit: BoxFit.cover,
+                  width: 80,
+                  height: 80,
+                ),
               ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  GestureDetector(
-                    onTap: () async {
-                      await _launchWebUrl(
-                        'https://web.facebook.com/watpavimokkhavanaram.la',
-                      );
-                    },
-                    child: Image.asset(
-                      'assets/tathakod_logo.png',
-                      fit: BoxFit.cover,
-                      width: 50,
-                    ),
-                  ),
-                  const SizedBox(width: 20),
-                  GestureDetector(
-                    onTap: () async {
-                      await _launchWebUrl(
-                        'https://web.facebook.com/profile.php?id=100077638042542',
-                      );
-                    },
-                    child: Image.asset(
-                      'assets/buddha_nature_logo_old.png',
-                      fit: BoxFit.cover,
-                      width: 60,
-                    ),
-                  ),
-                ],
+              GestureDetector(
+                onTap: () async {
+                  await _launchWebUrl('https://web.facebook.com/dhammakonnon');
+                },
+                child: Image.asset(
+                  'assets/dhammakonnon.png',
+                  fit: BoxFit.cover,
+                  width: 80,
+                  height: 80,
+                ),
               ),
+              GestureDetector(
+                onTap: () async {
+                  await _launchWebUrl(
+                    'https://www.facebook.com/Sumittosumittabounsong',
+                  );
+                },
+                child: Image.asset(
+                  'assets/ຮຸ່ງເເສງເເຫ່ງທັມ.png',
+                  fit: BoxFit.cover,
+                  width: 80,
+                  height: 80,
+                ),
+              ),
+              GestureDetector(
+                onTap: () async {
+                  await _launchWebUrl(
+                    'https://web.facebook.com/watpavimokkhavanaram.la',
+                  );
+                },
+                child: Image.asset(
+                  'assets/tathakod_logo.png',
+                  fit: BoxFit.cover,
+                  width: 80,
+                  height: 80,
+                ),
+              ),
+              GestureDetector(
+                onTap: () async {
+                  await _launchWebUrl(
+                    'https://www.facebook.com/dhammalife.laos',
+                  );
+                },
+                child: Image.asset(
+                  'assets/ພຸທທະວົງສ໌.png',
+                  fit: BoxFit.cover,
+                  width: 80,
+                  height: 80,
+                ),
+              ),
+              GestureDetector(
+                onTap: () async {
+                  await _launchWebUrl(
+                    'https://www.facebook.com/profile.php?id=100091798479187',
+                  );
+                },
+                child: Image.asset(
+                  'assets/ວິນັຍສຸຄົຕ.png',
+                  fit: BoxFit.cover,
+                  width: 80,
+                  height: 80,
+                ),
+              ),
+              GestureDetector(
+                onTap: () async {
+                  await _launchWebUrl(
+                    'https://www.facebook.com/phouhuck.phousamnieng.7',
+                  );
+                },
+                child: Image.asset(
+                  'assets/ວັດບ້ານນາຈິກ.png',
+                  fit: BoxFit.cover,
+                  width: 80,
+                  height: 80,
+                ),
+              ),
+              GestureDetector(
+                onTap: () async {
+                  await _launchWebUrl(
+                    'https://web.facebook.com/profile.php?id=100077638042542',
+                  );
+                },
+                child: Image.asset(
+                  'assets/buddha_nature_logo_old.png',
+                  fit: BoxFit.cover,
+                  width: 80,
+                  height: 80,
+                ),
+              ),
+              // Add more logos here if needed
             ],
           ),
-          onTap: () => {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => MyHomePage(title: '')),
-            ),
-          },
         ),
+      ),
+    );
+
+    final menuList = Column(
+      children: [
         ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
           leading: _isChecked
               ? Icon(Icons.library_books, color: _checkColor)
               : Icon(Icons.library_books_outlined, color: _checkColor),
@@ -580,7 +637,9 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
             ),
           },
         ),
+        SizedBox(height: 8),
         ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
           leading: _isChecked
               ? Icon(Icons.favorite, color: _checkColor)
               : Icon(Icons.favorite, color: _checkColor),
@@ -598,8 +657,9 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
             ),
           },
         ),
-
+        SizedBox(height: 8),
         ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
           leading: _isChecked
               ? Icon(Icons.book, color: _checkColor)
               : Icon(Icons.book_outlined, color: _checkColor),
@@ -613,8 +673,9 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
           ),
           onTap: () => _openLinkBooks(),
         ),
-
+        SizedBox(height: 8),
         ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
           leading: _isChecked
               ? Icon(Icons.filter_vintage, color: _checkColor)
               : Icon(Icons.sunny, color: _checkColor),
@@ -628,8 +689,9 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
           ),
           onTap: () => _openLinkDhamma(),
         ),
-
+        SizedBox(height: 8),
         ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
           leading: _isChecked
               ? Icon(Icons.video_library, color: _checkColor)
               : Icon(Icons.video_collection_outlined, color: _checkColor),
@@ -643,8 +705,9 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
           ),
           onTap: () => _openLinkVideo(),
         ),
-
+        SizedBox(height: 8),
         ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
           leading: _isChecked
               ? Icon(Icons.calendar_month, color: _checkColor)
               : Icon(Icons.calendar_month_outlined, color: _checkColor),
@@ -658,8 +721,9 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
           ),
           onTap: () => _openLinkCalendar(),
         ),
-
+        SizedBox(height: 8),
         ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
           leading: _isChecked
               ? Icon(Icons.language, color: _checkColor)
               : Icon(Icons.language_outlined, color: _checkColor),
@@ -673,7 +737,9 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
           ),
           onTap: () => _openLinkEnglish(),
         ),
+        SizedBox(height: 8),
         ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
           leading: _isChecked
               ? Icon(Icons.newspaper_outlined, color: _checkColor)
               : Icon(Icons.newspaper_rounded, color: _checkColor),
@@ -687,17 +753,9 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
           ),
           onTap: () => _openLinkNews(),
         ),
-        // ListTile(
-        //   leading: _isChecked
-        //       ? Icon(Icons.calendar_month, color: _checkColor)
-        //       : Icon(Icons.calendar_month_outlined, color: _checkColor),
-        //   title: const Text(
-        //     'ປະຕິທິນທັມ',
-        //     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: 0.5),
-        //   ),
-        //   onTap: () => _openLinkCalendar(),
-        // ),
+        SizedBox(height: 8),
         ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
           leading: _isChecked
               ? Icon(Icons.message, color: _checkColor)
               : Icon(Icons.message_outlined, color: _checkColor),
@@ -711,7 +769,9 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
           ),
           onTap: () => _openLinkChat(),
         ),
+        SizedBox(height: 8),
         ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
           leading: _isChecked
               ? Icon(Icons.chat_bubble_rounded, color: _checkColor)
               : Icon(Icons.chat_bubble_rounded, color: _checkColor),
@@ -725,7 +785,9 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
           ),
           onTap: () => _openLinkGroupChat(),
         ),
+        SizedBox(height: 8),
         ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
           leading: _isChecked
               ? Icon(Icons.contact_page_outlined, color: _checkColor)
               : Icon(Icons.contact_page_outlined, color: _checkColor),
@@ -743,8 +805,9 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
             ),
           },
         ),
-
+        SizedBox(height: 8),
         ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
           leading: _isChecked
               ? Icon(Icons.refresh_outlined, color: _checkColor)
               : Icon(Icons.update_outlined, color: _checkColor),
@@ -758,8 +821,10 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
           ),
           onTap: _handleTap,
         ),
-
+        SizedBox(height: 8),
         ExpansionTile(
+          tilePadding: const EdgeInsets.symmetric(horizontal: 24),
+          childrenPadding: const EdgeInsets.symmetric(horizontal: 24),
           leading: Icon(
             Icons.hearing,
             color: const Color.fromARGB(241, 179, 93, 78),
@@ -774,6 +839,8 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
           ),
           children: [
             ExpansionTile(
+              tilePadding: const EdgeInsets.symmetric(horizontal: 0),
+              childrenPadding: const EdgeInsets.symmetric(horizontal: 0),
               title: Text(
                 'ທັມໃນເບື້ອງຕົ້ນ',
                 style: TextStyle(fontSize: 18, letterSpacing: 0.5),
@@ -854,6 +921,8 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
               height: 1,
             ),
             ExpansionTile(
+              tilePadding: const EdgeInsets.symmetric(horizontal: 0),
+              childrenPadding: const EdgeInsets.symmetric(horizontal: 0),
               title: Text(
                 'ທັມໃນທ່າມກາງ',
                 style: TextStyle(fontSize: 18, letterSpacing: 0.5),
@@ -1006,6 +1075,8 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
               height: 1,
             ),
             ExpansionTile(
+              tilePadding: const EdgeInsets.symmetric(horizontal: 0),
+              childrenPadding: const EdgeInsets.symmetric(horizontal: 0),
               title: Text(
                 'ທັມໃນທີສຸດ',
                 style: TextStyle(fontSize: 18, letterSpacing: 0.5),
@@ -1142,22 +1213,12 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
             ),
           ],
         ),
-        // // Add a version number at the end
-        // Row(
-        //   mainAxisAlignment: MainAxisAlignment.end,
-        //   children: const [
-        //     Text(
-        //       'Version 1.0.0', // Update version number as needed
-        //       style: TextStyle(
-        //         fontSize: 12, // Adjust the font size as needed
-        //         color: Colors.grey, // Adjust the color as needed
-        //       ),
-        //     ),
-        //   ],
-        // ),
+        SizedBox(height: 20),
       ],
-    ),
-  );
+    );
+
+    return Wrap(runSpacing: -10, children: [logoGrid, menuList]);
+  }
 
   Future<void> _launchWebUrl(String url) async {
     if (await canLaunch(url)) {

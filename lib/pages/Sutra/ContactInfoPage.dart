@@ -313,6 +313,29 @@ class ContactInfoPage extends StatelessWidget {
                   GestureDetector(
                     onTap: () async {
                       await launchWebUrl(
+                        'https://www.facebook.com/Sumittosumittabounsong',
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.facebook, color: Colors.blue),
+                        SizedBox(width: 10),
+                        Text(
+                          'ຮຸ່ງເເສງເເຫ່ງທັມ',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.blue,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  GestureDetector(
+                    onTap: () async {
+                      await launchWebUrl(
                         'https://web.facebook.com/watpavimokkhavanaram.la',
                       );
                     },
@@ -323,6 +346,76 @@ class ContactInfoPage extends StatelessWidget {
                         SizedBox(width: 10),
                         Text(
                           'ຕະຖາຄົຕພາສິຕ',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.blue,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+                  GestureDetector(
+                    onTap: () async {
+                      await launchWebUrl(
+                        'https://www.facebook.com/dhammalife.laos',
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.facebook, color: Colors.blue),
+                        SizedBox(width: 10),
+                        Text(
+                          'ພຸທທະວົງສ໌',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.blue,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  GestureDetector(
+                    onTap: () async {
+                      await launchWebUrl(
+                        'https://www.facebook.com/profile.php?id=100091798479187',
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.facebook, color: Colors.blue),
+                        SizedBox(width: 10),
+                        Text(
+                          'ວິນັຍສຸຄົຕ',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.blue,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  GestureDetector(
+                    onTap: () async {
+                      await launchWebUrl(
+                        'https://www.facebook.com/phouhuck.phousamnieng.7',
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.facebook, color: Colors.blue),
+                        SizedBox(width: 10),
+                        Text(
+                          'ວັດບ້ານນາຈິກ',
                           style: TextStyle(
                             fontSize: 20,
                             color: Colors.blue,
@@ -355,6 +448,7 @@ class ContactInfoPage extends StatelessWidget {
                       ],
                     ),
                   ),
+                  const SizedBox(height: 15),
                 ],
               ),
             ],
