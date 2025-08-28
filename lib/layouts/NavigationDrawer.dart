@@ -616,6 +616,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
 
     final menuList = Column(
       children: [
+        SizedBox(height: 4),
         ListTile(
           contentPadding: const EdgeInsets.symmetric(horizontal: 24),
           leading: _isChecked
