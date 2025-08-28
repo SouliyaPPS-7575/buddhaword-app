@@ -101,15 +101,127 @@ class ContactInfoPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
+              // Facebook pages as clickable logos
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      await launchWebUrl('https://web.facebook.com/watdanpra');
+                    },
+                    child: Image.asset(
+                      'assets/buddha_nature_logo.png',
+                      fit: BoxFit.cover,
+                      width: 80,
+                      height: 80,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      await launchWebUrl(
+                        'https://web.facebook.com/dhammakonnon',
+                      );
+                    },
+                    child: Image.asset(
+                      'assets/dhammakonnon.png',
+                      fit: BoxFit.cover,
+                      width: 80,
+                      height: 80,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      await launchWebUrl(
+                        'https://www.facebook.com/Sumittosumittabounsong',
+                      );
+                    },
+                    child: Image.asset(
+                      'assets/ຮຸ່ງເເສງເເຫ່ງທັມ.png',
+                      fit: BoxFit.cover,
+                      width: 80,
+                      height: 80,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      await launchWebUrl(
+                        'https://web.facebook.com/watpavimokkhavanaram.la',
+                      );
+                    },
+                    child: Image.asset(
+                      'assets/tathakod_logo.png',
+                      fit: BoxFit.cover,
+                      width: 80,
+                      height: 80,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      await launchWebUrl(
+                        'https://www.facebook.com/dhammalife.laos',
+                      );
+                    },
+                    child: Image.asset(
+                      'assets/ພຸທທະວົງສ໌.png',
+                      fit: BoxFit.cover,
+                      width: 80,
+                      height: 80,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      await launchWebUrl(
+                        'https://www.facebook.com/profile.php?id=100091798479187',
+                      );
+                    },
+                    child: Image.asset(
+                      'assets/ວິນັຍສຸຄົຕ.png',
+                      fit: BoxFit.cover,
+                      width: 80,
+                      height: 80,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      await launchWebUrl(
+                        'https://www.facebook.com/phouhuck.phousamnieng.7',
+                      );
+                    },
+                    child: Image.asset(
+                      'assets/ວັດບ້ານນາຈິກ.png',
+                      fit: BoxFit.cover,
+                      width: 80,
+                      height: 80,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      await launchWebUrl(
+                        'https://web.facebook.com/profile.php?id=100077638042542',
+                      );
+                    },
+                    child: Image.asset(
+                      'assets/buddha_nature_logo_old.png',
+                      fit: BoxFit.cover,
+                      width: 80,
+                      height: 80,
+                    ),
+                  ),
+                  // Add more logos here if needed
+                ],
+              ),
+              const SizedBox(height: 30),
               const Text(
-                'ຕິດ​ຕໍ່​ພວກ​ເຮົາ',
+                'ຕິດ​ຕໍ່',
                 style: TextStyle(
-                  fontSize: 30, // Increased font size
+                  fontSize: 24, // Increased font size
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
