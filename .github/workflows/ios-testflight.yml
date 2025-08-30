@@ -1,0 +1,86 @@
+name: iOS TestFlight
+
+on:
+  push:
+    tags:
+      - 'v*'
+      - 'ios-v*'
+
+jobs:
+  build-and-upload:
+    name: Build and Upload to TestFlight
+    runs-on: macos-14
+
+    env:
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      ASC_KEY_CONTENT: ${{ secrets.ASC_KEY_CONTENT }} # contents of .p8
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      APP_IDENTIFIER: com.buddha.laoTipitaka
+      TESTFLIGHT_WHATS_NEW: ${{ secrets.TESTFLIGHT_WHATS_NEW }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Install Ruby and Bundler
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: ios/fastlane
+
+      - name: Import signing certificate (P12)
+        uses: apple-actions/import-codesign-certs@v3
+        with:
+          p12-file-base64: ${{ secrets.CERT_P12_BASE64 }}
+          p12-password: ${{ secrets.CERT_P12_PASSWORD }}
+
+      - name: Install provisioning profile
+        uses: aknuds1/action-setup-provisioning-profile@v1
+        with:
+          provisioning-profile-base64: ${{ secrets.PROVISIONING_PROFILE_BASE64 }}
+
+      - name: Create App Store Connect API key file
+        id: asc_key
+        run: |
+          KEY_FILE="$RUNNER_TEMP/AuthKey.p8"
+          printf "%s" "$ASC_KEY_CONTENT" > "$KEY_FILE"
+          echo "key_file=$KEY_FILE" >> $GITHUB_OUTPUT
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Build IPA via Fastlane
+        working-directory: ios
+        run: |
+          bundle config set --local path 'vendor/bundle'
+          bundle install --quiet
+          bundle exec fastlane ios build_ipa
+
+      - name: Upload to TestFlight via Fastlane
+        env:
+          ASC_KEY_ID: ${{ env.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ env.ASC_ISSUER_ID }}
+          ASC_KEY_FILE: ${{ steps.asc_key.outputs.key_file }}
+          TESTFLIGHT_WHATS_NEW: ${{ env.TESTFLIGHT_WHATS_NEW }}
+        working-directory: ios
+        run: |
+          bundle exec fastlane ios upload_testflight
+
+    # Required secrets (configure in GitHub repo settings → Secrets and variables → Actions):
+    # - ASC_KEY_ID: App Store Connect API Key ID
+    # - ASC_ISSUER_ID: App Store Connect Issuer ID
+    # - ASC_KEY_CONTENT: Contents of AuthKey_XXXXXX.p8
+    # - CERT_P12_BASE64: Base64 of your iOS Distribution .p12 certificate
+    # - CERT_P12_PASSWORD: Password for the .p12
+    # - PROVISIONING_PROFILE_BASE64: Base64 of your App Store provisioning profile (.mobileprovision)
+    # Optional:
+    # - APPLE_TEAM_ID: Your Apple Team ID
+    # - TESTFLIGHT_WHATS_NEW: Release notes text
+

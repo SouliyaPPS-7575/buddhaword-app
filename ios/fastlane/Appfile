@@ -1,0 +1,7 @@
+# App Store Connect metadata for fastlane
+
+app_identifier("com.buddha.laoTipitaka")
+# Optional: set team if needed via env
+itc_team_id(ENV["ASC_TEAM_ID"]) if ENV["ASC_TEAM_ID"]
+team_id(ENV["ASC_TEAM_ID"]) if ENV["ASC_TEAM_ID"]
+

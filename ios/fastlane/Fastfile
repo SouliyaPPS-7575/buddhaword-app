@@ -1,0 +1,55 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Build and upload to TestFlight"
+  lane :beta do
+    build_ipa
+    upload_testflight
+  end
+
+  desc "Build IPA via Flutter"
+  lane :build_ipa do
+    sh "flutter --version"
+    sh "flutter clean"
+    sh "flutter pub get"
+    # Build the IPA; this generates to build/ios/ipa/*.ipa
+    # Build for App Store / TestFlight distribution
+    sh "flutter build ipa --export-method app-store"
+  end
+
+  desc "Upload last built IPA to TestFlight"
+  lane :upload_testflight do
+    # Expect App Store Connect API key credentials via env vars
+    key_id = ENV["ASC_KEY_ID"]
+    issuer_id = ENV["ASC_ISSUER_ID"]
+    key_file = ENV["ASC_KEY_FILE"]
+
+    unless key_id && issuer_id && key_file && File.exist?(key_file)
+      UI.user_error!("Missing ASC API key envs. Set ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_FILE (path to .p8)")
+    end
+
+    api_key = app_store_connect_api_key(
+      key_id: key_id,
+      issuer_id: issuer_id,
+      key_filepath: key_file,
+      duration: 1200,
+      in_house: false
+    )
+
+    # Find the most recent IPA from flutter build
+    ipa_candidates = Dir["build/ios/ipa/*.ipa"].sort_by { |p| File.mtime(p) }
+    UI.user_error!("No IPA found in build/ios/ipa. Run 'fastlane ios build_ipa' first.") if ipa_candidates.empty?
+    ipa_path = ipa_candidates.last
+    UI.message("Uploading IPA: #{ipa_path}")
+
+    pilot(
+      api_key: api_key,
+      ipa: ipa_path,
+      skip_submission: true,
+      skip_waiting_for_build_processing: false,
+      distribute_external: (ENV["TESTFLIGHT_DISTRIBUTE_EXTERNAL"] == "true"),
+      groups: (ENV["TESTFLIGHT_GROUPS"] || "").split(",").map(&:strip).reject(&:empty?),
+      changelog: ENV["TESTFLIGHT_WHATS_NEW"] || "Automated upload via Fastlane"
+    )
+  end
+end
