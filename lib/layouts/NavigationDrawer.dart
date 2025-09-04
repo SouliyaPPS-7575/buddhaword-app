@@ -1218,7 +1218,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
       ],
     );
 
-    return Wrap(runSpacing: 0, children: [logoGrid, menuList]);
+    return Wrap(runSpacing: 6, children: [logoGrid, menuList]);
   }
 
   Future<void> _launchWebUrl(String url) async {
