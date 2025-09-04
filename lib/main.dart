@@ -79,12 +79,56 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    // Approximate CSS: width: clamp(120px, 30vw, 300px)
+    final double logoWidth = (screenWidth * 0.30).clamp(120.0, 300.0);
+
+    const logos = <String>[
+      'assets/buddha_nature_logo.png',
+      'assets/dhammakonnon.png',
+      'assets/ຮຸ່ງເເສງເເຫ່ງທັມ.png',
+      'assets/tathakod_logo.png',
+      'assets/ພຸທທະວົງສ໌.png',
+      'assets/ວິນັຍສຸຄົຕ.png',
+      'assets/ວັດບ້ານນາຈິກ.png',
+      'assets/buddha_nature_logo_old.png',
+    ];
+
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [Image.asset('assets/default_image_old.jpg', width: 320)],
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Container width ~92vw like the CSS example
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: screenWidth * 0.92,
+                  ),
+                  child: Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: [
+                      for (final path in logos)
+                        Semantics(
+                          label: 'partner logo',
+                          image: true,
+                          child: Image.asset(
+                            path,
+                            width: logoWidth,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
