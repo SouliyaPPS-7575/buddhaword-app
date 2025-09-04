@@ -84,7 +84,7 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [Image.asset('assets/buddha_nature_logo.png', width: 320)],
+          children: [Image.asset('assets/default_image_old.jpg', width: 320)],
         ),
       ),
     );
@@ -711,7 +711,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                   } else {
                                                     // Asset doesn't exist, load default image
                                                     return Image.asset(
-                                                      'assets/default_image.jpg',
+                                                      'assets/default_image_old.jpg',
                                                       fit: BoxFit.cover,
                                                       width: double.infinity,
                                                       height: cardHeight,
