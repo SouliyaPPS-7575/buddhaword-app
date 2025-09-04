@@ -18,14 +18,14 @@ android {
     ndkVersion = "27.0.12077973"
 
     compileOptions {
-        // Use Java 17 to avoid obsolete Java 8 warnings
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        // Use Java 11 to avoid obsolete Java 8 warnings and keep plugins consistent
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        // Align Kotlin bytecode target with Java 17
-        jvmTarget = JavaVersion.VERSION_17.toString()
+        // Align Kotlin bytecode target with Java 11
+        jvmTarget = JavaVersion.VERSION_11.toString()
     }
 
     defaultConfig {
@@ -35,8 +35,8 @@ android {
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
-        versionCode = 62
-        versionName = "62.0.0"
+        versionCode = 63
+        versionName = "63.0.0"
     }
 
     signingConfigs {
